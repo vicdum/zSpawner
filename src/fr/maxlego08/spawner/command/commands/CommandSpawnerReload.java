@@ -2,20 +2,25 @@ package fr.maxlego08.spawner.command.commands;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.command.VCommand;
+import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 
-public class CommandTemplate extends VCommand {
+public class CommandSpawnerReload extends VCommand {
 
-	public CommandTemplate(SpawnerPlugin plugin) {
+	public CommandSpawnerReload(SpawnerPlugin plugin) {
 		super(plugin);
-		this.setPermission(Permission.EXAMPLE_PERMISSION);
-		this.addSubCommand(new CommandTemplateReload(plugin));
+		this.setPermission(Permission.EXAMPLE_PERMISSION_RELOAD);
+		this.addSubCommand("reload", "rl");
+		this.setDescription(Message.DESCRIPTION_RELOAD);
 	}
 
 	@Override
 	protected CommandType perform(SpawnerPlugin plugin) {
-		syntaxMessage();
+		
+		plugin.reloadFiles();
+		message(sender, Message.RELOAD);
+		
 		return CommandType.SUCCESS;
 	}
 

@@ -1,9 +1,11 @@
 package fr.maxlego08.spawner;
 
-import fr.maxlego08.spawner.command.commands.CommandTemplate;
+import fr.maxlego08.spawner.api.storage.IStorage;
+import fr.maxlego08.spawner.api.storage.SpawnerStorage;
+import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
-import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
+import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 
 /**
@@ -14,18 +16,28 @@ import fr.maxlego08.spawner.zcore.ZPlugin;
  */
 public class SpawnerPlugin extends ZPlugin {
 
+    private final SpawnerManager manager = new SpawnerManager(this);
+    private SpawnerStorage spawnerStorage;
+
     @Override
     public void onEnable() {
 
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
-        placeholder.setPrefix("template");
+        placeholder.setPrefix("zspawner");
 
         this.preEnable();
 
-        this.registerCommand("template", new CommandTemplate(this));
+        this.saveDefaultConfig();
 
-        this.addSave(Config.getInstance());
+        this.registerCommand("zspawner", new CommandSpawner(this), "spawner", "sp");
+
+        // this.addSave(Config.getInstance());
         this.addSave(new MessageLoader(this));
+
+        this.spawnerStorage = new StorageManager(this);
+        this.addSave(this.spawnerStorage);
+
+        this.addListener(new SpawnerListener(this));
 
         this.loadFiles();
 
@@ -42,4 +54,15 @@ public class SpawnerPlugin extends ZPlugin {
         this.postDisable();
     }
 
+    public SpawnerManager getManager() {
+        return manager;
+    }
+
+    public SpawnerStorage getSpawnerStorage() {
+        return this.spawnerStorage;
+    }
+
+    public IStorage getStorage() {
+        return this.spawnerStorage.getStorage();
+    }
 }

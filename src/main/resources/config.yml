@@ -1,0 +1,23 @@
+
+# Change the storage type of the plugin.
+#
+# Here are the types of storage available:
+# - SQLITE, use of a database, for large servers
+# - MYSQL, use of a database, for large servers
+#
+storage: SQLITE
+
+# Updates data every 120,000 milliseconds (2 minutes).
+# If the storage is in JSON, then the file will save
+# If the storage is SQLITE or MYSQL then the drawers will be updated if they need to be
+updateInterval: 120000
+
+# Configuration for SQLITE and MYSQL storage
+# Attention, storage in MYSQL is not yet available !
+sql:
+  tablePrefix: "zspawner"
+  user: homestead
+  password: secret
+  port: 3306
+  host: 192.168.10.10
+  database: zspawner

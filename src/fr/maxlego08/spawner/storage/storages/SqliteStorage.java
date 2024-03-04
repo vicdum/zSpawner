@@ -1,0 +1,204 @@
+package fr.maxlego08.spawner.storage.storages;
+
+import fr.maxlego08.spawner.SpawnerPlugin;
+import fr.maxlego08.spawner.ZSpawner;
+import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.storage.IStorage;
+import fr.maxlego08.spawner.zcore.ZPlugin;
+import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+public class SqliteStorage extends ZUtils implements IStorage {
+
+    private final String spawnerTableName;
+    private final Map<String, Spawner> spawners = new HashMap<>();
+    private final SpawnerPlugin plugin;
+    protected Connection connection;
+    private File databaseFile = null;
+
+    public SqliteStorage(SpawnerPlugin plugin, boolean createFile) {
+        this.plugin = plugin;
+
+        FileConfiguration configuration = plugin.getConfig();
+        String tablePrefix = configuration.getString("sql.tablePrefix", "zspawner");
+        this.spawnerTableName = tablePrefix + "_spawners";
+
+        if (createFile) {
+            this.databaseFile = new File(plugin.getDataFolder(), "database.db");
+            if (!databaseFile.exists()) {
+                try {
+                    databaseFile.createNewFile();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public Optional<Spawner> getSpawner(Location location) {
+        return Optional.ofNullable(this.spawners.getOrDefault(changeLocationToString(location), null));
+    }
+
+    @Override
+    public List<Spawner> getSpawners(int x, int z) {
+        return spawners.values().stream().filter(spawner -> spawner.sameChunk(x, z)).collect(Collectors.toList());
+    }
+
+    @Override
+    public long countSpawners(int x, int z) {
+        return spawners.values().stream().filter(spawner -> spawner.sameChunk(x, z)).count();
+    }
+
+    @Override
+    public void placeSpawner(Location location, Spawner spawner) {
+        this.spawners.put(changeLocationToString(location), spawner);
+        ZPlugin.service.execute(() -> this.upsertSpawner(spawner));
+    }
+
+    @Override
+    public void removeSpawner(Location location) {
+        Spawner spawner = this.spawners.remove(changeLocationToString(location));
+        if (spawner != null) ZPlugin.service.execute(() -> this.deleteSpawner(spawner));
+    }
+
+    @Override
+    public void load() {
+        ZPlugin.service.execute(() -> {
+
+            this.spawners.clear();
+
+            this.create();
+            this.getAllSpawners().forEach(spawner -> this.spawners.put(changeLocationToString(spawner.getLocation()), spawner));
+        });
+    }
+
+    @Override
+    public void save() {
+        this.update();
+        this.disconnect();
+    }
+
+    @Override
+    public void purge(World world, boolean destroyBlock) {
+        // ToDo
+    }
+
+    @Override
+    public void update() {
+        ZPlugin.service.execute(() -> this.spawners.values().stream().filter(Spawner::needUpdate).forEach(this::upsertSpawner));
+    }
+
+    public void disconnect() {
+        try {
+            if (isConnected()) connection.close();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private boolean isConnected() throws SQLException {
+        return connection != null && !connection.isClosed() && connection.isValid(1);
+    }
+
+    public void connection() {
+        try {
+            if (!isConnected()) {
+                connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public Connection getConnection() {
+        this.connection();
+        return connection;
+    }
+
+    public void create() {
+
+        String createSpawnersTableSQL = "CREATE TABLE IF NOT EXISTS " + this.spawnerTableName + " (" + "owner UUID, " + "spawnerId UUID, " + "location TEXT, " + "type TEXT, " + "placedAt LONG, " + "level TEXT, " + "entityType TEXT, " + "PRIMARY KEY (spawnerId), " + "UNIQUE(owner, spawnerId));";
+
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(createSpawnersTableSQL)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Could not create spawners table: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+    public void deleteSpawner(Spawner spawner) {
+        String sql = "DELETE FROM " + this.spawnerTableName + " WHERE spawnerId = ?";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawner.getSpawnerId().toString());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Error deleting spawner from SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+    public void upsertSpawner(Spawner spawner) {
+        spawner.update();
+        String sql = "INSERT INTO " + this.spawnerTableName + "(owner, spawnerId, location, type, placedAt, level, entityType) " + "VALUES(?,?,?,?,?,?,?) " + "ON CONFLICT(owner, spawnerId) DO UPDATE SET " + "location = EXCLUDED.location, " + "type = EXCLUDED.type, " + "placedAt = EXCLUDED.placedAt, " + "level = EXCLUDED.level, " + "entityType = EXCLUDED.entityType;";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawner.getOwner().toString());
+            preparedStatement.setString(2, spawner.getSpawnerId().toString());
+            preparedStatement.setString(3, changeLocationToString(spawner.getLocation()));
+            preparedStatement.setString(4, spawner.getType().toString());
+            preparedStatement.setLong(5, spawner.getPlacedAt());
+            preparedStatement.setString(6, spawner.getLevel().getName());
+            preparedStatement.setString(7, spawner.getEntityType().name());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Error upserting spawner in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+    public List<Spawner> getAllSpawners() {
+        List<Spawner> spawners = new ArrayList<>();
+        String sql = "SELECT * FROM " + this.spawnerTableName;
+        try (Statement statement = this.getConnection().createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+
+                UUID owner = UUID.fromString(resultSet.getString("owner"));
+                UUID spawnerId = UUID.fromString(resultSet.getString("spawnerId"));
+                String location = resultSet.getString("location");
+                String type = resultSet.getString("type");
+                long placedAt = resultSet.getLong("placedAt");
+                String level = resultSet.getString("level");
+                String entityType = resultSet.getString("entityType");
+
+                Spawner spawner = new ZSpawner(spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), changeStringLocationToLocation(location));
+                spawners.add(spawner);
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return spawners;
+    }
+
+
+}
