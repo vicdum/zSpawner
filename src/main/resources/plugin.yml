@@ -1,0 +1,8 @@
+name: zSpawner
+author: Maxlego08
+main: fr.maxlego08.spawner.SpawnerPlugin
+website: https://groupez.dev
+description: Default plugin developed by GroupeZ
+version: ${project.version}
+api-version: 1.13
+commands:
