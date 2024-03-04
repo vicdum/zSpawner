@@ -5,6 +5,7 @@ import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.save.MessageLoader;
+import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 
@@ -17,6 +18,7 @@ import fr.maxlego08.spawner.zcore.ZPlugin;
 public class SpawnerPlugin extends ZPlugin {
 
     private final SpawnerManager manager = new SpawnerManager(this);
+    private final StackableManager stackableManager = new StackableManager(this);
     private SpawnerStorage spawnerStorage;
 
     @Override
@@ -33,6 +35,7 @@ public class SpawnerPlugin extends ZPlugin {
 
         // this.addSave(Config.getInstance());
         this.addSave(new MessageLoader(this));
+        this.addSave(this.stackableManager);
 
         this.spawnerStorage = new StorageManager(this);
         this.addSave(this.spawnerStorage);
@@ -64,5 +67,9 @@ public class SpawnerPlugin extends ZPlugin {
 
     public IStorage getStorage() {
         return this.spawnerStorage.getStorage();
+    }
+
+    public StackableManager getStackableManager() {
+        return stackableManager;
     }
 }

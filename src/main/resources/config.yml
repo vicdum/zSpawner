@@ -21,3 +21,111 @@ sql:
   port: 3306
   host: 192.168.10.10
   database: zspawner
+
+stackableSpawner:
+
+  enable: false
+
+  limits:
+    - ALL: 5
+    - SKELETON: 10
+
+  blacklist:
+    - BLAZE
+
+  whitelist: []
+
+  name: '#e08a34x%amount% #cfe034%entity%'
+
+  levels:
+    - stackAmount: 1
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 5
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 2
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 6
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 3
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 7
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 4
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 8
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 5
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 9
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 6
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 10
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 7
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 11
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 8
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 12
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 9
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 13
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+    - stackAmount: 10
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 14
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+      potentialSpawns: []
+
