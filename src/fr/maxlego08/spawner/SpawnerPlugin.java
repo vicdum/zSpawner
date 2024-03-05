@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner;
 
+import fr.maxlego08.menu.api.ButtonManager;
+import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
@@ -20,6 +22,8 @@ public class SpawnerPlugin extends ZPlugin {
     private final SpawnerManager manager = new SpawnerManager(this);
     private final StackableManager stackableManager = new StackableManager(this);
     private SpawnerStorage spawnerStorage;
+    private InventoryManager inventoryManager;
+    private ButtonManager buttonManager;
 
     @Override
     public void onEnable() {
@@ -33,7 +37,11 @@ public class SpawnerPlugin extends ZPlugin {
 
         this.registerCommand("zspawner", new CommandSpawner(this), "spawner", "sp");
 
+        this.inventoryManager = getProvider(InventoryManager.class);
+        this.buttonManager = getProvider(ButtonManager.class);
+
         // this.addSave(Config.getInstance());
+        this.addSave(this.manager);
         this.addSave(new MessageLoader(this));
         this.addSave(this.stackableManager);
 
@@ -71,5 +79,13 @@ public class SpawnerPlugin extends ZPlugin {
 
     public StackableManager getStackableManager() {
         return stackableManager;
+    }
+
+    public ButtonManager getButtonManager() {
+        return buttonManager;
+    }
+
+    public InventoryManager getInventoryManager() {
+        return inventoryManager;
     }
 }

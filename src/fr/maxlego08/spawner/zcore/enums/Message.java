@@ -44,6 +44,10 @@ public enum Message {
     RELOAD("§aYou have just reloaded the configuration files."),
 
     DESCRIPTION_RELOAD("Reload configuration files"),
+    DESCRIPTION_GIVE("Give a spawner"),
+
+    GIVE_SENDER("§aYou just gave a spawner §f%entity% §8(§7%type%§8) §ato the player §e%target%§a."),
+    GIVE_PLAYER("§aYou just received a spawner at §f%entity%§a."),
 
     ;
 

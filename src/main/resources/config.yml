@@ -22,6 +22,30 @@ sql:
   host: 192.168.10.10
   database: zspawner
 
+items:
+  CLASSIC: # Classic spawner
+    material: SPAWNER
+    name: "&6&lSpawner &8- &f%type%"
+    lore:
+      - "&8Place the spawner on the ground"
+    flags:
+      - HIDE_POTION_EFFECTS
+  GUI: # Gui spawner
+    material: SPAWNER
+    name: "&6&lSpawner &8- &f%type%"
+    lore:
+      - "&8Place the spawner and find"
+      - "&8it in the &7/spawners"
+    flags:
+      - HIDE_POTION_EFFECTS
+  VIRTUAL: # Virtual spawner
+    material: SPAWNER
+    name: "&6&lSpawner &8- &f%type%"
+    lore:
+      - "&8Virtual spawner, place it to use it"
+    flags:
+      - HIDE_POTION_EFFECTS
+
 stackableSpawner:
 
   enable: false

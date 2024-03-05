@@ -11,6 +11,7 @@ public class CommandSpawner extends VCommand {
 		super(plugin);
 		this.setPermission(Permission.ZSPAWNER_USE);
 		this.addSubCommand(new CommandSpawnerReload(plugin));
+		this.addSubCommand(new CommandSpawnerGive(plugin));
 	}
 
 	@Override

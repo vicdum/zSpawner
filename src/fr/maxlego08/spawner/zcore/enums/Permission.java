@@ -3,9 +3,9 @@ package fr.maxlego08.spawner.zcore.enums;
 public enum Permission {
 
     ZSPAWNER_USE,
-	EXAMPLE_PERMISSION_RELOAD,
+    ZSPAWNER_RELOAD,
 
-	;
+	ZSPAWNER_GIVE;
 
 	private String permission;
 
