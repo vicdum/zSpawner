@@ -10,6 +10,15 @@ import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * System to create your plugins very simply Projet:

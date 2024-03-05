@@ -1,33 +1,28 @@
 package fr.maxlego08.spawner.stackable;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
-import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
+import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
-public class StackableManager extends ZUtils implements Savable {
+public class StackableManager extends YamlUtils implements Savable {
 
     private final SpawnerPlugin plugin;
     private final List<StackLevel> levels = new ArrayList<>();
+    private final Map<EntityType, Integer> limits = new HashMap<>();
     private boolean enable;
     private int globalLimit;
-    private final Map<EntityType, Integer> limits = new HashMap<>();
     private List<EntityType> blacklist = new ArrayList<>();
     private List<EntityType> whitelist = new ArrayList<>();
     private String hologram;
 
     public StackableManager(SpawnerPlugin plugin) {
+        super(plugin);
         this.plugin = plugin;
     }
 
@@ -60,8 +55,8 @@ public class StackableManager extends ZUtils implements Savable {
         }
 
 
-        blacklist = config.getStringList("stackableSpawner.blacklist").stream().map(EntityType::valueOf).collect(Collectors.toList());
-        whitelist = config.getStringList("stackableSpawner.whitelist").stream().map(EntityType::valueOf).collect(Collectors.toList());
+        blacklist = loadEntityList("stackableSpawner.blacklist");
+        whitelist = loadEntityList("stackableSpawner.whitelist");
         List<?> levelsList = config.getList("stackableSpawner.levels");
         this.levels.clear();
         if (levelsList != null) {
@@ -78,16 +73,7 @@ public class StackableManager extends ZUtils implements Savable {
 
     @Override
     public String toString() {
-        return "StackableManager{" +
-                "plugin=" + plugin +
-                ", levels=" + levels +
-                ", enable=" + enable +
-                ", globalLimit=" + globalLimit +
-                ", limits=" + limits +
-                ", blacklist=" + blacklist +
-                ", whitelist=" + whitelist +
-                ", hologram='" + hologram + '\'' +
-                '}';
+        return "StackableManager{" + "plugin=" + plugin + ", levels=" + levels + ", enable=" + enable + ", globalLimit=" + globalLimit + ", limits=" + limits + ", blacklist=" + blacklist + ", whitelist=" + whitelist + ", hologram='" + hologram + '\'' + '}';
     }
 
     public List<StackLevel> getLevels() {
