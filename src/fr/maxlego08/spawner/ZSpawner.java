@@ -136,6 +136,8 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         if (amount <= 1) disable();
         else this.spawnHologram();
+
+        this.updateHologram();
     }
 
     @Override
