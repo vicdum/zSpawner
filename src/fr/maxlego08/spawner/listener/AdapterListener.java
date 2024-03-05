@@ -61,8 +61,11 @@ public class AdapterListener extends ZUtils implements Listener {
                 .forEach(adapter -> adapter.onInventoryClick(event, (Player) event.getWhoClicked()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
+
+        if (event.isCancelled()) return;
+
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onBlockBreak(event, event.getPlayer()));
     }
 

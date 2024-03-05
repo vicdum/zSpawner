@@ -8,6 +8,7 @@ import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -92,11 +93,14 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
             this.create();
             this.getAllSpawners().forEach(spawner -> this.spawners.put(changeLocationToString(spawner.getLocation()), spawner));
+
+            Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.values().forEach(Spawner::load));
         });
     }
 
     @Override
     public void save() {
+        this.spawners.values().forEach(Spawner::disable);
         this.update();
         this.disconnect();
     }
@@ -140,7 +144,10 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     public void create() {
 
-        String createSpawnersTableSQL = "CREATE TABLE IF NOT EXISTS " + this.spawnerTableName + " (" + "owner UUID, " + "spawnerId UUID, " + "location TEXT, " + "type TEXT, " + "placedAt LONG, " + "level TEXT, " + "entityType TEXT, " + "PRIMARY KEY (spawnerId), " + "UNIQUE(owner, spawnerId));";
+        String createSpawnersTableSQL = "CREATE TABLE IF NOT EXISTS " + this.spawnerTableName + " (" + "owner UUID, " + "spawnerId UUID, " + "location TEXT, " + "type TEXT, " + "placedAt LONG, " + "level TEXT, " +
+                "entityType TEXT, " +
+                "amount INTEGER, " +
+                "PRIMARY KEY (spawnerId), " + "UNIQUE(owner, spawnerId));";
 
         try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(createSpawnersTableSQL)) {
             preparedStatement.executeUpdate();
@@ -161,7 +168,9 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     public void upsertSpawner(Spawner spawner) {
         spawner.update();
-        String sql = "INSERT INTO " + this.spawnerTableName + "(owner, spawnerId, location, type, placedAt, level, entityType) " + "VALUES(?,?,?,?,?,?,?) " + "ON CONFLICT(owner, spawnerId) DO UPDATE SET " + "location = EXCLUDED.location, " + "type = EXCLUDED.type, " + "placedAt = EXCLUDED.placedAt, " + "level = EXCLUDED.level, " + "entityType = EXCLUDED.entityType;";
+        String sql = "INSERT INTO " + this.spawnerTableName + "(owner, spawnerId, location, type, placedAt, level, entityType, amount) " + "VALUES(?,?,?,?,?,?,?,?) " + "ON CONFLICT(owner, spawnerId) DO UPDATE SET " + "location = EXCLUDED.location, " + "type = EXCLUDED.type, " + "placedAt = EXCLUDED.placedAt, " + "level = EXCLUDED.level, "
+                + "entityType = EXCLUDED.entityType, "
+                + "amount = EXCLUDED.amount;";
         try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, spawner.getOwner().toString());
             preparedStatement.setString(2, spawner.getSpawnerId().toString());
@@ -170,6 +179,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
             preparedStatement.setLong(5, spawner.getPlacedAt());
             preparedStatement.setString(6, spawner.getLevel().getName());
             preparedStatement.setString(7, spawner.getEntityType().name());
+            preparedStatement.setInt(8, spawner.getAmount());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             Logger.info("Error upserting spawner in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
@@ -190,8 +200,9 @@ public class SqliteStorage extends ZUtils implements IStorage {
                 long placedAt = resultSet.getLong("placedAt");
                 String level = resultSet.getString("level");
                 String entityType = resultSet.getString("entityType");
+                int amount = resultSet.getInt("amount");
 
-                Spawner spawner = new ZSpawner(spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), changeStringLocationToLocation(location));
+                Spawner spawner = new ZSpawner(this.plugin, spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), changeStringLocationToLocation(location), amount);
                 spawners.add(spawner);
             }
         } catch (SQLException exception) {

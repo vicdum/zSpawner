@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.stackable;
 
+import org.bukkit.block.CreatureSpawner;
+
 public class StackLevel {
     private final int stackAmount;
     private final int delay;
@@ -51,5 +53,17 @@ public class StackLevel {
 
     public int getSpawnRange() {
         return spawnRange;
+    }
+
+    public void updateSpawner(CreatureSpawner spawner) {
+
+        spawner.setDelay(this.delay);
+        spawner.setMinSpawnDelay(this.minSpawnDelay);
+        spawner.setMaxSpawnDelay(this.maxSpawnDelay);
+        spawner.setSpawnCount(this.spawnCount);
+        spawner.setMaxNearbyEntities(this.maxNearbyEntities);
+        spawner.setRequiredPlayerRange(this.requiredPlayerRange);
+        spawner.setSpawnRange(this.spawnRange);
+
     }
 }

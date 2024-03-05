@@ -30,4 +30,14 @@ public interface Spawner {
     void update();
 
     void place(Location location);
+
+    int getAmount();
+
+    void setAmount(int amount);
+
+    void updateSpawner();
+
+    void load();
+
+    void disable();
 }

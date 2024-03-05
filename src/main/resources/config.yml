@@ -26,8 +26,9 @@ stackableSpawner:
 
   enable: false
 
+  globalLimit: 5
+
   limits:
-    - ALL: 5
     - SKELETON: 10
 
   blacklist:
@@ -35,7 +36,7 @@ stackableSpawner:
 
   whitelist: []
 
-  name: '#e08a34x%amount% #cfe034%entity%'
+  hologram: '&6x%amount% &f%entity%'
 
   levels:
     - stackAmount: 1
@@ -46,7 +47,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 2
       delay: 200
       minSpawnDelay: 100
@@ -55,7 +55,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 3
       delay: 200
       minSpawnDelay: 100
@@ -64,7 +63,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 4
       delay: 200
       minSpawnDelay: 100
@@ -73,7 +71,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 5
       delay: 200
       minSpawnDelay: 100
@@ -82,7 +79,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 6
       delay: 200
       minSpawnDelay: 100
@@ -91,7 +87,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 7
       delay: 200
       minSpawnDelay: 100
@@ -100,7 +95,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 8
       delay: 200
       minSpawnDelay: 100
@@ -109,7 +103,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 9
       delay: 200
       minSpawnDelay: 100
@@ -118,7 +111,6 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
     - stackAmount: 10
       delay: 200
       minSpawnDelay: 100
@@ -127,5 +119,4 @@ stackableSpawner:
       maxNearbyEntities: 10
       requiredPlayerRange: 16
       spawnRange: 8
-      potentialSpawns: []
 
