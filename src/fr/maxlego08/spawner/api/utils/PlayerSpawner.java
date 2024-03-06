@@ -42,4 +42,8 @@ public class PlayerSpawner {
         this.placingSpawner = null;
         this.placingCooldown = 0;
     }
+
+    public void toggleSort() {
+        this.typeShort = this.typeShort.next();
+    }
 }

@@ -1,9 +1,11 @@
 package fr.maxlego08.spawner.api.storage;
 
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +33,5 @@ public interface IStorage {
 
     void update();
 
+    long countSpawners(Player player, SpawnerType spawnerType);
 }

@@ -116,6 +116,30 @@ public class SpawnerListener extends ListenerAdapter {
             optional.ifPresent(spawner -> {
 
                 event.setCancelled(true);
+
+                if (spawner.getType() != SpawnerType.CLASSIC) {
+
+                    if (spawner.getOwner().equals(player.getUniqueId())) {
+
+                        if (spawner.getType() == SpawnerType.GUI) {
+
+                            // TODO ajouter une option pour casser le spawner directement
+
+                            message(this.plugin, player, Message.BREAK_ERROR_GUI);
+                            return;
+                        }
+
+                        if (spawner.getType() == SpawnerType.VIRTUAL) {
+
+                            message(this.plugin, player, Message.BREAK_ERROR_VIRTUAL);
+                            return;
+                        }
+                    }
+
+                    message(this.plugin, player, Message.BREAK_ERROR_OTHER);
+                    return;
+                }
+
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType()));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {

@@ -14,6 +14,7 @@ import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
+import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
@@ -113,6 +114,7 @@ public class SpawnerManager extends YamlUtils implements Savable {
 
         ButtonManager buttonManager = this.plugin.getButtonManager();
         buttonManager.register(new NoneLoader(this.plugin, SpawnersButton.class, "zspawner_spawners"));
+        buttonManager.register(new NoneLoader(this.plugin, SortButton.class, "zspawner_sort"));
 
     }
 

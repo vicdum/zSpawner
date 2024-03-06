@@ -14,6 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,6 +125,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
     @Override
     public void update() {
         ZPlugin.service.execute(() -> this.spawners.stream().filter(Spawner::needUpdate).forEach(this::upsertSpawner));
+    }
+
+    @Override
+    public long countSpawners(Player player, SpawnerType spawnerType) {
+        return getSpawners(player).stream().filter(spawner -> spawner.getType() == spawnerType).count();
     }
 
     public void disconnect() {

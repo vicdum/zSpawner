@@ -1,3 +1,29 @@
+########################################################################################################################
+#
+#  ███████╗░██████╗██████╗░░█████╗░░██╗░░░░░░░██╗███╗░░██╗███████╗██████╗░
+#  ╚════██║██╔════╝██╔══██╗██╔══██╗░██║░░██╗░░██║████╗░██║██╔════╝██╔══██╗
+#  ░░███╔═╝╚█████╗░██████╔╝███████║░╚██╗████╗██╔╝██╔██╗██║█████╗░░██████╔╝
+#  ██╔══╝░░░╚═══██╗██╔═══╝░██╔══██║░░████╔═████║░██║╚████║██╔══╝░░██╔══██╗
+#  ███████╗██████╔╝██║░░░░░██║░░██║░░╚██╔╝░╚██╔╝░██║░╚███║███████╗██║░░██║
+#  ╚══════╝╚═════╝░╚═╝░░░░░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝░░╚══╝╚══════╝╚═╝░░╚═╝
+#
+# Commands:
+# /zspawners - zspawner.use - Open spawner gui
+# /zspawners reload - zspawner.reload - Reload configuration files
+# /zspawners give <type> <entity> <player> [<silent>] - zspawner.give - Give a spawner
+# /zspawners add <entity> <player> [<silent>] - zspawner.add - Add a spawner
+# /zspawners remove <entity> <player> [<silent>] - zspawner.remove - remove a spawner
+#
+# Placeholders:
+# %zspawner_sort% - Display player sort type
+# %zspawner_sort_name% - Display player sort name
+# %zspawner_gui_spawners% - Count GUI player spawners
+# %zspawner_virtual_spawners% - Count VIRTUAL player spawners
+# %zspawner_classic_spawners% - Count CLASSIC player spawners
+#
+########################################################################################################################
+
+
 # Change the storage type of the plugin.
 #
 # Here are the types of storage available:

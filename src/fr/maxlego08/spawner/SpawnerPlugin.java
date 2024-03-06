@@ -21,6 +21,7 @@ public class SpawnerPlugin extends ZPlugin {
 
     private final SpawnerManager manager = new SpawnerManager(this);
     private final StackableManager stackableManager = new StackableManager(this);
+    private final SpawnerPlaceholders spawnerPlaceholders = new SpawnerPlaceholders(this);
     private SpawnerStorage spawnerStorage;
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
@@ -52,6 +53,8 @@ public class SpawnerPlugin extends ZPlugin {
 
         this.manager.loadButtons();
         this.loadFiles();
+
+        this.spawnerPlaceholders.register();
 
         this.postEnable();
     }
