@@ -14,7 +14,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,6 +70,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
     @Override
     public List<Spawner> getSpawners(OfflinePlayer offlinePlayer) {
         return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Spawner> getSpawners(OfflinePlayer offlinePlayer, SpawnerType spawnerType) {
+        return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId()) && spawnerType == spawner.getType()).collect(Collectors.toList());
     }
 
     @Override
@@ -128,7 +130,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
     }
 
     @Override
-    public long countSpawners(Player player, SpawnerType spawnerType) {
+    public long countSpawners(OfflinePlayer player, SpawnerType spawnerType) {
         return getSpawners(player).stream().filter(spawner -> spawner.getType() == spawnerType).count();
     }
 

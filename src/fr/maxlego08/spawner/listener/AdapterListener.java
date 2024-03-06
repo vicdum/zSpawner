@@ -2,17 +2,16 @@ package fr.maxlego08.spawner.listener;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -146,21 +145,12 @@ public class AdapterListener extends ZUtils implements Listener {
     }
 
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
+    public void onExplode(EntityExplodeEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onBlockExplode(event.blockList()));
+    }
 
-        if (event.getEntity() instanceof LivingEntity && event.getDamager() instanceof LivingEntity) {
-            this.plugin.getListenerAdapters().forEach(adapter -> adapter.onDamageByEntity(event, event.getCause(),
-                    event.getDamage(), (LivingEntity) event.getDamager(), (LivingEntity) event.getEntity()));
-        }
-
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-            this.plugin.getListenerAdapters().forEach(adapter -> adapter.onPlayerDamagaByPlayer(event, event.getCause(),
-                    event.getDamage(), (Player) event.getDamager(), (Player) event.getEntity()));
-        }
-
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Projectile) {
-            this.plugin.getListenerAdapters().forEach(adapter -> adapter.onPlayerDamagaByArrow(event, event.getCause(),
-                    event.getDamage(), (Projectile) event.getDamager(), (Player) event.getEntity()));
-        }
+    @EventHandler
+    public void onExplode(BlockExplodeEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onBlockExplode(event.blockList()));
     }
 }

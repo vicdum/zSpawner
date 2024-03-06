@@ -28,6 +28,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.List;
+
 @SuppressWarnings("deprecation")
 public abstract class ListenerAdapter extends ZUtils {
 
@@ -101,5 +103,9 @@ public abstract class ListenerAdapter extends ZUtils {
 	}
 
 	protected void onPlayerWalk(PlayerMoveEvent event, Player player, int i) {
+	}
+
+	protected void onBlockExplode(List<Block> blocks) {
+
 	}
 }

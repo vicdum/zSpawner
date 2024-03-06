@@ -60,6 +60,7 @@ public enum Message {
     ADD_SENDER("§aYou just add a spawner §f%entity% §ato the player §e%target%§a."),
     ADD_PLAYER("§aYou just received a spawner at §f%entity%§a. §8(§7/zspawner§8)"),
 
+    BREAK_GUI("§aYour spawner is available in §f/zspawner§a."),
     BREAK_ERROR_GUI("§cUse §f/zspawner §cto break the spawner."),
     BREAK_ERROR_VIRTUAL("§cYou can’t break the spawner like this."),
     BREAK_ERROR_OTHER("§cYou can’t break this spawner."),

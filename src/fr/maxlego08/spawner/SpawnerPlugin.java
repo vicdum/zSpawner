@@ -6,6 +6,7 @@ import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
+import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
@@ -41,7 +42,6 @@ public class SpawnerPlugin extends ZPlugin {
         this.inventoryManager = getProvider(InventoryManager.class);
         this.buttonManager = getProvider(ButtonManager.class);
 
-        // this.addSave(Config.getInstance());
         this.addSave(this.manager);
         this.addSave(new MessageLoader(this));
         this.addSave(this.stackableManager);
@@ -51,6 +51,7 @@ public class SpawnerPlugin extends ZPlugin {
 
         this.addListener(new SpawnerListener(this));
 
+        Config.getInstance().load(this);
         this.manager.loadButtons();
         this.loadFiles();
 

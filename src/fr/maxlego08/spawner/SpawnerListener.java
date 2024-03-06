@@ -6,10 +6,12 @@ import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.listener.ListenerAdapter;
+import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -125,6 +127,12 @@ public class SpawnerListener extends ListenerAdapter {
 
                             // TODO ajouter une option pour casser le spawner directement
 
+                            if (Config.ownerCanBreakSpawner) {
+                                spawner.breakBlock();
+                                message(this.plugin, player, Message.BREAK_GUI);
+                                return;
+                            }
+
                             message(this.plugin, player, Message.BREAK_ERROR_GUI);
                             return;
                         }
@@ -143,8 +151,6 @@ public class SpawnerListener extends ListenerAdapter {
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType()));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {
-
-                    // ToDo drop du bon type de spawner
                     spawner.setAmount(spawner.getAmount() - 1);
                     return;
                 }
@@ -154,5 +160,46 @@ public class SpawnerListener extends ListenerAdapter {
                 storage.removeSpawner(spawner.getLocation());
             });
         }
+    }
+
+    @Override
+    protected void onBlockExplode(List<Block> blocks) {
+
+        if (!Config.checkSpawnerExplosion()) return;
+
+        IStorage storage = this.plugin.getStorage();
+
+        blocks.removeIf(block -> {
+
+            Optional<Spawner> optional = storage.getSpawner(block.getLocation());
+            if (optional.isPresent()) {
+                Spawner spawner = optional.get();
+                if (spawner.getType() == SpawnerType.VIRTUAL || Config.spawnerExplosion.get(spawner.getType())) {
+                    return true;
+                }
+
+                System.out.println(spawner.getType() +" - " + Config.spawnerDrop.getOrDefault(spawner.getType(), false));
+                if (Config.spawnerDrop.getOrDefault(spawner.getType(), false)) {
+
+                    spawner.breakBlock();
+                    storage.removeSpawner(spawner);
+
+                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType()));
+                    return false;
+                }
+            }
+
+            if (block.getType() == Material.SPAWNER && Config.disableNaturalSpawnerExplosion) {
+                return true;
+            }
+
+            if (block.getType() == Material.SPAWNER && Config.dropNaturalSpawnerOnExplose) {
+                CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, SpawnerType.CLASSIC, spawner.getSpawnedType()));
+                return false;
+            }
+
+            return false;
+        });
     }
 }

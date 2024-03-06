@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +34,7 @@ public interface IStorage {
 
     void update();
 
-    long countSpawners(Player player, SpawnerType spawnerType);
+    long countSpawners(OfflinePlayer player, SpawnerType spawnerType);
+
+    List<Spawner> getSpawners(OfflinePlayer player, SpawnerType spawnerType);
 }
