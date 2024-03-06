@@ -60,6 +60,12 @@ public enum Message {
     ADD_SENDER("§aYou just add a spawner §f%entity% §ato the player §e%target%§a."),
     ADD_PLAYER("§aYou just received a spawner at §f%entity%§a. §8(§7/zspawner§8)"),
 
+
+    PLACE_START("§aYou have §f1 §2minute §ato place the spawner in your land."),
+    PLACE_ERROR_BLACKLIST("§cYou cannot place a spawner on this block."),
+    PLACE_ERROR_LIMIT("§cYou cannot place more than §f%limit% §cspawners in a chunk."),
+    PLACE_SUCCESS("§aYou have just placed a spawner."),
+
     ;
 
     private List<String> messages;

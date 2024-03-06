@@ -3,9 +3,11 @@ package fr.maxlego08.spawner;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.storage.IStorage;
+import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -43,7 +45,7 @@ public class SpawnerListener extends ListenerAdapter {
         IStorage storage = this.plugin.getStorage();
         StackableManager stackableManager = this.plugin.getStackableManager();
 
-        if (stackableManager.isEnable()) {
+        if (stackableManager.isEnable() && spawnerType == SpawnerType.CLASSIC) {
 
             Block blockAgainst = event.getBlockAgainst();
             Optional<Spawner> optional = storage.getSpawner(blockAgainst.getLocation());
@@ -83,6 +85,28 @@ public class SpawnerListener extends ListenerAdapter {
     protected void onBlockBreak(BlockBreakEvent event, Player player) {
 
         Block block = event.getBlock();
+
+        SpawnerManager manager = this.plugin.getManager();
+        PlayerSpawner playerSpawner = manager.getPlayerSpawners().get(player.getUniqueId());
+        if (playerSpawner != null && playerSpawner.isPlacingSpawner()) {
+
+            event.setCancelled(true);
+
+            if (manager.getBlacklistMaterials().contains(block.getType())) {
+                message(this.plugin, player, Message.PLACE_ERROR_BLACKLIST);
+                return;
+            }
+
+            // Gérer la limite par chunk
+
+            Spawner spawner = playerSpawner.getPlacingSpawner();
+            playerSpawner.placeSpawner();
+            spawner.place(block.getLocation());
+            message(this.plugin, player, Message.PLACE_SUCCESS);
+
+            return;
+        }
+
         if (block.getType() == Material.SPAWNER) {
 
             IStorage storage = this.plugin.getStorage();

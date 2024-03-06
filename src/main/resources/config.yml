@@ -1,4 +1,3 @@
-
 # Change the storage type of the plugin.
 #
 # Here are the types of storage available:
@@ -58,7 +57,7 @@ stackableSpawner:
   blacklist:
     - BLAZE
 
-  whitelist: []
+  whitelist: [ ]
 
   hologram: '&6x%amount% &f%entity%'
 
@@ -226,3 +225,20 @@ entitiesMaterial:
   - IRON_GOLEM: IRON_INGOT
   - MUSHROOM_COW: RED_MUSHROOM
   - ILLUSIONER: BOW
+
+blacklistBlocks:
+  - CHEST
+  - DROPPER
+  - TRAPPED_CHEST
+  - CAULDRON
+  - FURNACE
+  - ENDER_CHEST
+  - BEDROCK
+  - BREWING_STAND
+  - DISPENSER
+  - OBSIDIAN
+  - SPAWNER
+  - DIAMOND_BLOCK
+  - GOLD_BLOCK
+  - IRON_BLOCK
+  - NETHERITE_BLOCK

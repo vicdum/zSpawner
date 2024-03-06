@@ -8,13 +8,16 @@ import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SpawnersButton extends ZButton implements PaginateButton {
 
@@ -31,7 +34,8 @@ public class SpawnersButton extends ZButton implements PaginateButton {
 
     @Override
     public void onRender(Player player, InventoryDefault inventory) {
-        List<Spawner> spawners = this.plugin.getStorage().getSpawners(player);
+        Sort sort = this.plugin.getManager().getPlayerSort(player);
+        List<Spawner> spawners = this.plugin.getStorage().getSpawners(player).stream().sorted(sort.getComparator()).collect(Collectors.toList());
         Pagination<Spawner> pagination = new Pagination<>();
         List<Spawner> paginatedSpawners = pagination.paginate(spawners, this.slots.size(), inventory.getPage());
 
@@ -54,10 +58,18 @@ public class SpawnersButton extends ZButton implements PaginateButton {
             placeholders.register("material", this.plugin.getManager().getEntitiesMaterials().getOrDefault(spawner.getEntityType(), "SPAWNER"));
 
             ItemStack itemStack = menuItemStack.build(player, false, placeholders);
-            inventory.addItem(slot, itemStack).setClick(event -> {
-
-            });
+            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawner, player, event));
         }
+    }
+
+    private void onClick(Spawner spawner, Player player, InventoryClickEvent event) {
+
+        if (spawner.isPlace()) {
+            this.plugin.getManager().breakSpawner(player, spawner);
+            return;
+        }
+
+        this.plugin.getManager().startPlacement(player, spawner);
     }
 
     @Override

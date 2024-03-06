@@ -206,4 +206,27 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void disable() {
         if (this.stackArmorstand != null) stackArmorstand.remove();
     }
+
+    @Override
+    public void breakBlock() {
+        if (!this.isPlace()) return;
+
+        this.location.getBlock().setType(Material.AIR);
+        this.location = null;
+        this.placedAt = 0;
+
+        if (this.stackArmorstand != null) stackArmorstand.remove();
+
+        this.needUpdate = true;
+    }
+
+    @Override
+    public int comparePlace() {
+        return isPlace() ? 1 : 0;
+    }
+
+    @Override
+    public int compareNotPlace() {
+        return isPlace() ? 0 : 1;
+    }
 }

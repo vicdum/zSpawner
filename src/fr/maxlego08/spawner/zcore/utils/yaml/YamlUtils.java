@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.zcore.utils.yaml;
 
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -108,6 +109,16 @@ public abstract class YamlUtils extends ZUtils {
         }
 
         return spawnerMaterials;
+    }
+
+    protected List<Material> loadBlacklist() {
+        return getConfig().getStringList("blacklistBlocks").stream().map(material -> {
+            try {
+                return Material.valueOf(material.toUpperCase());
+            } catch (Exception exception) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
 }

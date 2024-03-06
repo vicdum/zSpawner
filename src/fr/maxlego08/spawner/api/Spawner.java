@@ -40,4 +40,10 @@ public interface Spawner {
     void load();
 
     void disable();
+
+    void breakBlock();
+
+    int comparePlace();
+
+    int compareNotPlace();
 }

@@ -11,12 +11,15 @@ import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.enums.Sort;
+import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,9 +32,12 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class SpawnerManager extends YamlUtils implements Savable {
 
@@ -39,7 +45,9 @@ public class SpawnerManager extends YamlUtils implements Savable {
     private final NamespacedKey spawnerTypeKey;
     private final NamespacedKey spawnerEntityKey;
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
+    private final Map<UUID, PlayerSpawner> playerSpawners = new HashMap<>();
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
+    private List<Material> blacklistMaterials = new ArrayList<>();
 
     public SpawnerManager(SpawnerPlugin plugin) {
         super(plugin);
@@ -80,6 +88,7 @@ public class SpawnerManager extends YamlUtils implements Savable {
         }
 
         this.entitiesMaterials = loadEntityMaterials();
+        this.blacklistMaterials = loadBlacklist();
 
         this.loadInventories();
     }
@@ -160,5 +169,31 @@ public class SpawnerManager extends YamlUtils implements Savable {
 
     public Map<EntityType, String> getEntitiesMaterials() {
         return entitiesMaterials;
+    }
+
+    public void breakSpawner(Player player, Spawner spawner) {
+        spawner.breakBlock();
+        openSpawner(player);
+    }
+
+    public void startPlacement(Player player, Spawner spawner) {
+
+        player.closeInventory();
+        PlayerSpawner playerSpawner = this.playerSpawners.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
+        playerSpawner.setPlacingSpawner(spawner);
+        message(this.plugin, player, Message.PLACE_START);
+    }
+
+    public Map<UUID, PlayerSpawner> getPlayerSpawners() {
+        return playerSpawners;
+    }
+
+    public List<Material> getBlacklistMaterials() {
+        return blacklistMaterials;
+    }
+
+    public Sort getPlayerSort(Player player) {
+        PlayerSpawner playerSpawner = this.playerSpawners.get(player.getUniqueId());
+        return playerSpawner == null ? Sort.PLACE : playerSpawner.getTypeShort();
     }
 }
