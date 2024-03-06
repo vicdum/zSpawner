@@ -1222,4 +1222,21 @@ public abstract class ZUtils extends MessageUtils {
 		return false;
 	}
 
+	protected BlockFace getCardinalDirection(Player player) {
+		double rotation = (player.getLocation().getYaw() - 90) % 360;
+		if (rotation < 0) {
+			rotation += 360.0;
+		}
+
+		if (rotation > 45 && rotation <= 135) {
+			return BlockFace.NORTH;
+		} else if (rotation > 135 && rotation <= 225) {
+			return BlockFace.EAST;
+		} else if (rotation > 225 && rotation <= 315) {
+			return BlockFace.SOUTH;
+		} else {
+			return BlockFace.WEST;
+		}
+	}
+
 }

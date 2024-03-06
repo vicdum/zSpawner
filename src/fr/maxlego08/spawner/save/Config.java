@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.save;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.SpawnerType;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -22,6 +23,8 @@ public class Config {
     public static boolean ownerCanBreakSpawner = false;
     public static Map<SpawnerType, Boolean> spawnerExplosion = new HashMap<>();
     public static Map<SpawnerType, Boolean> spawnerDrop = new HashMap<>();
+    public static Material virtualMaterial = Material.LODESTONE;
+    public static String virtualName = "&6x%amount%";
 
     /**
      * static Singleton instance.
@@ -87,5 +90,8 @@ public class Config {
 
         spawnerDrop.put(SpawnerType.GUI, configuration.getBoolean("dropSpawnerOnExplose.GUI", false));
         spawnerDrop.put(SpawnerType.CLASSIC, configuration.getBoolean("dropSpawnerOnExplose.CLASSIC", false));
+
+        virtualMaterial = Material.valueOf(configuration.getString("virtual.material", "LODESTONE"));
+        virtualName = configuration.getString("virtual.name", "&6x%amount%");
     }
 }

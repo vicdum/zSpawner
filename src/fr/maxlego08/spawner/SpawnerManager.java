@@ -12,6 +12,7 @@ import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
+import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
@@ -20,8 +21,11 @@ import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,7 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SpawnerManager extends YamlUtils implements Savable {
+public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     private final SpawnerPlugin plugin;
     private final NamespacedKey spawnerTypeKey;
@@ -105,6 +109,7 @@ public class SpawnerManager extends YamlUtils implements Savable {
 
         try {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/gui/spawners.yml");
+            inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/virtual.yml");
         } catch (InventoryException exception) {
             exception.printStackTrace();
         }
@@ -160,7 +165,7 @@ public class SpawnerManager extends YamlUtils implements Savable {
 
     public void addSpawner(CommandSender sender, Player target, EntityType entityType, boolean silent) {
 
-        Spawner spawner = new ZSpawner(this.plugin, target.getUniqueId(), SpawnerType.GUI, entityType);
+        Spawner spawner = new ZSpawner(this.plugin, target.getUniqueId(), SpawnerType.GUI, entityType, BlockFace.NORTH);
         this.plugin.getStorage().addSpawner(spawner);
 
         message(this.plugin, sender, Message.ADD_SENDER, "%target%", target.getName(), "%entity%", name(entityType.name()));
@@ -197,5 +202,32 @@ public class SpawnerManager extends YamlUtils implements Savable {
     public Sort getPlayerSort(Player player) {
         PlayerSpawner playerSpawner = this.playerSpawners.get(player.getUniqueId());
         return playerSpawner == null ? Sort.PLACE : playerSpawner.getTypeShort();
+    }
+
+    public void openVirtualSpawner(Player player, Spawner spawner) {
+
+        PlayerSpawner playerSpawner = this.playerSpawners.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
+        playerSpawner.setVirtualSpawner(spawner);
+
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.openInventory(player, this.plugin, "virtual");
+    }
+
+    @Override
+    public void run() {
+
+        IStorage storage = this.plugin.getStorage();
+        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(Spawner::isChunkLoaded).forEach(spawner -> {
+
+            Location location = spawner.getLocation();
+            double distance = spawner.getDistance();
+            int playerCount = location.getWorld().getNearbyEntities(location, distance, distance, distance, entity -> entity instanceof Player).size();
+            if (playerCount > 0) spawner.tick();
+
+            // Todo
+            /*if (spawner.canAutoKill()){
+                spawner.autoKill();
+            }*/
+        });
     }
 }

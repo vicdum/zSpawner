@@ -8,6 +8,7 @@ public class PlayerSpawner {
     private Sort typeShort = Sort.PLACE;
     private long placingCooldown = 0;
     private Spawner placingSpawner;
+    private Spawner virtualSpawner;
 
     public Sort getTypeShort() {
         return typeShort;
@@ -45,5 +46,13 @@ public class PlayerSpawner {
 
     public void toggleSort() {
         this.typeShort = this.typeShort.next();
+    }
+
+    public Spawner getVirtualSpawner() {
+        return virtualSpawner;
+    }
+
+    public void setVirtualSpawner(Spawner virtualSpawner) {
+        this.virtualSpawner = virtualSpawner;
     }
 }

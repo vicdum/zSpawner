@@ -5,7 +5,9 @@ import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,10 @@ public interface IStorage {
     long countSpawners(OfflinePlayer player, SpawnerType spawnerType);
 
     Optional<Spawner> getSpawner(Location location);
+
+    Optional<Spawner> getSpawnerByEntity(LivingEntity entity);
+
+    Optional<Spawner> getSpawnerByDeadEntity(Entity entity);
 
     List<Spawner> getSpawners(int x, int z);
 
@@ -39,4 +45,6 @@ public interface IStorage {
     void save();
 
     void update();
+
+    List<Spawner> getSpawners(SpawnerType spawnerType);
 }

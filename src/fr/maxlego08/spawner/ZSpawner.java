@@ -3,17 +3,30 @@ package fr.maxlego08.spawner;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.ZombieVillager;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ZSpawner extends ZUtils implements Spawner {
 
@@ -22,14 +35,19 @@ public class ZSpawner extends ZUtils implements Spawner {
     private final UUID ownerId;
     private final SpawnerType spawnerType;
     private final EntityType entityType;
+    private final BlockFace blockFace;
     private final SpawnerLevel spawnerLevel;
+    private final List<Entity> deadEntities = new ArrayList<>();
     private long placedAt;
     private Location location;
     private boolean needUpdate;
     private int amount;
     private ArmorStand stackArmorstand;
+    private LivingEntity livingEntity;
+    private long lastSpawnAt;
+    private Cuboid cuboid;
 
-    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, SpawnerLevel spawnerLevel, Location location, int amount) {
+    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, SpawnerLevel spawnerLevel, Location location, int amount, BlockFace blockFace) {
         this.plugin = plugin;
         this.uniqueId = uniqueId;
         this.ownerId = ownerId;
@@ -39,9 +57,10 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.spawnerLevel = spawnerLevel;
         this.location = location;
         this.amount = amount;
+        this.blockFace = blockFace;
     }
 
-    public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType) {
+    public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
         this.plugin = plugin;
         this.ownerId = ownerId;
         this.uniqueId = UUID.randomUUID();
@@ -50,6 +69,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.amount = 1;
         this.location = null;
         this.placedAt = 0;
+        this.blockFace = blockFace;
         this.spawnerLevel = plugin.getManager().getSpawnerLevel("default");
     }
 
@@ -116,11 +136,19 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.placedAt = System.currentTimeMillis();
         this.location = location;
         Block block = location.getBlock();
-        block.setType(Material.SPAWNER, true);
 
-        CreatureSpawner spawner = (CreatureSpawner) block.getState();
-        spawner.setSpawnedType(this.entityType);
-        spawner.update(true);
+        if (this.spawnerType == SpawnerType.VIRTUAL) {
+
+            block.setType(Config.virtualMaterial, true);
+            spawnEntity();
+        } else {
+
+            block.setType(Material.SPAWNER, true);
+
+            CreatureSpawner spawner = (CreatureSpawner) block.getState();
+            spawner.setSpawnedType(this.entityType);
+            spawner.update(true);
+        }
 
         this.needUpdate = true;
     }
@@ -147,15 +175,22 @@ public class ZSpawner extends ZUtils implements Spawner {
         if (!isPlace()) return;
 
         Block block = this.location.getBlock();
-        CreatureSpawner spawner = (CreatureSpawner) block.getState();
 
-        StackableManager stackableManager = this.plugin.getStackableManager();
-        if (stackableManager.isEnable()) {
-            stackableManager.updateSpawner(spawner, this.amount);
-            this.spawnHologram();
+        if (this.spawnerType == SpawnerType.VIRTUAL) {
+
+            this.spawnEntity();
+        } else {
+
+            CreatureSpawner spawner = (CreatureSpawner) block.getState();
+
+            StackableManager stackableManager = this.plugin.getStackableManager();
+            if (stackableManager.isEnable()) {
+                stackableManager.updateSpawner(spawner, this.amount);
+                this.spawnHologram();
+            }
+
+            spawner.update(true);
         }
-
-        spawner.update(true);
     }
 
     @Override
@@ -163,18 +198,67 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         if (!isPlace()) return;
 
-        spawnHologram();
         Block block = this.location.getBlock();
-        if (block.getType() != Material.SPAWNER) {
-            block.setType(Material.SPAWNER, true);
-            CreatureSpawner spawner = (CreatureSpawner) block.getState();
-            spawner.setSpawnedType(this.entityType);
-            spawner.update(true);
-            this.updateSpawner();
+
+        if (this.spawnerType == SpawnerType.VIRTUAL) {
+
+            spawnEntity();
+            if (block.getType() != Config.virtualMaterial) {
+                block.setType(Config.virtualMaterial);
+            }
+        } else {
+            spawnHologram();
+            if (block.getType() != Material.SPAWNER) {
+                block.setType(Material.SPAWNER, true);
+                CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                spawner.setSpawnedType(this.entityType);
+                spawner.update(true);
+                this.updateSpawner();
+            }
         }
     }
 
-    public void spawnHologram() {
+    private Location getSpawnedEntityLocation() {
+        Location location = this.location.clone().add(0.5, 1, 0.5);
+        if (this.blockFace.equals(BlockFace.SOUTH)) location.setYaw(180.f);
+        if (this.blockFace.equals(BlockFace.WEST)) location.setYaw(-90.f);
+        if (this.blockFace.equals(BlockFace.EAST)) location.setYaw(90.f);
+        return location;
+    }
+
+    private void spawnEntity() {
+
+        if (this.livingEntity != null) {
+            this.updateEntity();
+            return;
+        }
+
+        Location location = getSpawnedEntityLocation();
+
+        World world = location.getWorld();
+        this.livingEntity = (LivingEntity) world.spawnEntity(location, this.entityType);
+        this.livingEntity.setAI(false);
+        this.livingEntity.setCollidable(false);
+        this.livingEntity.setCustomNameVisible(true);
+        this.livingEntity.setVisualFire(false);
+        this.livingEntity.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+
+        if (this.livingEntity instanceof Ageable) {
+            Ageable ageable = (Ageable) this.livingEntity;
+            ageable.setAdult();
+        }
+
+        if (this.livingEntity instanceof ZombieVillager) {
+            this.livingEntity.remove();
+            this.livingEntity = null;
+            this.spawnEntity();
+            return;
+        }
+
+        this.updateEntity();
+    }
+
+    private void spawnHologram() {
 
         if (this.stackArmorstand != null) {
             this.updateHologram();
@@ -195,16 +279,25 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
     }
 
-    public void updateHologram() {
+    private void updateHologram() {
         StackableManager stackableManager = this.plugin.getStackableManager();
         if (this.stackArmorstand == null || !stackableManager.isEnable()) return;
 
-        this.stackArmorstand.setCustomName(color(getMessage(stackableManager.getHologram(), "%amount%", this.amount, "%entity%", name(this.entityType.name()))));
+        if (this.stackArmorstand != null) {
+            this.stackArmorstand.setCustomName(color(getMessage(stackableManager.getHologram(), "%amount%", this.amount, "%entity%", name(this.entityType.name()))));
+        }
+    }
+
+    private void updateEntity() {
+        if (this.livingEntity != null) {
+            this.livingEntity.setCustomName(color(getMessage(Config.virtualName, "%amount%", this.amount)));
+        }
     }
 
     @Override
     public void disable() {
         if (this.stackArmorstand != null) stackArmorstand.remove();
+        if (this.livingEntity != null) livingEntity.remove();
     }
 
     @Override
@@ -213,9 +306,11 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         this.location.getBlock().setType(Material.AIR);
         this.location = null;
+        this.cuboid = null;
         this.placedAt = 0;
 
         if (this.stackArmorstand != null) stackArmorstand.remove();
+        if (this.livingEntity != null) livingEntity.remove();
 
         this.needUpdate = true;
     }
@@ -228,5 +323,85 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public int compareNotPlace() {
         return isPlace() ? 0 : 1;
+    }
+
+    @Override
+    public LivingEntity getLivingEntity() {
+        return this.livingEntity;
+    }
+
+    @Override
+    public List<Entity> getDeadEntities() {
+        return this.deadEntities;
+    }
+
+    @Override
+    public void entityDeath() {
+
+        this.amount -= 1;
+        this.needUpdate = true;
+        this.updateEntity();
+
+        if (this.livingEntity != null && this.livingEntity.isValid() && ((this.livingEntity.getLocation().getBlockX() != this.location.getBlockX() || this.livingEntity.getLocation().getBlockZ() != this.location.getBlockZ()))) {
+            this.livingEntity.teleport(getSpawnedEntityLocation());
+        }
+    }
+
+    @Override
+    public void addItems(List<ItemStack> itemStacks) {
+        // ToDo
+    }
+
+    @Override
+    public boolean isChunkLoaded() {
+        World world = this.location.getWorld();
+        return world.isChunkLoaded(this.location.getChunk());
+    }
+
+    @Override
+    public double getDistance() {
+        // ToDo
+        return 16.0;
+    }
+
+    @Override
+    public void tick() {
+
+        if (this.livingEntity == null || !this.livingEntity.isValid()) {
+            this.spawnEntity();
+        }
+
+        // ToDo, utiliser le système de niveau pour ne pas avoir les valeurs en static
+
+        if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < 10000) {
+
+            long ms = ThreadLocalRandom.current().nextLong(5000, 10000); // Entre 5 et 10 secondes
+            this.lastSpawnAt = System.currentTimeMillis() + ms;
+
+            this.amount += getNumberBetween(1, 3);
+            this.needUpdate = true;
+            this.updateEntity();
+        }
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return this.blockFace;
+    }
+
+    @Override
+    public Cuboid getCuboid() {
+        if (this.cuboid != null) return this.cuboid;
+        // ToDo, ajouter dans la configuration
+        int entitySize = 2;
+        switch (this.entityType) {
+            case ELDER_GUARDIAN:
+            case IRON_GOLEM:
+            case ENDERMAN:
+                entitySize = 3;
+                break;
+        }
+        Location maxLocation = this.spawnerType == SpawnerType.VIRTUAL ? this.location.clone().add(0, entitySize, 0) : this.location.clone();
+        return this.cuboid = new Cuboid(this.location.clone(), maxLocation);
     }
 }

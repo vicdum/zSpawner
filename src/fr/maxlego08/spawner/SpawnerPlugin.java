@@ -11,6 +11,7 @@ import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import org.bukkit.Bukkit;
 
 /**
  * System to create your plugins very simply Projet:
@@ -56,6 +57,8 @@ public class SpawnerPlugin extends ZPlugin {
         this.loadFiles();
 
         this.spawnerPlaceholders.register();
+
+        Bukkit.getScheduler().runTaskTimer(this, this.manager, 20, 20);
 
         this.postEnable();
     }

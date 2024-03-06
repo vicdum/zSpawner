@@ -1,8 +1,15 @@
 package fr.maxlego08.spawner.api;
 
+import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import org.bukkit.Location;
+import org.bukkit.WorldCreator;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface Spawner {
@@ -46,4 +53,22 @@ public interface Spawner {
     int comparePlace();
 
     int compareNotPlace();
+
+    LivingEntity getLivingEntity();
+
+    List<Entity> getDeadEntities();
+
+    void entityDeath();
+
+    void addItems(List<ItemStack> itemStacks);
+
+    boolean isChunkLoaded();
+
+    double getDistance();
+
+    void tick();
+
+    BlockFace getBlockFace();
+
+    Cuboid getCuboid();
 }

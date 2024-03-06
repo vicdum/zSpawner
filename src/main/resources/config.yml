@@ -308,3 +308,10 @@ chunkLimit:
   # Allows for a limit per entity
   limits:
     - SKELETON: 10
+
+# Virtual spawner configuration
+virtual:
+
+  material: LODESTONE
+
+  name: "&6x%amount%"
