@@ -45,9 +45,20 @@ public enum Message {
 
     DESCRIPTION_RELOAD("Reload configuration files"),
     DESCRIPTION_GIVE("Give a spawner"),
+    DESCRIPTION_ADD("Add gui spawner"),
+    DESCRIPTION_REMOVE("Remove gui spawner"),
+    DESCRIPTION_HELP("Help commands"),
+
+    SPAWNER_UNPLACED("&cᴜɴᴘʟᴀᴄᴇᴅ"),
+    SPAWNER_LOCATION("&f%world%&7, &f%x%&7, &f %y%&7, &f %z%"),
+    SPAWNER_PLACE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ᴘʟᴀᴄᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
+    SPAWNER_REMOVE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
 
     GIVE_SENDER("§aYou just gave a spawner §f%entity% §8(§7%type%§8) §ato the player §e%target%§a."),
     GIVE_PLAYER("§aYou just received a spawner at §f%entity%§a."),
+
+    ADD_SENDER("§aYou just add a spawner §f%entity% §ato the player §e%target%§a."),
+    ADD_PLAYER("§aYou just received a spawner at §f%entity%§a. §8(§7/zspawner§8)"),
 
     ;
 

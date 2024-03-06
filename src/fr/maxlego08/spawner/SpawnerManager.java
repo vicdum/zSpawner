@@ -1,23 +1,28 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.ButtonManager;
+import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.utils.Placeholders;
+import fr.maxlego08.menu.button.loader.NoneLoader;
+import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
+import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
 import fr.maxlego08.spawner.zcore.enums.Message;
-import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
+import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -28,14 +33,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class SpawnerManager extends ZUtils implements Savable {
+public class SpawnerManager extends YamlUtils implements Savable {
 
     private final SpawnerPlugin plugin;
     private final NamespacedKey spawnerTypeKey;
     private final NamespacedKey spawnerEntityKey;
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
+    private Map<EntityType, String> entitiesMaterials = new HashMap<>();
 
     public SpawnerManager(SpawnerPlugin plugin) {
+        super(plugin);
         this.plugin = plugin;
         this.spawnerTypeKey = new NamespacedKey(plugin, "type");
         this.spawnerEntityKey = new NamespacedKey(plugin, "entity");
@@ -71,6 +78,33 @@ public class SpawnerManager extends ZUtils implements Savable {
                 }
             });
         }
+
+        this.entitiesMaterials = loadEntityMaterials();
+
+        this.loadInventories();
+    }
+
+    public void openSpawner(Player player) {
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.openInventory(player, this.plugin, "spawners");
+    }
+
+    public void loadInventories() {
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.deleteInventories(this.plugin);
+
+        try {
+            inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/gui/spawners.yml");
+        } catch (InventoryException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void loadButtons() {
+
+        ButtonManager buttonManager = this.plugin.getButtonManager();
+        buttonManager.register(new NoneLoader(this.plugin, SpawnersButton.class, "zspawner_spawners"));
+
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType) {
@@ -94,9 +128,9 @@ public class SpawnerManager extends ZUtils implements Savable {
         ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType);
         give(target, itemStack);
 
-        message(sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
+        message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
         if (!silent) {
-            message(target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
+            message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
         }
     }
 
@@ -111,5 +145,20 @@ public class SpawnerManager extends ZUtils implements Savable {
             return Optional.of(new SpawnerResult(spawnerType, entityType));
         }
         return Optional.empty();
+    }
+
+    public void addSpawner(CommandSender sender, Player target, EntityType entityType, boolean silent) {
+
+        Spawner spawner = new ZSpawner(this.plugin, target.getUniqueId(), SpawnerType.GUI, entityType);
+        this.plugin.getStorage().addSpawner(spawner);
+
+        message(this.plugin, sender, Message.ADD_SENDER, "%target%", target.getName(), "%entity%", name(entityType.name()));
+        if (!silent) {
+            message(this.plugin, target, Message.ADD_PLAYER, "%entity%", name(entityType.name()));
+        }
+    }
+
+    public Map<EntityType, String> getEntitiesMaterials() {
+        return entitiesMaterials;
     }
 }

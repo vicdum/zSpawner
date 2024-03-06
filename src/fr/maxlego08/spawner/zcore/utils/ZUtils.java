@@ -262,41 +262,7 @@ public abstract class ZUtils extends MessageUtils {
 	 *            executed when the player is teleported or not
 	 */
 	protected void teleport(Player player, int delay, Location location, Consumer<Boolean> cmd) {
-		if (teleportPlayers.contains(player.getName())) {
-			message(player, Message.TELEPORT_ERROR);
-			return;
-		}
-		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-		Location playerLocation = player.getLocation();
-		AtomicInteger verif = new AtomicInteger(delay);
-		teleportPlayers.add(player.getName());
-		if (!location.getChunk().isLoaded())
-			location.getChunk().load();
-		ses.scheduleWithFixedDelay(() -> {
-			if (!same(playerLocation, player.getLocation())) {
-				message(player, Message.TELEPORT_MOVE);
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				if (cmd != null)
-					cmd.accept(false);
-				return;
-			}
-			int currentSecond = verif.getAndDecrement();
-			if (!player.isOnline()) {
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				return;
-			}
-			if (currentSecond == 0) {
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				player.teleport(location);
-				message(player, Message.TELEPORT_SUCCESS);
-				if (cmd != null)
-					cmd.accept(true);
-			} else
-				message(player, Message.TELEPORT_MESSAGE, currentSecond);
-		}, 0, 1, TimeUnit.SECONDS);
+
 	}
 
 	/**

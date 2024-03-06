@@ -10,6 +10,7 @@ import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -33,9 +34,9 @@ import java.util.stream.Collectors;
 public class SqliteStorage extends ZUtils implements IStorage {
 
     private final String spawnerTableName;
-    private final Map<String, Spawner> spawners = new HashMap<>();
     private final SpawnerPlugin plugin;
     protected Connection connection;
+    private List<Spawner> spawners = new ArrayList<>();
     private File databaseFile = null;
 
     public SqliteStorage(SpawnerPlugin plugin, boolean createFile) {
@@ -60,29 +61,39 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     @Override
     public Optional<Spawner> getSpawner(Location location) {
-        return Optional.ofNullable(this.spawners.getOrDefault(changeLocationToString(location), null));
+        return this.spawners.stream().filter(spawner -> spawner.isPlace() && spawner.getLocation().equals(location)).findFirst();
     }
 
     @Override
     public List<Spawner> getSpawners(int x, int z) {
-        return spawners.values().stream().filter(spawner -> spawner.sameChunk(x, z)).collect(Collectors.toList());
+        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Spawner> getSpawners(OfflinePlayer offlinePlayer) {
+        return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId())).collect(Collectors.toList());
     }
 
     @Override
     public long countSpawners(int x, int z) {
-        return spawners.values().stream().filter(spawner -> spawner.sameChunk(x, z)).count();
+        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).count();
     }
 
     @Override
-    public void placeSpawner(Location location, Spawner spawner) {
-        this.spawners.put(changeLocationToString(location), spawner);
+    public void addSpawner(Spawner spawner) {
+        this.spawners.add(spawner);
         ZPlugin.service.execute(() -> this.upsertSpawner(spawner));
     }
 
     @Override
     public void removeSpawner(Location location) {
-        Spawner spawner = this.spawners.remove(changeLocationToString(location));
-        if (spawner != null) ZPlugin.service.execute(() -> this.deleteSpawner(spawner));
+        getSpawner(location).ifPresent(this::removeSpawner);
+    }
+
+    @Override
+    public void removeSpawner(Spawner spawner) {
+        this.spawners.remove(spawner);
+        ZPlugin.service.execute(() -> this.deleteSpawner(spawner));
     }
 
     @Override
@@ -92,15 +103,15 @@ public class SqliteStorage extends ZUtils implements IStorage {
             this.spawners.clear();
 
             this.create();
-            this.getAllSpawners().forEach(spawner -> this.spawners.put(changeLocationToString(spawner.getLocation()), spawner));
+            this.spawners = this.getAllSpawners();
 
-            Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.values().forEach(Spawner::load));
+            Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.forEach(Spawner::load));
         });
     }
 
     @Override
     public void save() {
-        this.spawners.values().forEach(Spawner::disable);
+        this.spawners.forEach(Spawner::disable);
         this.update();
         this.disconnect();
     }
@@ -112,7 +123,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     @Override
     public void update() {
-        ZPlugin.service.execute(() -> this.spawners.values().stream().filter(Spawner::needUpdate).forEach(this::upsertSpawner));
+        ZPlugin.service.execute(() -> this.spawners.stream().filter(Spawner::needUpdate).forEach(this::upsertSpawner));
     }
 
     public void disconnect() {
@@ -144,10 +155,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     public void create() {
 
-        String createSpawnersTableSQL = "CREATE TABLE IF NOT EXISTS " + this.spawnerTableName + " (" + "owner UUID, " + "spawnerId UUID, " + "location TEXT, " + "type TEXT, " + "placedAt LONG, " + "level TEXT, " +
-                "entityType TEXT, " +
-                "amount INTEGER, " +
-                "PRIMARY KEY (spawnerId), " + "UNIQUE(owner, spawnerId));";
+        String createSpawnersTableSQL = "CREATE TABLE IF NOT EXISTS " + this.spawnerTableName + " (" + "owner UUID, " + "spawnerId UUID, " + "location TEXT, " + "type TEXT, " + "placedAt LONG, " + "level TEXT, " + "entityType TEXT, " + "amount INTEGER, " + "PRIMARY KEY (spawnerId), " + "UNIQUE(owner, spawnerId));";
 
         try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(createSpawnersTableSQL)) {
             preparedStatement.executeUpdate();
@@ -168,13 +176,16 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     public void upsertSpawner(Spawner spawner) {
         spawner.update();
-        String sql = "INSERT INTO " + this.spawnerTableName + "(owner, spawnerId, location, type, placedAt, level, entityType, amount) " + "VALUES(?,?,?,?,?,?,?,?) " + "ON CONFLICT(owner, spawnerId) DO UPDATE SET " + "location = EXCLUDED.location, " + "type = EXCLUDED.type, " + "placedAt = EXCLUDED.placedAt, " + "level = EXCLUDED.level, "
-                + "entityType = EXCLUDED.entityType, "
-                + "amount = EXCLUDED.amount;";
+        String sql = "INSERT INTO " + this.spawnerTableName + "(owner, spawnerId, location, type, placedAt, level, entityType, amount) " + "VALUES(?,?,?,?,?,?,?,?) " + "ON CONFLICT(owner, spawnerId) DO UPDATE SET " + "location = EXCLUDED.location, " + "type = EXCLUDED.type, " + "placedAt = EXCLUDED.placedAt, " + "level = EXCLUDED.level, " + "entityType = EXCLUDED.entityType, " + "amount = EXCLUDED.amount;";
         try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, spawner.getOwner().toString());
             preparedStatement.setString(2, spawner.getSpawnerId().toString());
-            preparedStatement.setString(3, changeLocationToString(spawner.getLocation()));
+
+            if (spawner.getLocation() == null) {
+                preparedStatement.setNull(3, java.sql.Types.VARCHAR);
+            } else {
+                preparedStatement.setString(3, changeLocationToString(spawner.getLocation()));
+            }
             preparedStatement.setString(4, spawner.getType().toString());
             preparedStatement.setLong(5, spawner.getPlacedAt());
             preparedStatement.setString(6, spawner.getLevel().getName());
@@ -202,7 +213,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
                 String entityType = resultSet.getString("entityType");
                 int amount = resultSet.getInt("amount");
 
-                Spawner spawner = new ZSpawner(this.plugin, spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), changeStringLocationToLocation(location), amount);
+                Spawner spawner = new ZSpawner(this.plugin, spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), location != null ? changeStringLocationToLocation(location) : null, amount);
                 spawners.add(spawner);
             }
         } catch (SQLException exception) {

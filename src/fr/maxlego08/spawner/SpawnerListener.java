@@ -75,7 +75,7 @@ public class SpawnerListener extends ListenerAdapter {
         Spawner spawner = new ZSpawner(plugin, player.getUniqueId(), spawnerType, entityType);
         spawner.place(block.getLocation());
 
-        storage.placeSpawner(block.getLocation(), spawner);
+        storage.addSpawner(spawner);
     }
 
 

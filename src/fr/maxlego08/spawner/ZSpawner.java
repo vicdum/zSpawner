@@ -100,6 +100,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public boolean sameChunk(int x, int z) {
+        if (!this.isPlace()) return false;
         Chunk chunk = this.location.getChunk();
         return chunk.getX() == x || chunk.getZ() == z;
     }
@@ -143,6 +144,8 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void updateSpawner() {
 
+        if (!isPlace()) return;
+
         Block block = this.location.getBlock();
         CreatureSpawner spawner = (CreatureSpawner) block.getState();
 
@@ -157,7 +160,18 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void load() {
+
+        if (!isPlace()) return;
+
         spawnHologram();
+        Block block = this.location.getBlock();
+        if (block.getType() != Material.SPAWNER) {
+            block.setType(Material.SPAWNER, true);
+            CreatureSpawner spawner = (CreatureSpawner) block.getState();
+            spawner.setSpawnedType(this.entityType);
+            spawner.update(true);
+            this.updateSpawner();
+        }
     }
 
     public void spawnHologram() {

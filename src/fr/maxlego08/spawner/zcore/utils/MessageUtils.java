@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.zcore.utils;
 
+import fr.maxlego08.menu.api.utils.MetaUpdater;
+import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.nms.NMSUtils;
 import fr.maxlego08.spawner.zcore.utils.players.ActionBar;
@@ -21,6 +23,12 @@ public abstract class MessageUtils extends LocationUtils {
 
     private final transient static int CENTER_PX = 154;
 
+    public static String removeColorCodes(String input) {
+        input = input.replaceAll("#[0-9a-fA-F]{6}", "");
+        input = input.replaceAll("§[0-9a-fA-Fk-oK-OrR]", "");
+        return input.replaceAll("&[0-9a-fA-Fk-oK-OrR]", "");
+    }
+
     /**
      * @param player
      * @param message
@@ -30,13 +38,23 @@ public abstract class MessageUtils extends LocationUtils {
         player.sendMessage(getMessage(message, args));
     }
 
-    /**
-     * @param player
-     * @param message
-     * @param args
-     */
-    protected void messageWO(CommandSender player, String message, Object... args) {
-        player.sendMessage(getMessage(message, args));
+    public void messageWO(SpawnerPlugin plugin, CommandSender sender, Message message, Object... args) {
+        MetaUpdater updater = plugin.getInventoryManager().getMeta();
+
+        if (sender instanceof ConsoleCommandSender) {
+            if (message.getMessages().size() > 0) {
+                message.getMessages().forEach(msg -> sender.sendMessage(removeColorCodes(Message.PREFIX.msg() + getMessage(msg, args))));
+            } else {
+                sender.sendMessage(removeColorCodes(Message.PREFIX.msg() + getMessage(message, args)));
+            }
+        } else {
+            Player player = (Player) sender;
+            if (message.getMessages().size() > 0) {
+                message.getMessages().forEach(msg -> updater.sendMessage(sender, this.papi(getMessage(msg, args), player)));
+            } else {
+                updater.sendMessage(sender, this.papi(getMessage(message, args), player));
+            }
+        }
     }
 
     /**
@@ -49,6 +67,15 @@ public abstract class MessageUtils extends LocationUtils {
     }
 
     /**
+     * @param sender
+     * @param message
+     * @param args
+     */
+    public void message(SpawnerPlugin plugin, CommandSender sender, String message, Object... args) {
+        plugin.getInventoryManager().getMeta().sendMessage(sender, Message.PREFIX.msg() + getMessage(message, args));
+    }
+
+    /**
      * Allows you to send a message to a command sender
      *
      * @param sender  User who sent the command
@@ -57,13 +84,15 @@ public abstract class MessageUtils extends LocationUtils {
      * @param args    The arguments - The arguments work in pairs, you must put for
      *                example %test% and then the value
      */
-    protected void message(CommandSender sender, Message message, Object... args) {
+    public void message(SpawnerPlugin plugin, CommandSender sender, Message message, Object... args) {
+
+        MetaUpdater updater = plugin.getInventoryManager().getMeta();
 
         if (sender instanceof ConsoleCommandSender) {
             if (message.getMessages().size() > 0) {
-                message.getMessages().forEach(msg -> sender.sendMessage(Message.PREFIX.msg() + getMessage(msg, args)));
+                message.getMessages().forEach(msg -> sender.sendMessage(removeColorCodes(Message.PREFIX.msg() + getMessage(msg, args))));
             } else {
-                sender.sendMessage(Message.PREFIX.msg() + getMessage(message, args));
+                sender.sendMessage(removeColorCodes(Message.PREFIX.msg() + getMessage(message, args)));
             }
         } else {
 
@@ -71,10 +100,9 @@ public abstract class MessageUtils extends LocationUtils {
             switch (message.getType()) {
                 case CENTER:
                     if (message.getMessages().size() > 0) {
-                        message.getMessages()
-                                .forEach(msg -> sender.sendMessage(this.getCenteredMessage(this.papi(getMessage(msg, args), player))));
+                        message.getMessages().forEach(msg -> updater.sendMessage(sender, this.getCenteredMessage(this.papi(getMessage(msg, args), player))));
                     } else {
-                        sender.sendMessage(this.getCenteredMessage(this.papi(getMessage(message, args), player)));
+                        updater.sendMessage(sender, this.getCenteredMessage(this.papi(getMessage(message, args), player)));
                     }
 
                     break;
@@ -83,10 +111,9 @@ public abstract class MessageUtils extends LocationUtils {
                     break;
                 case TCHAT:
                     if (message.getMessages().size() > 0) {
-                        message.getMessages()
-                                .forEach(msg -> sender.sendMessage(this.papi(Message.PREFIX.msg() + getMessage(msg, args), player)));
+                        message.getMessages().forEach(msg -> updater.sendMessage(sender, this.papi(Message.PREFIX.msg() + getMessage(msg, args), player)));
                     } else {
-                        sender.sendMessage(this.papi(Message.PREFIX.msg() + getMessage(message, args), player));
+                        updater.sendMessage(sender, this.papi(Message.PREFIX.msg() + getMessage(message, args), player));
                     }
                     break;
                 case TITLE:
@@ -96,8 +123,7 @@ public abstract class MessageUtils extends LocationUtils {
                     int fadeInTime = message.getStart();
                     int showTime = message.getTime();
                     int fadeOutTime = message.getEnd();
-                    this.title(player, this.papi(this.getMessage(title, args), player), this.papi(this.getMessage(subTitle, args), player), fadeInTime, showTime,
-                            fadeOutTime);
+                    this.title(player, this.papi(this.getMessage(title, args), player), this.papi(this.getMessage(subTitle, args), player), fadeInTime, showTime, fadeOutTime);
                     break;
                 default:
                     break;
@@ -105,18 +131,6 @@ public abstract class MessageUtils extends LocationUtils {
             }
 
         }
-    }
-
-    /**
-     * @param player
-     * @param message
-     * @param args
-     */
-    protected void broadcast(Message message, Object... args) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            message(player, message, args);
-        }
-        message(Bukkit.getConsoleSender(), message, args);
     }
 
     /**
@@ -251,14 +265,6 @@ public abstract class MessageUtils extends LocationUtils {
             compensated += spaceLength;
         }
         return sb.toString() + message;
-    }
-
-    protected void broadcastCenterMessage(List<String> messages) {
-        messages.stream().map(e -> e = getCenteredMessage(e)).forEach(e -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                messageWO(player, e);
-            }
-        });
     }
 
     protected void broadcastAction(String message) {

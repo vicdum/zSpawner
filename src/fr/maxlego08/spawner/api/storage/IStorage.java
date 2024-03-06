@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.api.storage;
 
 import fr.maxlego08.spawner.api.Spawner;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 
 import java.util.List;
@@ -13,11 +14,14 @@ public interface IStorage {
 
     List<Spawner> getSpawners(int x, int z);
 
-    long countSpawners(int x, int z);
+    List<Spawner> getSpawners(OfflinePlayer offlinePlayer);
 
-    void placeSpawner(Location location, Spawner spawner);
+    long countSpawners(int x, int z);
+    void addSpawner(Spawner spawner);
 
     void removeSpawner(Location location);
+
+    void removeSpawner(Spawner spawner);
 
     void load();
 
@@ -26,4 +30,5 @@ public interface IStorage {
     void purge(World world, boolean destroyBlock);
 
     void update();
+
 }

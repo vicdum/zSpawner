@@ -8,7 +8,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -31,24 +34,11 @@ public abstract class YamlUtils extends ZUtils {
         return plugin.getConfig();
     }
 
-    /**
-     * Get config
-     *
-     * @param path
-     * @return {@link YamlConfiguration}
-     */
     protected YamlConfiguration getConfig(File file) {
         if (file == null) return null;
         return YamlConfiguration.loadConfiguration(file);
     }
 
-    /**
-     * Get config
-     *
-     * @param path
-     * @return {@link YamlConfiguration}
-     * @throws InventoryFileNotFoundException
-     */
     protected YamlConfiguration getConfig(String path) {
         File file = new File(plugin.getDataFolder() + "/" + path);
         if (!file.exists()) return null;
@@ -100,6 +90,24 @@ public abstract class YamlUtils extends ZUtils {
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    protected Map<EntityType, String> loadEntityMaterials() {
+        Map<EntityType, String> spawnerMaterials = new HashMap<>();
+
+        List<?> list = getConfig().getList("entitiesMaterial");
+        if (list != null) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?>) {
+                    Map<String, String> currentMap = (Map<String, String>) object;
+                    currentMap.forEach((entity, material) -> {
+                        Arrays.stream(EntityType.values()).filter(e -> e.name().equalsIgnoreCase(entity)).findFirst().ifPresent(entityType -> spawnerMaterials.put(entityType, material));
+                    });
+                }
+            }
+        }
+
+        return spawnerMaterials;
     }
 
 }

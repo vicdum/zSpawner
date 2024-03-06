@@ -4,20 +4,26 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.command.VCommand;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
+import org.bukkit.entity.Player;
 
 public class CommandSpawner extends VCommand {
 
-	public CommandSpawner(SpawnerPlugin plugin) {
-		super(plugin);
-		this.setPermission(Permission.ZSPAWNER_USE);
-		this.addSubCommand(new CommandSpawnerReload(plugin));
-		this.addSubCommand(new CommandSpawnerGive(plugin));
-	}
+    public CommandSpawner(SpawnerPlugin plugin) {
+        super(plugin);
+        this.setPermission(Permission.ZSPAWNER_USE);
+        this.addSubCommand(new CommandSpawnerReload(plugin));
+        this.addSubCommand(new CommandSpawnerGive(plugin));
+        this.addSubCommand(new CommandSpawnerHelp(plugin));
+        this.addSubCommand(new CommandSpawnerAdd(plugin));
+    }
 
-	@Override
-	protected CommandType perform(SpawnerPlugin plugin) {
-		syntaxMessage();
-		return CommandType.SUCCESS;
-	}
+    @Override
+    protected CommandType perform(SpawnerPlugin plugin) {
+
+        if (this.sender instanceof Player) plugin.getManager().openSpawner(this.player);
+        else syntaxMessage();
+
+        return CommandType.SUCCESS;
+    }
 
 }
