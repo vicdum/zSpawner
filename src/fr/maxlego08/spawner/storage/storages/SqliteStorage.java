@@ -83,6 +83,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
     }
 
     @Override
+    public long countSpawners(int x, int z, EntityType entityType) {
+        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z) && entityType == spawner.getEntityType()).count();
+    }
+
+    @Override
     public void addSpawner(Spawner spawner) {
         this.spawners.add(spawner);
         ZPlugin.service.execute(() -> this.upsertSpawner(spawner));

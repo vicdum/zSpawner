@@ -73,6 +73,9 @@ public enum Message {
     SORT_PLACE("spawners placed"),
     SORT_NO_PLACE("spawners not placed"),
 
+    LIMIT_ENTITY("§cYou cannot place more than §f%amount% §b%type%§c spawner."),
+    LIMIT_GLOBAL("§cYou cannot place more than §f%amount%§c spawner."),
+
     ;
 
     private List<String> messages;

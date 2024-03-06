@@ -3,12 +3,18 @@ package fr.maxlego08.spawner.save;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Config {
 
+    public static boolean enableLimit = true;
+    public static int globalLimit = 5;
+    public static Map<EntityType, Integer> entityLimits = new HashMap<>();
     public static boolean enableDebug = true;
     public static boolean enableDebugTime = false;
     public static boolean disableNaturalSpawnerExplosion = false;
@@ -56,6 +62,22 @@ public class Config {
         enableDebug = configuration.getBoolean("enableDebug", false);
         enableDebugTime = configuration.getBoolean("enableDebugTime", false);
         ownerCanBreakSpawner = configuration.getBoolean("ownerCanBreakSpawner", true);
+
+        enableLimit = configuration.getBoolean("chunkLimit.enable", false);
+        globalLimit = configuration.getInt("chunkLimit.global", 5);
+
+        entityLimits.clear();
+        List<?> limitsList = configuration.getList("stackableSpawner.limits");
+        if (limitsList != null) {
+            for (Object limitObject : limitsList) {
+                if (limitObject instanceof Map<?, ?>) {
+                    Map<String, Integer> limitMap = (Map<String, Integer>) limitObject;
+                    limitMap.forEach((entity, amount) -> {
+                        Arrays.stream(EntityType.values()).filter(e -> e.name().equalsIgnoreCase(entity)).findFirst().ifPresent(entityType -> entityLimits.put(entityType, amount));
+                    });
+                }
+            }
+        }
 
         dropNaturalSpawnerOnExplose = configuration.getBoolean("dropNaturalSpawnerOnExplose", true);
         disableNaturalSpawnerExplosion = configuration.getBoolean("disableNaturalSpawnerExplosion", true);

@@ -9,11 +9,13 @@ import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -76,6 +78,13 @@ public class SpawnerListener extends ListenerAdapter {
             }
         }
 
+        if (Config.enableLimit) {
+
+            Chunk chunk = block.getChunk();
+            if (hasSpawnerLimit(event, player, entityType, chunk)) return;
+        }
+
+
         Spawner spawner = new ZSpawner(plugin, player.getUniqueId(), spawnerType, entityType);
         spawner.place(block.getLocation());
 
@@ -99,9 +108,14 @@ public class SpawnerListener extends ListenerAdapter {
                 return;
             }
 
-            // Gérer la limite par chunk
-
             Spawner spawner = playerSpawner.getPlacingSpawner();
+
+            if (Config.enableLimit) {
+
+                Chunk chunk = block.getChunk();
+                if (hasSpawnerLimit(event, player, spawner.getEntityType(), chunk)) return;
+            }
+
             playerSpawner.placeSpawner();
             spawner.place(block.getLocation());
             message(this.plugin, player, Message.PLACE_SUCCESS);
@@ -178,7 +192,6 @@ public class SpawnerListener extends ListenerAdapter {
                     return true;
                 }
 
-                System.out.println(spawner.getType() +" - " + Config.spawnerDrop.getOrDefault(spawner.getType(), false));
                 if (Config.spawnerDrop.getOrDefault(spawner.getType(), false)) {
 
                     spawner.breakBlock();
@@ -202,4 +215,32 @@ public class SpawnerListener extends ListenerAdapter {
             return false;
         });
     }
+
+    private boolean hasSpawnerLimit(Cancellable event, Player player, EntityType entityType, Chunk chunk) {
+
+        IStorage storage = this.plugin.getStorage();
+
+        if (Config.entityLimits.containsKey(entityType)) {
+
+            int entityLimit = Config.entityLimits.get(entityType);
+            long amount = storage.countSpawners(chunk.getX(), chunk.getZ(), entityType);
+            if (amount >= entityLimit) {
+                event.setCancelled(true);
+                message(this.plugin, player, Message.LIMIT_ENTITY, "%amount%", entityLimit, "%type%", name(entityType.name()));
+                return true;
+            }
+        } else {
+
+            int entityLimit = Config.globalLimit;
+            long amount = storage.countSpawners(chunk.getX(), chunk.getZ());
+            if (amount >= entityLimit) {
+                event.setCancelled(true);
+                message(this.plugin, player, Message.LIMIT_GLOBAL, "%amount%", entityLimit);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

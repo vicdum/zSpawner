@@ -295,3 +295,16 @@ dropNaturalSpawnerOnExplose: false
 
 # Owner of a GUI spawner can break it to directly put it back in /spawners
 ownerCanBreakSpawner: true
+
+# Limit of spawner by chunk
+chunkLimit:
+
+  # Enable or disable the spawner limit
+  enable: false
+
+  # Allows to have a global limit per chunk
+  global: 5
+
+  # Allows for a limit per entity
+  limits:
+    - SKELETON: 10
