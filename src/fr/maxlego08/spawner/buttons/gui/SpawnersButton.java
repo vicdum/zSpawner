@@ -59,14 +59,14 @@ public class SpawnersButton extends ZButton implements PaginateButton {
             placeholders.register("material", this.plugin.getManager().getEntitiesMaterials().getOrDefault(spawner.getEntityType(), "SPAWNER"));
 
             ItemStack itemStack = menuItemStack.build(player, false, placeholders);
-            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawner, player, event));
+            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawner, player, event, inventory.getPage()));
         }
     }
 
-    private void onClick(Spawner spawner, Player player, InventoryClickEvent event) {
+    private void onClick(Spawner spawner, Player player, InventoryClickEvent event, int page) {
 
         if (spawner.isPlace()) {
-            this.plugin.getManager().breakSpawner(player, spawner);
+            this.plugin.getManager().breakSpawner(player, spawner, page);
             return;
         }
 

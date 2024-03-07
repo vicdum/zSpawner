@@ -443,7 +443,7 @@ public class SpawnerListener extends ListenerAdapter {
             event.setCancelled(true);
 
             if (spawner.getOwner().equals(player.getUniqueId())) {
-                this.plugin.getManager().openVirtualSpawner(player, spawner);
+                this.plugin.getManager().openVirtualSpawner(player, spawner, 1);
             }
         }
     }

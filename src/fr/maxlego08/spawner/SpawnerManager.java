@@ -99,9 +99,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         this.loadInventories();
     }
 
-    public void openSpawner(Player player) {
+    public void openSpawner(Player player, int page) {
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
-        inventoryManager.openInventory(player, this.plugin, "spawners");
+        inventoryManager.getInventory(this.plugin, "spawners").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
     }
 
     public void loadInventories() {
@@ -180,9 +180,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         return entitiesMaterials;
     }
 
-    public void breakSpawner(Player player, Spawner spawner) {
+    public void breakSpawner(Player player, Spawner spawner, int page) {
         spawner.breakBlock();
-        openSpawner(player);
+        openSpawner(player, page);
     }
 
     public void startPlacement(Player player, Spawner spawner) {
@@ -206,13 +206,13 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         return playerSpawner == null ? Sort.PLACE : playerSpawner.getTypeShort();
     }
 
-    public void openVirtualSpawner(Player player, Spawner spawner) {
+    public void openVirtualSpawner(Player player, Spawner spawner, int page) {
 
         PlayerSpawner playerSpawner = this.playerSpawners.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
         playerSpawner.setVirtualSpawner(spawner);
 
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
-        inventoryManager.openInventory(player, this.plugin, "virtual");
+        inventoryManager.getInventory(this.plugin, "virtual").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
     }
 
     @Override

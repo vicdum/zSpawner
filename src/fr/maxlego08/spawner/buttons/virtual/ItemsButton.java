@@ -65,11 +65,11 @@ public class ItemsButton extends ZButton implements PaginateButton {
             }).collect(Collectors.toList()), player);
             itemStack.setItemMeta(itemMeta);
 
-            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawnerItem, spawner, player, event));
+            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawnerItem, spawner, player, event, inventory.getPage()));
         }
     }
 
-    private void onClick(SpawnerItem spawnerItem, Spawner spawner, Player player, InventoryClickEvent event) {
+    private void onClick(SpawnerItem spawnerItem, Spawner spawner, Player player, InventoryClickEvent event, int page) {
 
         SpawnerManager manager = plugin.getManager();
         if (event.getClick() == ClickType.SHIFT_LEFT) {
@@ -80,7 +80,7 @@ public class ItemsButton extends ZButton implements PaginateButton {
             manager.removeStackLoot(player, spawner, spawnerItem, 64);
         }
 
-        manager.openVirtualSpawner(player, spawner);
+        manager.openVirtualSpawner(player, spawner, page);
     }
 
     @Override

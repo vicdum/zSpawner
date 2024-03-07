@@ -20,7 +20,7 @@ public class CommandSpawner extends VCommand {
     @Override
     protected CommandType perform(SpawnerPlugin plugin) {
 
-        if (this.sender instanceof Player) plugin.getManager().openSpawner(this.player);
+        if (this.sender instanceof Player) plugin.getManager().openSpawner(this.player, 1);
         else syntaxMessage();
 
         return CommandType.SUCCESS;

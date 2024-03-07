@@ -25,7 +25,7 @@ public class SortButton extends ZButton {
         PlayerSpawner playerSpawner = manager.getPlayerSpawners().computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
         playerSpawner.toggleSort();
 
-        manager.openSpawner(player);
+        manager.openSpawner(player, 1);
 
         super.onClick(player, event, inventory, slot, placeholders);
     }
