@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.zcore.utils.yaml;
 
+import fr.maxlego08.spawner.ZSpawnerLevel;
+import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Material;
@@ -9,6 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -120,5 +123,32 @@ public abstract class YamlUtils extends ZUtils {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
+
+    protected List<SpawnerLevel> loadLevels() {
+        List<SpawnerLevel> levels = new ArrayList<>();
+        FileConfiguration config = getConfig();
+        for (String key : config.getConfigurationSection("virtual.levels").getKeys(false)) {
+            String path = "virtual.levels." + key + ".";
+            int level = config.getInt(path + "level");
+            String displayName = config.getString(path + "displayName");
+            List<Material> blacklistMaterials = config.getStringList(path + "blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+            List<Material> whitelistMaterials = config.getStringList(path + "whitelistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+            int distance = config.getInt(path + "distance");
+            double experienceMultiplier = config.getDouble(path + "experienceMultiplier");
+            double lootMultiplier = config.getDouble(path + "lootMultiplier");
+            boolean autoKill = config.getBoolean(path + "autoKill");
+            int maxEntity = config.getInt(path + "maxEntity");
+            int minDelay = config.getInt(path + "minDelay");
+            int maxDelay = config.getInt(path + "maxDelay");
+            int minSpawn = config.getInt(path + "minSpawn");
+            int maxSpawn = config.getInt(path + "maxSpawn");
+            int mobPerMinute = config.getInt(path + "mobPerMinute");
+
+            SpawnerLevel levelConfig = new ZSpawnerLevel(level, key, displayName, blacklistMaterials, whitelistMaterials, distance, experienceMultiplier, lootMultiplier, autoKill, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute);
+            levels.add(levelConfig);
+        }
+        return levels;
+    }
+
 
 }

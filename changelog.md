@@ -1,4 +1,7 @@
 # ToDo
 
-- Gérer les explosions du block, pouvoir activer / désactiver
-- Ajouter un système de silk spawner
+- [x] Gérer les explosions du block, pouvoir activer / désactiver
+- [ ] Ajouter un système de silk spawner
+- [ ] Proposer un système d'upgrade de spawner par spawner
+
+# Unreleased

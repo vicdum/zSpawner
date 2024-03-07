@@ -49,6 +49,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     private long lastSpawnAt;
     private Cuboid cuboid;
     private List<SpawnerItem> items = new ArrayList<>();
+    private long lastEntityKill;
 
     public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, SpawnerLevel spawnerLevel, Location location, int amount, BlockFace blockFace) {
         this.plugin = plugin;
@@ -73,7 +74,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.location = null;
         this.placedAt = 0;
         this.blockFace = blockFace;
-        this.spawnerLevel = plugin.getManager().getSpawnerLevel("default");
+        this.spawnerLevel = plugin.getManager().getSpawnerLevel(Config.defaultLevelName);
     }
 
     @Override
@@ -299,6 +300,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void disable() {
+        System.out.println("JE DISABLE ICI !");
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
     }
@@ -375,26 +377,27 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public double getDistance() {
-        // ToDo
-        return 16.0;
+        return spawnerLevel.getDistance();
+    }
+
+    private boolean isInValid() {
+        return this.livingEntity == null || !this.livingEntity.isValid() || this.livingEntity.isDead();
     }
 
     @Override
     public void tick() {
 
-        if (this.livingEntity == null || !this.livingEntity.isValid() || this.livingEntity.isDead()) {
+        if (isInValid()) {
             this.livingEntity = null;
             this.spawnEntity();
         }
 
-        // ToDo, utiliser le système de niveau pour ne pas avoir les valeurs en static
+        if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerLevel.getMaxEntity()) {
 
-        if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < 10000) {
-
-            long ms = ThreadLocalRandom.current().nextLong(5000, 10000); // Entre 5 et 10 secondes
+            long ms = ThreadLocalRandom.current().nextLong(spawnerLevel.getMinDelay(), spawnerLevel.getMaxDelay());
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(1, 3);
+            this.amount += getNumberBetween(spawnerLevel.getMinSpawn(), spawnerLevel.getMaxSpawn());
             this.needUpdate = true;
             this.updateEntity();
         }
@@ -431,5 +434,39 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void removeItem(SpawnerItem spawnerItem) {
         this.items.remove(spawnerItem);
         this.plugin.getStorage().deleteSpawnerItem(this, spawnerItem);
+    }
+
+    @Override
+    public void autoKill() {
+        int entityPerMinute = spawnerLevel.getMobPerMinute();
+        double entityPerSecond = (double) entityPerMinute / 60d;
+
+        if (entityPerSecond < 1) {
+
+            double secondWait = 1d / entityPerSecond;
+
+            if (System.currentTimeMillis() >= this.lastEntityKill) {
+
+                this.lastEntityKill = System.currentTimeMillis() + (1000L * (int) secondWait);
+                this.killEntity(1);
+            }
+        } else this.killEntity((int) entityPerSecond);
+    }
+
+    private void killEntity(int count) {
+
+        if (this.amount <= 0 || count <= 0 || this.isInValid()) {
+            return;
+        }
+
+        World world = this.location.getWorld();
+        Location location = this.location.clone().add(0.5, 1, 0.5);
+        LivingEntity clonedEntity = world.spawn(location, this.livingEntity.getClass());
+        clonedEntity.setAI(false);
+        this.getDeadEntities().add(clonedEntity);
+        clonedEntity.damage(livingEntity.getHealth() * 2);
+
+        this.entityDeath();
+        this.killEntity(count - 1);
     }
 }

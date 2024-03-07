@@ -79,4 +79,6 @@ public interface Spawner {
     Optional<SpawnerItem> getSpawnerItem(ItemStack itemStack);
 
     void removeItem(SpawnerItem spawnerItem);
+
+    void autoKill();
 }

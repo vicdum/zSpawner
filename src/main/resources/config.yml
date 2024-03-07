@@ -24,10 +24,10 @@
 ########################################################################################################################
 
 # Displays more information in the console, if you have a problem please enable this option and send errors to support.
-enableDebug: false
+enableDebug: true
 
 # Enables time debugs, is used to measure plugin performance
-enableDebugTime: false
+enableDebugTime: true
 
 # Change the storage type of the plugin.
 #
@@ -70,7 +70,7 @@ items:
       - HIDE_POTION_EFFECTS
   VIRTUAL: # Virtual spawner
     material: SPAWNER
-    name: "&6&lSpawner &8- &f%type%"
+    name: "&6&lSpawner &8- &f%type% &8(&7%level%&8)"
     lore:
       - "&8Virtual spawner, place it to use it"
     flags:
@@ -312,6 +312,45 @@ chunkLimit:
 # Virtual spawner configuration
 virtual:
 
+  # Material used for the block
   material: LODESTONE
 
+  # Name to display entity number
   name: "&6x%amount%"
+
+  defaultLevelName: level1
+
+  # Need another level system ? Come directly ask me about my discord, so we can discuss it
+  levels:
+    level1:
+      level: 1
+      displayName: "Level 1"
+      blacklistMaterials: # blacklist materials
+        - BOW
+      whitelistMaterials: [ ] # whitelist materials
+      distance: 6 # Spawn distance
+      experienceMultiplier: 1
+      lootMultiplier: 1
+      autoKill: false
+      mobPerMinute: 0
+      maxEntity: 1000
+      minDelay: 10000 # 10 seconds
+      maxDelay: 15000 # 15 seconds
+      minSpawn: 1 # Minimum spawn entity
+      maxSpawn: 2 # Maximum spawn entity
+    level2:
+      level: 2
+      displayName: "Level 2"
+      blacklistMaterials: # blacklist materials
+        - BOW
+      whitelistMaterials: [ ] # whitelist materials
+      distance: 8 # Spawn distance
+      experienceMultiplier: 1.5
+      lootMultiplier: 1.5
+      autoKill: true
+      mobPerMinute: 20 # 20 mobs will be killed each minute
+      maxEntity: 5000
+      minDelay: 5000 # 5 seconds
+      maxDelay: 10000 # 10 seconds
+      minSpawn: 2 # Minimum spawn entity
+      maxSpawn: 4 # Maximum spawn entity

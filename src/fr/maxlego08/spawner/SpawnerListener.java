@@ -188,7 +188,7 @@ public class SpawnerListener extends ListenerAdapter {
                     return;
                 }
 
-                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType()));
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getLevel()));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {
                     spawner.setAmount(spawner.getAmount() - 1);
@@ -223,7 +223,7 @@ public class SpawnerListener extends ListenerAdapter {
                     spawner.breakBlock();
                     storage.removeSpawner(spawner);
 
-                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType()));
+                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner.getLevel()));
                     return false;
                 }
             }
@@ -234,7 +234,7 @@ public class SpawnerListener extends ListenerAdapter {
 
             if (block.getType() == Material.SPAWNER && Config.dropNaturalSpawnerOnExplose) {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
-                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, SpawnerType.CLASSIC, spawner.getSpawnedType()));
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, SpawnerType.CLASSIC, spawner.getSpawnedType(), null));
                 return false;
             }
 
@@ -264,10 +264,7 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onTeleport(EntityTeleportEvent event, Entity entity) {
-        System.out.println("TP " + entity + " - " + entity.hasMetadata("zspawner"));
-        if (entity.hasMetadata("zspawner")) {
-            event.setCancelled(true);
-        }
+        if (entity.hasMetadata("zspawner")) event.setCancelled(true);
     }
 
     @Override

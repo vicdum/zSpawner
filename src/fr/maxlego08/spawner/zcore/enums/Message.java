@@ -76,6 +76,10 @@ public enum Message {
     LIMIT_ENTITY("§cYou cannot place more than §f%amount% §b%type%§c spawner."),
     LIMIT_GLOBAL("§cYou cannot place more than §f%amount%§c spawner."),
 
+    VIRTUAL_REMOVE_ERROR_EMPTY("§cYou must clear the spawner before you can retrieve it."),
+    VIRTUAL_REMOVE_ERROR_FULL("§cYour inventory has no room to receive the spawner."),
+    VIRTUAL_REMOVE_SUCCESS("§aYou just got your virtual spawner back."),
+
     ;
 
     private List<String> messages;
