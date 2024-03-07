@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface Spawner {
+public interface Spawner extends Updatable {
 
     UUID getOwner();
 
@@ -24,17 +24,15 @@ public interface Spawner {
 
     long getPlacedAt();
 
-    SpawnerLevel getLevel();
+    SpawnerOption getOption();
+
+    void setOption(SpawnerOption spawnerOption);
 
     EntityType getEntityType();
 
     boolean isPlace();
 
-    boolean needUpdate();
-
     boolean sameChunk(int x, int z);
-
-    void update();
 
     void place(Location location);
 
@@ -81,4 +79,6 @@ public interface Spawner {
     void removeItem(SpawnerItem spawnerItem);
 
     void autoKill();
+
+    String getSpawnerKey();
 }

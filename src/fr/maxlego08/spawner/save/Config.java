@@ -25,7 +25,6 @@ public class Config {
     public static Map<SpawnerType, Boolean> spawnerDrop = new HashMap<>();
     public static Material virtualMaterial = Material.LODESTONE;
     public static String virtualName = "&6x%amount%";
-    public static String defaultLevelName = "level1";
 
     /**
      * static Singleton instance.
@@ -94,6 +93,5 @@ public class Config {
 
         virtualMaterial = Material.valueOf(configuration.getString("virtual.material", "LODESTONE"));
         virtualName = configuration.getString("virtual.name", "&6x%amount%");
-        defaultLevelName = configuration.getString("virtual.defaultLevelName", "level1");
     }
 }

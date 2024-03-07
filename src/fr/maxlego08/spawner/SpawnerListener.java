@@ -111,7 +111,7 @@ public class SpawnerListener extends ListenerAdapter {
 
 
         BlockFace blockFace = getCardinalDirection(player);
-        Spawner spawner = new ZSpawner(plugin, player.getUniqueId(), spawnerType, entityType, blockFace);
+        Spawner spawner = new ZSpawner(plugin, spawnerResult.getSpawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
         spawner.place(block.getLocation());
 
         storage.addSpawner(spawner);
@@ -188,7 +188,7 @@ public class SpawnerListener extends ListenerAdapter {
                     return;
                 }
 
-                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getLevel()));
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {
                     spawner.setAmount(spawner.getAmount() - 1);
@@ -223,7 +223,7 @@ public class SpawnerListener extends ListenerAdapter {
                     spawner.breakBlock();
                     storage.removeSpawner(spawner);
 
-                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner.getLevel()));
+                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
                     return false;
                 }
             }

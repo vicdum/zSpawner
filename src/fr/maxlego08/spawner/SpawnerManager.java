@@ -10,7 +10,7 @@ import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.api.SpawnerLevel;
+import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.api.storage.IStorage;
@@ -20,10 +20,8 @@ import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
-import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
-import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
@@ -54,29 +52,23 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private final SpawnerPlugin plugin;
     private final NamespacedKey spawnerTypeKey;
     private final NamespacedKey spawnerEntityKey;
-    private final NamespacedKey spawnerLevelKey;
+    private final NamespacedKey spawnerUuidKey;
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
     private final Map<UUID, PlayerSpawner> playerSpawners = new HashMap<>();
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
     private List<Material> blacklistMaterials = new ArrayList<>();
-    private List<SpawnerLevel> levels = new ArrayList<>();
+    private SpawnerOption spawnerOption;
 
     public SpawnerManager(SpawnerPlugin plugin) {
         super(plugin);
         this.plugin = plugin;
         this.spawnerTypeKey = new NamespacedKey(plugin, "type");
         this.spawnerEntityKey = new NamespacedKey(plugin, "entity");
-        this.spawnerLevelKey = new NamespacedKey(plugin, "level");
+        this.spawnerUuidKey = new NamespacedKey(plugin, "level");
     }
 
-    public SpawnerLevel getSpawnerLevel(String levelName) {
-
-        if (this.levels.stream().noneMatch(e -> e.getName().equalsIgnoreCase(Config.defaultLevelName))) {
-            Logger.info("Error with level. Default level was not found.", Logger.LogType.ERROR);
-            return ZSpawnerLevel.DEFAULT_LEVEL;
-        }
-
-        return this.levels.stream().filter(e -> e.getName().equalsIgnoreCase(levelName)).findFirst().orElseGet(() -> getSpawnerLevel(Config.defaultLevelName));
+    public SpawnerOption getDefaultOption() {
+        return this.spawnerOption;
     }
 
     @Override
@@ -108,7 +100,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
         this.entitiesMaterials = loadEntityMaterials();
         this.blacklistMaterials = loadBlacklist();
-        this.levels = loadLevels();
+        this.spawnerOption = loadDefaultSpawnerOption();
+
+        System.out.println(this.spawnerOption);
 
         this.loadInventories();
     }
@@ -140,7 +134,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     }
 
-    public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, SpawnerLevel level) {
+    public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, UUID spawnerId) {
 
         MenuItemStack menuItemStack = this.spawnerTypeItemStacks.get(spawnerType);
         Placeholders placeholders = new Placeholders();
@@ -152,8 +146,8 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.spawnerTypeKey, PersistentDataType.STRING, spawnerType.name());
         persistentDataContainer.set(this.spawnerEntityKey, PersistentDataType.STRING, entityType.name());
-        if (level != null) {
-            persistentDataContainer.set(this.spawnerLevelKey, PersistentDataType.STRING, level.getName());
+        if (spawnerId != null) {
+            persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawnerId.toString());
         }
 
         itemStack.setItemMeta(itemMeta);
@@ -179,7 +173,10 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
             SpawnerType spawnerType = SpawnerType.valueOf(persistentDataContainer.get(this.spawnerTypeKey, PersistentDataType.STRING));
             EntityType entityType = EntityType.valueOf(persistentDataContainer.get(this.spawnerEntityKey, PersistentDataType.STRING));
-            return Optional.of(new SpawnerResult(spawnerType, entityType));
+
+            UUID spawnerId = UUID.fromString(persistentDataContainer.getOrDefault(this.spawnerUuidKey, PersistentDataType.STRING, UUID.randomUUID().toString()));
+
+            return Optional.of(new SpawnerResult(spawnerType, entityType, spawnerId));
         }
         return Optional.empty();
     }
@@ -245,7 +242,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             int playerCount = location.getWorld().getNearbyEntities(location, distance, distance, distance, entity -> entity instanceof Player).size();
             if (playerCount > 0) spawner.tick();
 
-            if (spawner.getLevel().isAutoKill()) spawner.autoKill();
+            if (spawner.getOption().enableAutoKill()) spawner.autoKill();
         });
     }
 
@@ -303,7 +300,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         }
 
         spawner.breakBlock();
-        ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getLevel());
+        ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId());
         player.getInventory().addItem(itemStack);
 
         ZPlugin.service.execute(() -> this.plugin.getStorage().removeSpawner(spawner));

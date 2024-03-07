@@ -45,6 +45,7 @@ public enum Message {
 
     DESCRIPTION_RELOAD("Reload configuration files"),
     DESCRIPTION_GIVE("Give a spawner"),
+    DESCRIPTION_OPTION("Set virtual spawner option"),
     DESCRIPTION_ADD("Add gui spawner"),
     DESCRIPTION_REMOVE("Remove gui spawner"),
     DESCRIPTION_HELP("Help commands"),
@@ -79,6 +80,9 @@ public enum Message {
     VIRTUAL_REMOVE_ERROR_EMPTY("§cYou must clear the spawner before you can retrieve it."),
     VIRTUAL_REMOVE_ERROR_FULL("§cYour inventory has no room to receive the spawner."),
     VIRTUAL_REMOVE_SUCCESS("§aYou just got your virtual spawner back."),
+
+    COMMAND_OPTION_ERROR("§cCannot find spawner with key §f%spawnerKey%§c."),
+    COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
 
     ;
 

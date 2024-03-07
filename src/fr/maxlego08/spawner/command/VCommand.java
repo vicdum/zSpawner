@@ -263,7 +263,7 @@ public abstract class VCommand extends Arguments {
 	 */
 	protected void addRequireArg(String message) {
 		this.requireArgs.add(message);
-		this.ignoreParent = this.parent == null ? true : false;
+		this.ignoreParent = this.parent == null;
 		this.ignoreArgs = true;
 	}
 

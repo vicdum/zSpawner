@@ -2,7 +2,7 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.api.SpawnerLevel;
+import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
@@ -38,8 +38,8 @@ public class ZSpawner extends ZUtils implements Spawner {
     private final SpawnerType spawnerType;
     private final EntityType entityType;
     private final BlockFace blockFace;
-    private final SpawnerLevel spawnerLevel;
     private final List<Entity> deadEntities = new ArrayList<>();
+    private SpawnerOption spawnerOption;
     private long placedAt;
     private Location location;
     private boolean needUpdate;
@@ -51,30 +51,25 @@ public class ZSpawner extends ZUtils implements Spawner {
     private List<SpawnerItem> items = new ArrayList<>();
     private long lastEntityKill;
 
-    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, SpawnerLevel spawnerLevel, Location location, int amount, BlockFace blockFace) {
+    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace) {
         this.plugin = plugin;
         this.uniqueId = uniqueId;
         this.ownerId = ownerId;
         this.spawnerType = spawnerType;
         this.entityType = entityType;
         this.placedAt = placedAt;
-        this.spawnerLevel = spawnerLevel;
         this.location = location;
         this.amount = amount;
         this.blockFace = blockFace;
+        this.spawnerOption = this.plugin.getManager().getDefaultOption();
+    }
+
+    public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
+        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace);
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
-        this.plugin = plugin;
-        this.ownerId = ownerId;
-        this.uniqueId = UUID.randomUUID();
-        this.spawnerType = spawnerType;
-        this.entityType = entityType;
-        this.amount = 1;
-        this.location = null;
-        this.placedAt = 0;
-        this.blockFace = blockFace;
-        this.spawnerLevel = plugin.getManager().getSpawnerLevel(Config.defaultLevelName);
+        this(plugin, UUID.randomUUID(), ownerId, spawnerType, entityType, blockFace);
     }
 
     @Override
@@ -103,8 +98,13 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     @Override
-    public SpawnerLevel getLevel() {
-        return this.spawnerLevel;
+    public SpawnerOption getOption() {
+        return this.spawnerOption;
+    }
+
+    @Override
+    public void setOption(SpawnerOption spawnerOption) {
+        this.spawnerOption = spawnerOption;
     }
 
     @Override
@@ -377,7 +377,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public double getDistance() {
-        return spawnerLevel.getDistance();
+        return spawnerOption.getDistance();
     }
 
     private boolean isInValid() {
@@ -392,12 +392,12 @@ public class ZSpawner extends ZUtils implements Spawner {
             this.spawnEntity();
         }
 
-        if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerLevel.getMaxEntity()) {
+        if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerOption.getMaxEntity()) {
 
-            long ms = ThreadLocalRandom.current().nextLong(spawnerLevel.getMinDelay(), spawnerLevel.getMaxDelay());
+            long ms = ThreadLocalRandom.current().nextLong(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay());
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(spawnerLevel.getMinSpawn(), spawnerLevel.getMaxSpawn());
+            this.amount += getNumberBetween(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn());
             this.needUpdate = true;
             this.updateEntity();
         }
@@ -437,8 +437,13 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     @Override
+    public String getSpawnerKey() {
+        return this.uniqueId.toString().substring(0, 6) + "_" + entityType.name().toLowerCase();
+    }
+
+    @Override
     public void autoKill() {
-        int entityPerMinute = spawnerLevel.getMobPerMinute();
+        int entityPerMinute = spawnerOption.getMobPerMinute();
         double entityPerSecond = (double) entityPerMinute / 60d;
 
         if (entityPerSecond < 1) {

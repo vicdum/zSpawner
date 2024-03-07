@@ -59,4 +59,9 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     public boolean isSimilar(ItemStack itemStack) {
         return this.itemStack.isSimilar(itemStack);
     }
+
+    @Override
+    public void update() {
+        this.needUpdate = false;
+    }
 }
