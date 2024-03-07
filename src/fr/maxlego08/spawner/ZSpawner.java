@@ -300,7 +300,6 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void disable() {
-        System.out.println("JE DISABLE ICI !");
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
     }
