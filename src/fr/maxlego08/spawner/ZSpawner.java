@@ -460,8 +460,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
 
         World world = this.location.getWorld();
-        Location location = this.location.clone().add(0.5, 1, 0.5);
-        LivingEntity clonedEntity = world.spawn(location, this.livingEntity.getClass());
+        LivingEntity clonedEntity = world.spawn(getSpawnedEntityLocation(), this.livingEntity.getClass());
         clonedEntity.setAI(false);
         this.getDeadEntities().add(clonedEntity);
         clonedEntity.damage(livingEntity.getHealth() * 2);
