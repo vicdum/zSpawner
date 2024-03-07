@@ -58,6 +58,6 @@ public class StorageManager implements SpawnerStorage {
     }
 
     public void saveTask() {
-        this.storage.update();
+        this.storage.update(true);
     }
 }

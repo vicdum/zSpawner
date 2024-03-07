@@ -4,7 +4,9 @@ import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
 import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
+import fr.maxlego08.spawner.SpawnerManager;
 import fr.maxlego08.spawner.SpawnerPlugin;
+import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import org.bukkit.entity.Player;
@@ -39,6 +41,10 @@ public class ItemsButton extends ZButton implements PaginateButton {
     @Override
     public void onRender(Player player, InventoryDefault inventory) {
 
+        PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
+        Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
+        if (spawner == null) return;
+
         List<SpawnerItem> items = getSpawnerItems(player);
         Pagination<SpawnerItem> pagination = new Pagination<>();
         List<SpawnerItem> paginatedItems = pagination.paginate(items, this.slots.size(), inventory.getPage());
@@ -59,19 +65,27 @@ public class ItemsButton extends ZButton implements PaginateButton {
             }).collect(Collectors.toList()), player);
             itemStack.setItemMeta(itemMeta);
 
-            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawnerItem, player, event));
+            inventory.addItem(slot, itemStack).setClick(event -> onClick(spawnerItem, spawner, player, event));
         }
     }
 
-    private void onClick(SpawnerItem spawnerItem, Player player, InventoryClickEvent event) {
+    private void onClick(SpawnerItem spawnerItem, Spawner spawner, Player player, InventoryClickEvent event) {
 
+        SpawnerManager manager = plugin.getManager();
         if (event.getClick() == ClickType.SHIFT_LEFT) {
-
+            manager.fillInventoryWithLoot(player, spawner, spawnerItem);
         } else if (event.isRightClick()) {
-
+            manager.removeStackLoot(player, spawner, spawnerItem, 1);
         } else if (event.isLeftClick()) {
-
+            manager.removeStackLoot(player, spawner, spawnerItem, 64);
         }
+
+        manager.openVirtualSpawner(player, spawner);
+    }
+
+    @Override
+    public boolean isPermanent() {
+        return true;
     }
 
     @Override

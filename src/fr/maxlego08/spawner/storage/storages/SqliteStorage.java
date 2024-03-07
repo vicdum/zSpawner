@@ -143,7 +143,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
     @Override
     public void save() {
         this.spawners.forEach(Spawner::disable);
-        this.update();
+        this.update(false);
         this.disconnect();
     }
 
@@ -153,11 +153,14 @@ public class SqliteStorage extends ZUtils implements IStorage {
     }
 
     @Override
-    public void update() {
-        ZPlugin.service.execute(() -> this.spawners.stream().filter(Spawner::needUpdate).forEach(spawner -> {
+    public void update(boolean async) {
+        Runnable runnable = () -> this.spawners.stream().filter(Spawner::needUpdate).forEach(spawner -> {
             this.upsertSpawner(spawner);
             spawner.getItems().stream().filter(SpawnerItem::needUpdate).forEach(spawnerItem -> this.upsertSpawnerItem(spawner.getSpawnerId(), ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()), spawnerItem.getAmount()));
-        }));
+        });
+
+        if (async) ZPlugin.service.execute(runnable);
+        else runnable.run();
     }
 
     @Override
@@ -168,6 +171,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
     @Override
     public long countSpawners(OfflinePlayer player, SpawnerType spawnerType) {
         return getSpawners(player).stream().filter(spawner -> spawner.getType() == spawnerType).count();
+    }
+
+    @Override
+    public void deleteSpawnerItem(Spawner spawner, SpawnerItem spawnerItem) {
+        ZPlugin.service.execute(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), ItemStackUtils.serializeItemStack(spawnerItem.getItemStack())));
     }
 
     public void disconnect() {

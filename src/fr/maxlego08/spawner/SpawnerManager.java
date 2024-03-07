@@ -9,6 +9,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
@@ -230,5 +231,40 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
                 spawner.autoKill();
             }*/
         });
+    }
+
+    public void fillInventoryWithLoot(Player player, Spawner spawner, SpawnerItem spawnerItem) {
+
+        ItemStack itemStack = spawnerItem.getItemStack().clone();
+        long amount = spawnerItem.getAmount();
+        while (amount > 0 && player.getInventory().firstEmpty() != -1) {
+            int toAdd = (int) Math.min(amount, itemStack.getMaxStackSize());
+            ItemStack currentItemStack = itemStack.clone();
+            currentItemStack.setAmount(toAdd);
+            player.getInventory().addItem(currentItemStack);
+            amount -= toAdd;
+        }
+
+        if (amount <= 0) spawner.removeItem(spawnerItem);
+        else spawnerItem.setAmount(amount);
+    }
+
+    public void removeStackLoot(Player player, Spawner spawner, SpawnerItem spawnerItem, int removeAmount) {
+
+        if (!hasInventorySpace(player)) return;
+
+        ItemStack itemStack = spawnerItem.getItemStack().clone();
+        long amount = spawnerItem.getAmount();
+        int available = (int) Math.min(Math.min(itemStack.getMaxStackSize(), removeAmount), amount);
+
+        itemStack.setAmount(available);
+        player.getInventory().addItem(itemStack);
+
+        spawnerItem.removeAmount(available);
+        if (spawnerItem.getAmount() <= 0) spawner.removeItem(spawnerItem);
+    }
+
+    public boolean hasInventorySpace(Player player) {
+        return player.getInventory().firstEmpty() != -1;
     }
 }

@@ -299,6 +299,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void disable() {
+        System.out.println("JE DISABLE LE SPAWNER");
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
     }
@@ -383,6 +384,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void tick() {
 
         if (this.livingEntity == null || !this.livingEntity.isValid() || this.livingEntity.isDead()) {
+            System.out.println("L'entité est pas correcte, je dois la faire spawn");
             this.spawnEntity();
         }
 
@@ -424,5 +426,11 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public Optional<SpawnerItem> getSpawnerItem(ItemStack itemStack) {
         return this.items.stream().filter(spawnerItem -> spawnerItem.isSimilar(itemStack)).findFirst();
+    }
+
+    @Override
+    public void removeItem(SpawnerItem spawnerItem) {
+        this.items.remove(spawnerItem);
+        this.plugin.getStorage().deleteSpawnerItem(this, spawnerItem);
     }
 }

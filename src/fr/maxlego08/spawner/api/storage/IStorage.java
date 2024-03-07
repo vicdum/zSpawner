@@ -1,6 +1,7 @@
 package fr.maxlego08.spawner.api.storage;
 
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -44,7 +45,9 @@ public interface IStorage {
 
     void save();
 
-    void update();
+    void update(boolean async);
 
     List<Spawner> getSpawners(SpawnerType spawnerType);
+
+    void deleteSpawnerItem(Spawner spawner, SpawnerItem spawnerItem);
 }

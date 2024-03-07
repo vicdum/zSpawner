@@ -77,4 +77,6 @@ public interface Spawner {
     void setItems(List<SpawnerItem> items);
 
     Optional<SpawnerItem> getSpawnerItem(ItemStack itemStack);
+
+    void removeItem(SpawnerItem spawnerItem);
 }
