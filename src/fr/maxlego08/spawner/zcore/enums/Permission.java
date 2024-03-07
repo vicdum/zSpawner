@@ -8,7 +8,8 @@ public enum Permission {
 	ZSPAWNER_GIVE,
 	ZSPAWNER_ADD,
 	ZSPAWNER_REMOVE,
-    ZSPAWNER_OPTION;
+    ZSPAWNER_OPTION,
+	ZSPAWNER_SHOW;
 
 	private String permission;
 

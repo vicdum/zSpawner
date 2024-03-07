@@ -6,13 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.Arguments;
 import fr.maxlego08.spawner.zcore.utils.commands.CollectionBiConsumer;
 import fr.maxlego08.spawner.zcore.utils.commands.Tab;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -590,6 +595,13 @@ public abstract class VCommand extends Arguments {
 						command.getDescription());
 			}
 		});
+	}
+
+	public List<String> getSpawners(String[] args, int index, SpawnerPlugin plugin, SpawnerType spawnerType){
+		if (args.length < index) return new ArrayList<>();
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[index]);
+		if (!offlinePlayer.hasPlayedBefore()) return new ArrayList<>();
+		return plugin.getStorage().getSpawners(offlinePlayer).stream().filter(spawner -> spawner.getType() == spawnerType).map(Spawner::getSpawnerKey).collect(Collectors.toList());
 	}
 
 }

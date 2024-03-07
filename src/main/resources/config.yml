@@ -12,7 +12,9 @@
 # /zspawners reload - zspawner.reload - Reload configuration files
 # /zspawners give <type> <entity> <player> [<silent>] - zspawner.give - Give a spawner
 # /zspawners add <entity> <player> [<silent>] - zspawner.add - Add a spawner
-# /zspawners remove <entity> <player> [<silent>] - zspawner.remove - remove a spawner
+# /zspawners remove <player> <spawner key> [<silent>] - zspawner.remove - Remove a spawner
+# /zspawners open <player> <spawner key> <option> <value> - zspawner.option - Set value to an option
+# /zspawners show [<player>] [<page>] - zspawner.show - Show spawners
 #
 # Placeholders:
 # %zspawner_sort% - Display player sort type

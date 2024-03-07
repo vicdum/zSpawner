@@ -49,6 +49,7 @@ public enum Message {
     DESCRIPTION_ADD("Add gui spawner"),
     DESCRIPTION_REMOVE("Remove gui spawner"),
     DESCRIPTION_HELP("Help commands"),
+    DESCRIPTION_SHOW("Show spawners"),
 
     SPAWNER_UNPLACED("&cᴜɴᴘʟᴀᴄᴇᴅ"),
     SPAWNER_LOCATION("&f%world%&7, &f%x%&7, &f %y%&7, &f %z%"),
@@ -60,6 +61,9 @@ public enum Message {
 
     ADD_SENDER("§aYou just add a spawner §f%entity% §ato the player §e%target%§a."),
     ADD_PLAYER("§aYou just received a spawner at §f%entity%§a. §8(§7/zspawner§8)"),
+
+    REMOVE_SENDER("§aYou just remove the spawner §f%spawnerKey% §ato the player §e%target%§a."),
+    REMOVE_PLAYER("§aYou just lost a spawner."),
 
     BREAK_GUI("§aYour spawner is available in §f/zspawner§a."),
     BREAK_ERROR_GUI("§cUse §f/zspawner §cto break the spawner."),
@@ -81,7 +85,8 @@ public enum Message {
     VIRTUAL_REMOVE_ERROR_FULL("§cYour inventory has no room to receive the spawner."),
     VIRTUAL_REMOVE_SUCCESS("§aYou just got your virtual spawner back."),
 
-    COMMAND_OPTION_ERROR("§cCannot find spawner with key §f%spawnerKey%§c."),
+    COMMAND_SPAWNER_NOT_FOUND("§cCannot find spawner with key §f%spawnerKey%§c."),
+    COMMAND_SPAWNER_TYPE("§cYou cannot perform this action on this spawner."),
     COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
 
     ;

@@ -186,6 +186,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
         ZPlugin.service.execute(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), ItemStackUtils.serializeItemStack(spawnerItem.getItemStack())));
     }
 
+    @Override
+    public List<Spawner> getSpawners() {
+        return spawners;
+    }
+
     public void disconnect() {
         try {
             if (isConnected()) connection.close();

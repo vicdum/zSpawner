@@ -8,7 +8,6 @@ import fr.maxlego08.spawner.command.VCommand;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.util.ArrayList;
@@ -26,12 +25,7 @@ public class CommandSpawnerOption extends VCommand {
         this.setDescription(Message.DESCRIPTION_GIVE);
 
         this.addRequireArg("player");
-        this.addRequireArg("spawner", (sender, args) -> {
-            if (args.length < 1) return new ArrayList<>();
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[1]);
-            if (!offlinePlayer.hasPlayedBefore()) return new ArrayList<>();
-            return plugin.getStorage().getSpawners(offlinePlayer).stream().filter(spawner -> spawner.getType() == SpawnerType.VIRTUAL).map(Spawner::getSpawnerKey).collect(Collectors.toList());
-        });
+        this.addRequireArg("spawner", (sender, args) -> getSpawners(args, 1, plugin, SpawnerType.VIRTUAL));
         this.addRequireArg("option", (sender, args) -> Arrays.stream(SpawnerOptionSetter.values()).map(e -> e.name().toLowerCase()).collect(Collectors.toList()));
         this.addRequireArg("value", (sender, args) -> {
             try {
@@ -73,11 +67,16 @@ public class CommandSpawnerOption extends VCommand {
 
         Optional<Spawner> optional = plugin.getStorage().getSpawners(offlinePlayer).stream().filter(e -> e.getSpawnerKey().equals(spawnerKey)).findFirst();
         if (!optional.isPresent()) {
-            message(this.plugin, this.sender, Message.COMMAND_OPTION_ERROR, "%spawnerKey%", spawnerKey);
+            message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);
             return CommandType.DEFAULT;
         }
 
         Spawner spawner = optional.get();
+        if (spawner.getType() != SpawnerType.VIRTUAL) {
+            message(this.plugin, this.sender, Message.COMMAND_SPAWNER_TYPE);
+            return CommandType.DEFAULT;
+        }
+
         if (!spawnerOptionSetter.apply(spawner.getOption(), value)) {
             return CommandType.SYNTAX_ERROR;
         }

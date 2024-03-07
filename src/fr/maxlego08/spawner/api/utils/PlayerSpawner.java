@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.api.utils;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.enums.Sort;
+import org.bukkit.OfflinePlayer;
 
 public class PlayerSpawner {
 
@@ -9,6 +10,7 @@ public class PlayerSpawner {
     private long placingCooldown = 0;
     private Spawner placingSpawner;
     private Spawner virtualSpawner;
+    private OfflinePlayer targetPlayer;
 
     public Sort getTypeShort() {
         return typeShort;
@@ -54,5 +56,13 @@ public class PlayerSpawner {
 
     public void setVirtualSpawner(Spawner virtualSpawner) {
         this.virtualSpawner = virtualSpawner;
+    }
+
+    public OfflinePlayer getTargetPlayer() {
+        return targetPlayer;
+    }
+
+    public void setTargetPlayer(OfflinePlayer targetPlayer) {
+        this.targetPlayer = targetPlayer;
     }
 }
