@@ -126,7 +126,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     public boolean sameChunk(int x, int z) {
         if (!this.isPlace()) return false;
         Chunk chunk = this.location.getChunk();
-        return chunk.getX() == x || chunk.getZ() == z;
+        return chunk.getX() == x && chunk.getZ() == z;
     }
 
     @Override
