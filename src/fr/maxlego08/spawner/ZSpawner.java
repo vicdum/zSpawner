@@ -299,7 +299,6 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void disable() {
-        System.out.println("JE DISABLE LE SPAWNER");
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
     }
@@ -384,7 +383,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void tick() {
 
         if (this.livingEntity == null || !this.livingEntity.isValid() || this.livingEntity.isDead()) {
-            System.out.println("L'entité est pas correcte, je dois la faire spawn");
+            this.livingEntity = null;
             this.spawnEntity();
         }
 

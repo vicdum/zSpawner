@@ -413,13 +413,13 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onChunkLoad(ChunkLoadEvent event, Chunk chunk, World world) {
         IStorage storage = this.plugin.getStorage();
-        storage.getSpawners(SpawnerType.VIRTUAL).forEach(Spawner::load);
+        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(spawner -> spawner.sameChunk(chunk.getX(), chunk.getZ())).forEach(Spawner::load);
     }
 
     @Override
     protected void onChunkUnLoad(ChunkUnloadEvent event, Chunk chunk, World world) {
         IStorage storage = this.plugin.getStorage();
-        storage.getSpawners(SpawnerType.VIRTUAL).forEach(Spawner::disable);
+        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(spawner -> spawner.sameChunk(chunk.getX(), chunk.getZ())).forEach(Spawner::disable);
     }
 
     @Override
