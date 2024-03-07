@@ -17,11 +17,11 @@ import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
+import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -120,6 +120,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         ButtonManager buttonManager = this.plugin.getButtonManager();
         buttonManager.register(new NoneLoader(this.plugin, SpawnersButton.class, "zspawner_spawners"));
         buttonManager.register(new NoneLoader(this.plugin, SortButton.class, "zspawner_sort"));
+        buttonManager.register(new NoneLoader(this.plugin, ItemsButton.class, "zspawner_items"));
 
     }
 

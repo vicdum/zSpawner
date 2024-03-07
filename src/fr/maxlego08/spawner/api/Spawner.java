@@ -2,7 +2,6 @@ package fr.maxlego08.spawner.api;
 
 import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import org.bukkit.Location;
-import org.bukkit.WorldCreator;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -10,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface Spawner {
@@ -71,4 +71,10 @@ public interface Spawner {
     BlockFace getBlockFace();
 
     Cuboid getCuboid();
+
+    List<SpawnerItem> getItems();
+
+    void setItems(List<SpawnerItem> items);
+
+    Optional<SpawnerItem> getSpawnerItem(ItemStack itemStack);
 }

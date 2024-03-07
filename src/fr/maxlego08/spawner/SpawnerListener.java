@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -277,6 +278,7 @@ public class SpawnerListener extends ListenerAdapter {
 
             if (spawner.getAmount() <= 0 || cause == EntityDamageEvent.DamageCause.SUFFOCATION || cause == EntityDamageEvent.DamageCause.LAVA || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.DRYOUT || cause == EntityDamageEvent.DamageCause.POISON || cause == EntityDamageEvent.DamageCause.MAGIC || cause == EntityDamageEvent.DamageCause.DROWNING || cause == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
                 event.setCancelled(true);
+                return;
             }
 
             if (event instanceof EntityDamageByEntityEvent) {
@@ -473,4 +475,8 @@ public class SpawnerListener extends ListenerAdapter {
         return false;
     }
 
+    @Override
+    protected void onQuit(PlayerQuitEvent event, Player player) {
+        this.plugin.getManager().getPlayerSpawners().remove(player.getUniqueId());
+    }
 }

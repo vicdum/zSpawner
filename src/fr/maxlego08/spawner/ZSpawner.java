@@ -1,6 +1,7 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerLevel;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.save.Config;
@@ -25,6 +26,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -46,6 +48,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     private LivingEntity livingEntity;
     private long lastSpawnAt;
     private Cuboid cuboid;
+    private List<SpawnerItem> items = new ArrayList<>();
 
     public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, SpawnerLevel spawnerLevel, Location location, int amount, BlockFace blockFace) {
         this.plugin = plugin;
@@ -349,7 +352,19 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void addItems(List<ItemStack> itemStacks) {
-        // ToDo
+
+        itemStacks.forEach(itemStack -> {
+            Optional<SpawnerItem> optional = getSpawnerItem(itemStack);
+            if (optional.isPresent()) {
+                SpawnerItem spawnerItem = optional.get();
+                spawnerItem.addAmount(itemStack.getAmount());
+            } else {
+                SpawnerItem spawnerItem = new ZSpawnerItem(itemStack, itemStack.getAmount());
+                this.items.add(spawnerItem);
+            }
+        });
+
+        this.needUpdate = true;
     }
 
     @Override
@@ -367,7 +382,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void tick() {
 
-        if (this.livingEntity == null || !this.livingEntity.isValid()) {
+        if (this.livingEntity == null || !this.livingEntity.isValid() || this.livingEntity.isDead()) {
             this.spawnEntity();
         }
 
@@ -392,16 +407,22 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public Cuboid getCuboid() {
         if (this.cuboid != null) return this.cuboid;
-        // ToDo, ajouter dans la configuration
-        int entitySize = 2;
-        switch (this.entityType) {
-            case ELDER_GUARDIAN:
-            case IRON_GOLEM:
-            case ENDERMAN:
-                entitySize = 3;
-                break;
-        }
-        Location maxLocation = this.spawnerType == SpawnerType.VIRTUAL ? this.location.clone().add(0, entitySize, 0) : this.location.clone();
+        Location maxLocation = this.spawnerType == SpawnerType.VIRTUAL ? this.location.clone().add(0, this.livingEntity == null ? 2 : Math.ceil(this.livingEntity.getHeight()), 0) : this.location.clone();
         return this.cuboid = new Cuboid(this.location.clone(), maxLocation);
+    }
+
+    @Override
+    public List<SpawnerItem> getItems() {
+        return this.items;
+    }
+
+    @Override
+    public void setItems(List<SpawnerItem> items) {
+        this.items = items;
+    }
+
+    @Override
+    public Optional<SpawnerItem> getSpawnerItem(ItemStack itemStack) {
+        return this.items.stream().filter(spawnerItem -> spawnerItem.isSimilar(itemStack)).findFirst();
     }
 }

@@ -1,12 +1,16 @@
 package fr.maxlego08.spawner.storage.storages;
 
+import fr.maxlego08.menu.zcore.utils.nms.ItemStackUtils;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.ZSpawner;
+import fr.maxlego08.spawner.ZSpawnerItem;
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +39,7 @@ import java.util.stream.Collectors;
 public class SqliteStorage extends ZUtils implements IStorage {
 
     private final String spawnerTableName;
+    private final String spawnerItemTableName;
     private final SpawnerPlugin plugin;
     protected Connection connection;
     private List<Spawner> spawners = new ArrayList<>();
@@ -46,6 +51,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
         FileConfiguration configuration = plugin.getConfig();
         String tablePrefix = configuration.getString("sql.tablePrefix", "zspawner");
         this.spawnerTableName = tablePrefix + "_spawners";
+        this.spawnerItemTableName = tablePrefix + "_items";
 
         if (createFile) {
             this.databaseFile = new File(plugin.getDataFolder(), "database.db");
@@ -124,7 +130,11 @@ public class SqliteStorage extends ZUtils implements IStorage {
             this.spawners.clear();
 
             this.create();
+            this.createSpawnerItemsTable();
+            ElapsedTime elapsedTime = new ElapsedTime("Select spawners");
+            elapsedTime.start();
             this.spawners = this.getAllSpawners();
+            elapsedTime.end();
 
             Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.forEach(Spawner::load));
         });
@@ -144,7 +154,10 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
     @Override
     public void update() {
-        ZPlugin.service.execute(() -> this.spawners.stream().filter(Spawner::needUpdate).forEach(this::upsertSpawner));
+        ZPlugin.service.execute(() -> this.spawners.stream().filter(Spawner::needUpdate).forEach(spawner -> {
+            this.upsertSpawner(spawner);
+            spawner.getItems().stream().filter(SpawnerItem::needUpdate).forEach(spawnerItem -> this.upsertSpawnerItem(spawner.getSpawnerId(), ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()), spawnerItem.getAmount()));
+        }));
     }
 
     @Override
@@ -195,6 +208,16 @@ public class SqliteStorage extends ZUtils implements IStorage {
         }
     }
 
+    public void createSpawnerItemsTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS " + this.spawnerItemTableName + " (" + "spawnerId UUID NOT NULL, " + "itemStack TEXT NOT NULL, " + "amount LONG NOT NULL, " + "PRIMARY KEY (spawnerId, itemStack), " + "FOREIGN KEY (spawnerId) REFERENCES " + this.spawnerTableName + "(spawnerId) ON DELETE CASCADE);";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Could not create " + this.spawnerItemTableName + " table: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+
     public void deleteSpawner(Spawner spawner) {
         String sql = "DELETE FROM " + this.spawnerTableName + " WHERE spawnerId = ?";
         try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
@@ -229,6 +252,19 @@ public class SqliteStorage extends ZUtils implements IStorage {
         }
     }
 
+    public void upsertSpawnerItem(UUID spawnerId, String itemStack, long amount) {
+        String sql = "INSERT INTO " + this.spawnerItemTableName + " (spawnerId, itemStack, amount) VALUES (?, ?, ?) " + "ON CONFLICT(spawnerId, itemStack) DO UPDATE SET " + "amount = EXCLUDED.amount;";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawnerId.toString());
+            preparedStatement.setString(2, itemStack);
+            preparedStatement.setLong(3, amount);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Error upserting spawner item in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+
     public List<Spawner> getAllSpawners() {
         List<Spawner> spawners = new ArrayList<>();
         String sql = "SELECT * FROM " + this.spawnerTableName;
@@ -248,11 +284,49 @@ public class SqliteStorage extends ZUtils implements IStorage {
 
                 Spawner spawner = new ZSpawner(this.plugin, spawnerId, owner, SpawnerType.valueOf(type), EntityType.valueOf(entityType), placedAt, this.plugin.getManager().getSpawnerLevel(level), location != null ? changeStringLocationToLocation(location) : null, amount, BlockFace.valueOf(blockFace));
                 spawners.add(spawner);
+
+                spawner.setItems(getSpawnerItems(spawnerId));
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
         return spawners;
+    }
+
+    public void deleteSpawnerItems(UUID spawnerId) {
+        String sql = "DELETE FROM " + this.spawnerItemTableName + " WHERE spawnerId = ?";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawnerId.toString());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Error deleting spawner items from SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+    }
+
+    public List<SpawnerItem> getSpawnerItems(UUID spawnerId) {
+        List<SpawnerItem> items = new ArrayList<>();
+        String sql = "SELECT itemStack, amount FROM " + this.spawnerItemTableName + " WHERE spawnerId = ?";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawnerId.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                items.add(new ZSpawnerItem(resultSet.getString("itemStack"), resultSet.getLong("amount")));
+            }
+        } catch (SQLException exception) {
+            Logger.info("Error retrieving spawner items from SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
+        return items;
+    }
+
+    public void deleteSpawnerItem(UUID spawnerId, String itemStack) {
+        String sql = "DELETE FROM " + this.spawnerItemTableName + " WHERE spawnerId = ? AND itemStack = ?";
+        try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, spawnerId.toString());
+            preparedStatement.setString(2, itemStack);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            Logger.info("Error deleting specific spawner item from SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+        }
     }
 
 

@@ -1,7 +1,7 @@
 name: "&8Virtual Spawner"
 size: 54
 items:
-  btn-0:
+  decoration:
     item:
       material: GRAY_STAINED_GLASS_PANE
     slots:
@@ -12,6 +12,22 @@ items:
       - 44
       - 46-48
       - 50-52
+
+  spawners:
+    type: ZSPAWNER_ITEMS
+    slots:
+      - 10-16
+      - 19-25
+      - 28-34
+      - 37-43
+    item:
+      lore:
+        - " &f⌂ #e6fff3qᴜᴀɴᴛɪᴛʏ#8c8c8c: #92bed8%quantity%"
+        - ""
+        - " #8c8c8c• #92bed8ʟᴇғᴛ ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ɢᴇᴛ 1 ɪᴛᴇᴍ"
+        - " #8c8c8c• #92bed8ʀɪɢʜᴛ ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ɢᴇᴛ 64 ɪᴛᴇᴍs"
+        - " #8c8c8c• #92bed8sʜɪғᴛ + ʟᴇғᴛ ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ɢᴇᴛ ᴛʜᴇ ᴍᴀxɪᴍᴜᴍ"
+
   sell:
     slot: 45
     item:
