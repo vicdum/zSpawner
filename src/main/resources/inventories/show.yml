@@ -1,5 +1,48 @@
+#########################################################################################################################################
+#
+#  ███████╗░██████╗██╗░░██╗░█████╗░██████╗░
+#  ╚════██║██╔════╝██║░░██║██╔══██╗██╔══██╗
+#  ░░███╔═╝╚█████╗░███████║██║░░██║██████╔╝
+#  ██╔══╝░░░╚═══██╗██╔══██║██║░░██║██╔═══╝░
+#  ███████╗██████╔╝██║░░██║╚█████╔╝██║░░░░░
+#  ╚══════╝╚═════╝░╚═╝░░╚═╝░╚════╝░╚═╝░░░░░
+#
+#   zSpawner uses the zMenu API for inventory configurations.
+#   zMenu documentation : https://docs.zmenu.dev/
+#   zShop documentation : https://zspawner.groupez.dev/
+#   Discord: https://discord.groupez.dev
+#   Sponsor: https://minecraft-inventory-builder.com/
+#
+# It is advisable to read the file basic_configuration.yml and advanced_configuration.yml to better understand how zMenu works
+#
+# This inventory displays the list of spawners of a player or the entire server.
+#
+#########################################################################################################################################
+
+# Inventory name (https://docs.zmenu.dev/configurations/inventories#name)
+#
+# This is the title of your inventory. You can put anything in it.
+# Color code and placeholders are supported.
+# If you are on Paper, Purpur or PufferFish you have access to the color code of MiniMessage (https://docs.advntr.dev/minimessage/format.html)
+#
 name: "&8Show Spawners &7%page%/%maxPage%"
+
+# Size (https://docs.zmenu.dev/configurations/inventories#size)
+#
+# Allows to set the size of the inventory.
+# The inventory size must be a multiple of 9. So you can put 9, 18, 27, 36, 45 and 54
+# If this option is not present in the configuration, then the default will be 54
+#
 size: 54
+
+# Item section. (https://docs.zmenu.dev/configurations/inventories#items)
+#
+# This is where you will add all the items that will be present in your inventory.
+# With zMenu, each item is a Button. A button will allow you to perform specific actions, such as opening a new inventory, changing pages, going back.
+# By default, the button will be of type NONE. All buttons will have the same configuration elements.
+# Only buttons with types like INVENTORY, BACK etc... will have specific configuration elements.
+# All button information here: https://docs.zmenu.dev/configurations/buttons
+#
 items:
 
   spawners:
