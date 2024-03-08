@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.listener;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.entity.Entity;

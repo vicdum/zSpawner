@@ -9,3 +9,4 @@
 # Unreleased
 
 - Fix virtual spawner with random entity spawn
+- Fix squid KnockBack

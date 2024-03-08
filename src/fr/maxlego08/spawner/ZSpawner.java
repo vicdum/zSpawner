@@ -222,7 +222,8 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
     }
 
-    private Location getSpawnedEntityLocation() {
+    @Override
+    public Location getSpawnedEntityLocation() {
         Location location = this.location.clone().add(0.5, 1, 0.5);
         if (this.blockFace.equals(BlockFace.SOUTH)) location.setYaw(180.f);
         if (this.blockFace.equals(BlockFace.WEST)) location.setYaw(-90.f);
@@ -245,6 +246,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.livingEntity.setCollidable(false);
         this.livingEntity.setCustomNameVisible(true);
         this.livingEntity.setVisualFire(false);
+        this.livingEntity.setSwimming(false);
         this.livingEntity.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
 
         if (this.livingEntity instanceof Ageable) {

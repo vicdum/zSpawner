@@ -332,3 +332,13 @@ virtual:
     maxDelay: 15000 # 15 seconds
     minSpawn: 1 # Minimum spawn entity
     maxSpawn: 2 # Maximum spawn entity
+
+# Silk spawners
+silkSpawner:
+
+  enable: false
+
+  whitelistMaterial:
+    - GOLD_PICKAXE
+
+  needSilkTouchEnchant: true
