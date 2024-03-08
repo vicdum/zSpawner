@@ -149,7 +149,11 @@ public class SpawnerListener extends ListenerAdapter {
                 }
 
                 if (Config.enableSilkSpawner) {
-                    if (cantSilkSpawner(player)) return;
+                    if (cantSilkSpawner(player)) {
+                        storage.removeSpawner(spawner.getLocation());
+                        event.setCancelled(false);
+                        return;
+                    }
                 }
 
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
