@@ -7,3 +7,5 @@
 - [ ] Ajouter le système de whitelist / blacklist de materials pour les materials
 
 # Unreleased
+
+- Fix virtual spawner with random entity spawn
