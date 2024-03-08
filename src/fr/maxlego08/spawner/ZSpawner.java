@@ -65,7 +65,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
-        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace);
+        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 1, blockFace);
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -300,7 +300,6 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public void disable() {
-        System.out.println("JE DISABLE ICI !");
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
     }
@@ -394,10 +393,11 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerOption.getMaxEntity()) {
 
-            long ms = ThreadLocalRandom.current().nextLong(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay());
+            long ms = ThreadLocalRandom.current().nextLong(Math.min(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()));
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn());
+            this.amount += getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxDelay()));
+            if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
             this.needUpdate = true;
             this.updateEntity();
         }
