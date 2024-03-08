@@ -26,10 +26,10 @@
 ########################################################################################################################
 
 # Displays more information in the console, if you have a problem please enable this option and send errors to support.
-enableDebug: true
+enableDebug: false
 
 # Enables time debugs, is used to measure plugin performance
-enableDebugTime: true
+enableDebugTime: false
 
 # Change the storage type of the plugin.
 #
