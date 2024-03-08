@@ -10,3 +10,4 @@
 
 - Fix virtual spawner with random entity spawn
 - Fix squid KnockBack
+- Add Silk Spawner for natural Spawner
