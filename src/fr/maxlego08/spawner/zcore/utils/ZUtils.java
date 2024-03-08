@@ -262,41 +262,7 @@ public abstract class ZUtils extends MessageUtils {
 	 *            executed when the player is teleported or not
 	 */
 	protected void teleport(Player player, int delay, Location location, Consumer<Boolean> cmd) {
-		if (teleportPlayers.contains(player.getName())) {
-			message(player, Message.TELEPORT_ERROR);
-			return;
-		}
-		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-		Location playerLocation = player.getLocation();
-		AtomicInteger verif = new AtomicInteger(delay);
-		teleportPlayers.add(player.getName());
-		if (!location.getChunk().isLoaded())
-			location.getChunk().load();
-		ses.scheduleWithFixedDelay(() -> {
-			if (!same(playerLocation, player.getLocation())) {
-				message(player, Message.TELEPORT_MOVE);
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				if (cmd != null)
-					cmd.accept(false);
-				return;
-			}
-			int currentSecond = verif.getAndDecrement();
-			if (!player.isOnline()) {
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				return;
-			}
-			if (currentSecond == 0) {
-				ses.shutdown();
-				teleportPlayers.remove(player.getName());
-				player.teleport(location);
-				message(player, Message.TELEPORT_SUCCESS);
-				if (cmd != null)
-					cmd.accept(true);
-			} else
-				message(player, Message.TELEPORT_MESSAGE, currentSecond);
-		}, 0, 1, TimeUnit.SECONDS);
+
 	}
 
 	/**
@@ -495,7 +461,7 @@ public abstract class ZUtils extends MessageUtils {
 	 */
 	protected void createInventory(SpawnerPlugin plugin, Player player, EnumInventory inventory, int page,
                                    Object... objects) {
-		plugin.getInventoryManager().createInventory(inventory, player, page, objects);
+		plugin.getZInventoryManager().createInventory(inventory, player, page, objects);
 	}
 
 	/**
@@ -506,7 +472,7 @@ public abstract class ZUtils extends MessageUtils {
 	 * @param objects
 	 */
 	protected void createInventory(SpawnerPlugin plugin, Player player, int inventory, int page, Object... objects) {
-		plugin.getInventoryManager().createInventory(inventory, player, page, objects);
+		plugin.getZInventoryManager().createInventory(inventory, player, page, objects);
 	}
 
 	/**
@@ -1254,6 +1220,23 @@ public abstract class ZUtils extends MessageUtils {
 		}
 
 		return false;
+	}
+
+	protected BlockFace getCardinalDirection(Player player) {
+		double rotation = (player.getLocation().getYaw() - 90) % 360;
+		if (rotation < 0) {
+			rotation += 360.0;
+		}
+
+		if (rotation > 45 && rotation <= 135) {
+			return BlockFace.NORTH;
+		} else if (rotation > 135 && rotation <= 225) {
+			return BlockFace.EAST;
+		} else if (rotation > 225 && rotation <= 315) {
+			return BlockFace.SOUTH;
+		} else {
+			return BlockFace.WEST;
+		}
 	}
 
 }

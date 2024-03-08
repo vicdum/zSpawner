@@ -10,7 +10,7 @@ import java.util.Map;
 
 public enum Message {
 
-    PREFIX("§8(§6Template§8) "),
+    PREFIX("§8(§6zSpawner§8) "),
 
     TELEPORT_MOVE("§cYou must not move!"),
     TELEPORT_MESSAGE("§7Teleportation in §3%second% §7seconds!"),
@@ -44,6 +44,50 @@ public enum Message {
     RELOAD("§aYou have just reloaded the configuration files."),
 
     DESCRIPTION_RELOAD("Reload configuration files"),
+    DESCRIPTION_GIVE("Give a spawner"),
+    DESCRIPTION_OPTION("Set virtual spawner option"),
+    DESCRIPTION_ADD("Add gui spawner"),
+    DESCRIPTION_REMOVE("Remove gui spawner"),
+    DESCRIPTION_HELP("Help commands"),
+    DESCRIPTION_SHOW("Show spawners"),
+
+    SPAWNER_UNPLACED("&cᴜɴᴘʟᴀᴄᴇᴅ"),
+    SPAWNER_LOCATION("&f%world%&7, &f%x%&7, &f %y%&7, &f %z%"),
+    SPAWNER_PLACE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ᴘʟᴀᴄᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
+    SPAWNER_REMOVE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
+
+    GIVE_SENDER("§aYou just gave a spawner §f%entity% §8(§7%type%§8) §ato the player §e%target%§a."),
+    GIVE_PLAYER("§aYou just received a spawner at §f%entity%§a."),
+
+    ADD_SENDER("§aYou just add a spawner §f%entity% §ato the player §e%target%§a."),
+    ADD_PLAYER("§aYou just received a spawner at §f%entity%§a. §8(§7/zspawner§8)"),
+
+    REMOVE_SENDER("§aYou just remove the spawner §f%spawnerKey% §ato the player §e%target%§a."),
+    REMOVE_PLAYER("§aYou just lost a spawner."),
+
+    BREAK_GUI("§aYour spawner is available in §f/zspawner§a."),
+    BREAK_ERROR_GUI("§cUse §f/zspawner §cto break the spawner."),
+    BREAK_ERROR_VIRTUAL("§cYou can’t break the spawner like this."),
+    BREAK_ERROR_OTHER("§cYou can’t break this spawner."),
+
+    PLACE_START("§aYou have §f1 §2minute §ato place the spawner in your land."),
+    PLACE_ERROR_BLACKLIST("§cYou cannot place a spawner on this block."),
+    PLACE_ERROR_LIMIT("§cYou cannot place more than §f%limit% §cspawners in a chunk."),
+    PLACE_SUCCESS("§aYou have just placed a spawner."),
+
+    SORT_PLACE("spawners placed"),
+    SORT_NO_PLACE("spawners not placed"),
+
+    LIMIT_ENTITY("§cYou cannot place more than §f%amount% §b%type%§c spawner."),
+    LIMIT_GLOBAL("§cYou cannot place more than §f%amount%§c spawner."),
+
+    VIRTUAL_REMOVE_ERROR_EMPTY("§cYou must clear the spawner before you can retrieve it."),
+    VIRTUAL_REMOVE_ERROR_FULL("§cYour inventory has no room to receive the spawner."),
+    VIRTUAL_REMOVE_SUCCESS("§aYou just got your virtual spawner back."),
+
+    COMMAND_SPAWNER_NOT_FOUND("§cCannot find spawner with key §f%spawnerKey%§c."),
+    COMMAND_SPAWNER_TYPE("§cYou cannot perform this action on this spawner."),
+    COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
 
     ;
 

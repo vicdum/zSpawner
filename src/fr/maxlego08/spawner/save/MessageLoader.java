@@ -3,8 +3,8 @@ package fr.maxlego08.spawner.save;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.MessageType;
 import fr.maxlego08.spawner.zcore.logger.Logger;
-import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
+import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * The MessageLoader class extends YamlUtils and implements Savable to manage message configurations.
@@ -59,6 +58,8 @@ public class MessageLoader extends YamlUtils implements Savable {
             if (!message.isUse()) continue;
 
             String path = "messages." + message.name().toLowerCase().replace("_", ".");
+
+            if (configuration.contains(path)) continue;
 
             if (message.getType() != MessageType.TCHAT) {
                 configuration.set(path + ".type", message.getType().name());
@@ -150,19 +151,19 @@ public class MessageLoader extends YamlUtils implements Savable {
             switch (messageType) {
                 case ACTION: {
                     String message = configuration.getString(key + ".message");
-                    enumMessage.setMessage(color(message));
+                    enumMessage.setMessage(message);
                     break;
                 }
                 case CENTER:
                 case TCHAT: {
                     if (configuration.contains(key + ".messages")) {
                         List<String> messages = configuration.getStringList(key + ".messages");
-                        enumMessage.setMessages(color(messages));
+                        enumMessage.setMessages(messages);
                         enumMessage.setMessage(null);
                     } else {
                         String message = configuration.getString(key + ".message");
-                        enumMessage.setMessage(color(message));
-                        enumMessage.setMessages(new ArrayList<String>());
+                        enumMessage.setMessage(message);
+                        enumMessage.setMessages(new ArrayList<>());
                     }
                     break;
                 }
@@ -173,8 +174,8 @@ public class MessageLoader extends YamlUtils implements Savable {
                     int showTime = configuration.getInt(key + ".showTime");
                     int fadeOutTime = configuration.getInt(key + ".fadeOutTime");
                     Map<String, Object> titles = new HashMap<String, Object>();
-                    titles.put("title", color(title));
-                    titles.put("subtitle", color(subtitle));
+                    titles.put("title", title);
+                    titles.put("subtitle", subtitle);
                     titles.put("start", fadeInTime);
                     titles.put("time", showTime);
                     titles.put("end", fadeOutTime);

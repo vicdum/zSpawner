@@ -2,20 +2,22 @@ package fr.maxlego08.spawner.command.commands;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.command.VCommand;
+import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 
-public class CommandTemplate extends VCommand {
+public class CommandSpawnerHelp extends VCommand {
 
-	public CommandTemplate(SpawnerPlugin plugin) {
+	public CommandSpawnerHelp(SpawnerPlugin plugin) {
 		super(plugin);
-		this.setPermission(Permission.EXAMPLE_PERMISSION);
-		this.addSubCommand(new CommandTemplateReload(plugin));
+		this.setPermission(Permission.ZSPAWNER_HELP);
+		this.addSubCommand("help");
+		this.setDescription(Message.DESCRIPTION_HELP);
 	}
 
 	@Override
 	protected CommandType perform(SpawnerPlugin plugin) {
-		syntaxMessage();
+		this.parent.syntaxMessage();
 		return CommandType.SUCCESS;
 	}
 

@@ -1,0 +1,334 @@
+########################################################################################################################
+#
+#  ███████╗░██████╗██████╗░░█████╗░░██╗░░░░░░░██╗███╗░░██╗███████╗██████╗░
+#  ╚════██║██╔════╝██╔══██╗██╔══██╗░██║░░██╗░░██║████╗░██║██╔════╝██╔══██╗
+#  ░░███╔═╝╚█████╗░██████╔╝███████║░╚██╗████╗██╔╝██╔██╗██║█████╗░░██████╔╝
+#  ██╔══╝░░░╚═══██╗██╔═══╝░██╔══██║░░████╔═████║░██║╚████║██╔══╝░░██╔══██╗
+#  ███████╗██████╔╝██║░░░░░██║░░██║░░╚██╔╝░╚██╔╝░██║░╚███║███████╗██║░░██║
+#  ╚══════╝╚═════╝░╚═╝░░░░░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝░░╚══╝╚══════╝╚═╝░░╚═╝
+#
+# Commands:
+# /zspawners - zspawner.use - Open spawner gui
+# /zspawners reload - zspawner.reload - Reload configuration files
+# /zspawners give <CLASSIC/GUI/VIRTUAL> <entity> <player> [<silent>] - zspawner.give - Give a spawner
+# /zspawners add <entity> <player> [<silent>] - zspawner.add - Add a spawner
+# /zspawners remove <player> <spawner key> [<silent>] - zspawner.remove - Remove a spawner
+# /zspawners open <player> <spawner key> <option> <value> - zspawner.option - Set value to an option
+# /zspawners show [<player>] [<page>] - zspawner.show - Show spawners
+#
+# Placeholders:
+# %zspawner_sort% - Display player sort type
+# %zspawner_sort_name% - Display player sort name
+# %zspawner_gui_spawners% - Count GUI player spawners
+# %zspawner_virtual_spawners% - Count VIRTUAL player spawners
+# %zspawner_classic_spawners% - Count CLASSIC player spawners
+#
+########################################################################################################################
+
+# Displays more information in the console, if you have a problem please enable this option and send errors to support.
+enableDebug: false
+
+# Enables time debugs, is used to measure plugin performance
+enableDebugTime: false
+
+# Change the storage type of the plugin.
+#
+# Here are the types of storage available:
+# - SQLITE, use of a database, for large servers
+# - MYSQL, use of a database, for large servers
+#
+storage: SQLITE
+
+# Updates data every 120,000 milliseconds (2 minutes).
+# If the storage is in JSON, then the file will save
+# If the storage is SQLITE or MYSQL then the drawers will be updated if they need to be
+updateInterval: 120000
+
+# Configuration for SQLITE and MYSQL storage
+# Attention, storage in MYSQL is not yet available !
+sql:
+  tablePrefix: "zspawner"
+  user: homestead
+  password: secret
+  port: 3306
+  host: 192.168.10.10
+  database: zspawner
+
+items:
+  CLASSIC: # Classic spawner
+    material: SPAWNER
+    name: "&6&lSpawner &r&8- &f%type%"
+    lore:
+      - "&8Place the spawner on the ground"
+    flags:
+      - HIDE_POTION_EFFECTS
+  GUI: # Gui spawner
+    material: SPAWNER
+    name: "&6&lSpawner &r&8- &f%type%"
+    lore:
+      - "&8Place the spawner and find"
+      - "&8it in the &7/spawners"
+    flags:
+      - HIDE_POTION_EFFECTS
+  VIRTUAL: # Virtual spawner
+    material: SPAWNER
+    name: "&6&lSpawner &r&8- &f%type%"
+    lore:
+      - "&8Virtual spawner, place it to use it"
+    flags:
+      - HIDE_POTION_EFFECTS
+
+stackableSpawner:
+
+  enable: false
+
+  globalLimit: 5
+
+  limits:
+    - SKELETON: 10
+
+  blacklist:
+    - BLAZE
+
+  whitelist: [ ]
+
+  hologram: '&6x%amount% &f%entity%'
+
+  levels:
+    - stackAmount: 1
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 5
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 2
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 6
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 3
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 7
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 4
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 8
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 5
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 9
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 6
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 10
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 7
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 11
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 8
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 12
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 9
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 13
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+    - stackAmount: 10
+      delay: 200
+      minSpawnDelay: 100
+      maxSpawnDelay: 400
+      spawnCount: 14
+      maxNearbyEntities: 10
+      requiredPlayerRange: 16
+      spawnRange: 8
+
+# Material for each entity that will be used for the/spawners command
+# You can use zMenu materials, so hdb, base64 etc (https://docs.zmenu.dev/configurations/items#material)
+entitiesMaterial:
+  - ELDER_GUARDIAN: ELDER_GUARDIAN_SPAWN_EGG
+  - WITHER_SKELETON: WITHER_SKELETON_SPAWN_EGG
+  - STRAY: STRAY_SPAWN_EGG
+  - HUSK: HUSK_SPAWN_EGG
+  - ZOMBIE_VILLAGER: ZOMBIE_VILLAGER_SPAWN_EGG
+  - SKELETON_HORSE: SKELETON_HORSE_SPAWN_EGG
+  - ZOMBIE_HORSE: ZOMBIE_HORSE_SPAWN_EGG
+  - DONKEY: DONKEY_SPAWN_EGG
+  - MULE: MULE_SPAWN_EGG
+  - EVOKER: EVOKER_SPAWN_EGG
+  - VEX: VEX_SPAWN_EGG
+  - VINDICATOR: VINDICATOR_SPAWN_EGG
+  - CREEPER: CREEPER_SPAWN_EGG
+  - SKELETON: SKELETON_SPAWN_EGG
+  - SPIDER: SPIDER_SPAWN_EGG
+  - ZOMBIE: ZOMBIE_SPAWN_EGG
+  - SLIME: SLIME_SPAWN_EGG
+  - GHAST: GHAST_SPAWN_EGG
+  - ZOMBIFIED_PIGLIN: ZOMBIFIED_PIGLIN_SPAWN_EGG
+  - ENDERMAN: ENDERMAN_SPAWN_EGG
+  - CAVE_SPIDER: CAVE_SPIDER_SPAWN_EGG
+  - SILVERFISH: SILVERFISH_SPAWN_EGG
+  - BLAZE: BLAZE_SPAWN_EGG
+  - MAGMA_CUBE: MAGMA_CUBE_SPAWN_EGG
+  - ENDER_DRAGON: ENDER_DRAGON_SPAWN_EGG
+  - WITHER: WITHER_SPAWN_EGG
+  - BAT: BAT_SPAWN_EGG
+  - WITCH: WITCH_SPAWN_EGG
+  - ENDERMITE: ENDERMITE_SPAWN_EGG
+  - GUARDIAN: GUARDIAN_SPAWN_EGG
+  - SHULKER: SHULKER_SPAWN_EGG
+  - PIG: PIG_SPAWN_EGG
+  - SHEEP: SHEEP_SPAWN_EGG
+  - COW: COW_SPAWN_EGG
+  - CHICKEN: CHICKEN_SPAWN_EGG
+  - SQUID: SQUID_SPAWN_EGG
+  - WOLF: WOLF_SPAWN_EGG
+  - OCELOT: OCELOT_SPAWN_EGG
+  - IRON_GOLEM: IRON_GOLEM_SPAWN_EGG
+  - HORSE: HORSE_SPAWN_EGG
+  - RABBIT: RABBIT_SPAWN_EGG
+  - POLAR_BEAR: POLAR_BEAR_SPAWN_EGG
+  - LLAMA: LLAMA_SPAWN_EGG
+  - PARROT: PARROT_SPAWN_EGG
+  - VILLAGER: VILLAGER_SPAWN_EGG
+  - TURTLE: TURTLE_SPAWN_EGG
+  - PHANTOM: PHANTOM_SPAWN_EGG
+  - COD: COD_SPAWN_EGG
+  - SALMON: SALMON_SPAWN_EGG
+  - PUFFERFISH: PUFFERFISH_SPAWN_EGG
+  - TROPICAL_FISH: TROPICAL_FISH_SPAWN_EGG
+  - DROWNED: DROWNED_SPAWN_EGG
+  - DOLPHIN: DOLPHIN_SPAWN_EGG
+  - CAT: CAT_SPAWN_EGG
+  - PANDA: PANDA_SPAWN_EGG
+  - PILLAGER: PILLAGER_SPAWN_EGG
+  - RAVAGER: RAVAGER_SPAWN_EGG
+  - TRADER_LLAMA: TRADER_LLAMA_SPAWN_EGG
+  - WANDERING_TRADER: WANDERING_TRADER_SPAWN_EGG
+  - FOX: FOX_SPAWN_EGG
+  - BEE: BEE_SPAWN_EGG
+  - HOGLIN: HOGLIN_SPAWN_EGG
+  - PIGLIN: PIGLIN_SPAWN_EGG
+  - STRIDER: STRIDER_SPAWN_EGG
+  - ZOGLIN: ZOGLIN_SPAWN_EGG
+  - PIGLIN_BRUTE: PIGLIN_BRUTE_SPAWN_EGG
+  - AXOLOTL: AXOLOTL_SPAWN_EGG
+  - GLOW_SQUID: GLOW_SQUID_SPAWN_EGG
+  - GOAT: GOAT_SPAWN_EGG
+  - ALLAY: ALLAY_SPAWN_EGG
+  - FROG: FROG_SPAWN_EGG
+  - TADPOLE: TADPOLE_SPAWN_EGG
+  - WARDEN: WARDEN_SPAWN_EGG
+  - CAMEL: CAMEL_SPAWN_EGG
+  - SNIFFER: SNIFFER_SPAWN_EGG
+  - BREEZE: BREEZE_SPAWN_EGG
+  - SNOWMAN: SNOWBALL
+  - IRON_GOLEM: IRON_INGOT
+  - MUSHROOM_COW: RED_MUSHROOM
+  - ILLUSIONER: BOW
+
+# Material blacklist that cannot be replaced by a spawner
+blacklistBlocks:
+  - CHEST
+  - DROPPER
+  - TRAPPED_CHEST
+  - CAULDRON
+  - FURNACE
+  - ENDER_CHEST
+  - BEDROCK
+  - BREWING_STAND
+  - DISPENSER
+  - OBSIDIAN
+  - SPAWNER
+  - DIAMOND_BLOCK
+  - GOLD_BLOCK
+  - IRON_BLOCK
+  - NETHERITE_BLOCK
+
+disableSpawnerExplosion:
+  GUI: true
+  CLASSIC: true
+  VIRTUAL: true # The virtual will always be true, it is impossible to explode
+
+# Retrieves spawners when they explode
+dropSpawnerOnExplose:
+  GUI: false
+  CLASSIC: false
+  VIRTUAL: false # The virtual will always be false, it is impossible to recover it this way.
+
+# Disable exploding on natural spawners
+disableNaturalSpawnerExplosion: false
+
+# Recover natural spawners during an explosion
+dropNaturalSpawnerOnExplose: false
+
+# Owner of a GUI spawner can break it to directly put it back in /spawners
+ownerCanBreakSpawner: true
+
+# Limit of spawner by chunk
+chunkLimit:
+
+  # Enable or disable the spawner limit
+  enable: false
+
+  # Allows to have a global limit per chunk
+  global: 5
+
+  # Allows for a limit per entity
+  limits:
+    - SKELETON: 10
+
+# Virtual spawner configuration
+virtual:
+
+  # Material used for the block
+  material: LODESTONE
+
+  # Name to display entity number
+  name: "&6x%amount%"
+
+  defaultSpawnerOption:
+    distance: 6 # Spawn distance
+    experienceMultiplier: 1
+    lootMultiplier: 1
+    autoKill: false
+    autoSell: false
+    mobPerMinute: 0
+    maxEntity: 1000
+    minDelay: 10000 # 10 seconds
+    maxDelay: 15000 # 15 seconds
+    minSpawn: 1 # Minimum spawn entity
+    maxSpawn: 2 # Maximum spawn entity
