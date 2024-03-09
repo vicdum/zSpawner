@@ -8,6 +8,8 @@
 
 # Unreleased
 
+# 4.0.1
+
 - Add Silk Spawner for natural Spawner
 - Fix virtual spawner with random entity spawn
 - Fix squid KnockBack
