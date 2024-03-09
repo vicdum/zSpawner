@@ -6,6 +6,7 @@ import fr.maxlego08.spawner.exceptions.ListenerNullException;
 import fr.maxlego08.spawner.inventory.VInventory;
 import fr.maxlego08.spawner.inventory.ZInventoryManager;
 import fr.maxlego08.spawner.listener.AdapterListener;
+import fr.maxlego08.spawner.listener.AdapterListenerPaper;
 import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.placeholder.Placeholder;
@@ -69,6 +70,7 @@ public abstract class ZPlugin extends JavaPlugin {
 
         /* Add Listener */
         this.addListener(new AdapterListener((SpawnerPlugin) this));
+        this.addListener(new AdapterListenerPaper((SpawnerPlugin) this));
         this.addListener(this.inventoryManager);
     }
 

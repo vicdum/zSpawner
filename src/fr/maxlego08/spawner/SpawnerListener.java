@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Directional;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -43,6 +45,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,66 +129,32 @@ public class SpawnerListener extends ListenerAdapter {
         SpawnerManager manager = this.plugin.getManager();
         PlayerSpawner playerSpawner = manager.getPlayerSpawners().get(player.getUniqueId());
         if (playerSpawner != null && playerSpawner.isPlacingSpawner()) {
-
-            event.setCancelled(true);
-
-            if (manager.getBlacklistMaterials().contains(block.getType())) {
-                message(this.plugin, player, Message.PLACE_ERROR_BLACKLIST);
-                return;
-            }
-
-            Spawner spawner = playerSpawner.getPlacingSpawner();
-
-            if (Config.enableLimit) {
-
-                Chunk chunk = block.getChunk();
-                if (hasSpawnerLimit(event, player, spawner.getEntityType(), chunk)) return;
-            }
-
-            playerSpawner.placeSpawner();
-            spawner.place(block.getLocation());
-            message(this.plugin, player, Message.PLACE_SUCCESS);
-
+            placeSpawner(player, playerSpawner, event, manager, block);
             return;
         }
 
-        if (block.getType() == Material.SPAWNER || block.getType() == Material.LODESTONE) {
+        if (block.getType() == Material.SPAWNER || block.getType() == Config.virtualMaterial) {
 
             IStorage storage = this.plugin.getStorage();
             StackableManager stackableManager = this.plugin.getStackableManager();
 
             Optional<Spawner> optional = storage.getSpawner(block.getLocation());
-            optional.ifPresent(spawner -> {
+            if (optional.isPresent()) {
+                Spawner spawner = optional.get();
 
                 event.setCancelled(true);
 
                 if (spawner.getType() != SpawnerType.CLASSIC) {
-
-                    if (spawner.getOwner().equals(player.getUniqueId())) {
-
-                        if (spawner.getType() == SpawnerType.GUI) {
-
-                            // TODO ajouter une option pour casser le spawner directement
-
-                            if (Config.ownerCanBreakSpawner) {
-                                spawner.breakBlock();
-                                message(this.plugin, player, Message.BREAK_GUI);
-                                return;
-                            }
-
-                            message(this.plugin, player, Message.BREAK_ERROR_GUI);
-                            return;
-                        }
-
-                        if (spawner.getType() == SpawnerType.VIRTUAL) {
-
-                            message(this.plugin, player, Message.BREAK_ERROR_VIRTUAL);
-                            return;
-                        }
-                    }
-
-                    message(this.plugin, player, Message.BREAK_ERROR_OTHER);
+                    breakOther(player, spawner);
                     return;
+                }
+
+                if (Config.enableSilkSpawner) {
+                    if (cantSilkSpawner(player)) {
+                        storage.removeSpawner(spawner.getLocation());
+                        event.setCancelled(false);
+                        return;
+                    }
                 }
 
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
@@ -198,8 +167,77 @@ public class SpawnerListener extends ListenerAdapter {
                 spawner.disable();
                 block.setType(Material.AIR);
                 storage.removeSpawner(spawner.getLocation());
-            });
+
+                return;
+            }
+
+            // On est dans le cas d'un spawner naturel
+            if (block.getType() == Material.SPAWNER && Config.enableSilkSpawner && block.getState() instanceof CreatureSpawner && Config.silkNaturalSpawner) {
+
+                if (cantSilkSpawner(player)) return;
+
+                CreatureSpawner spawner = (CreatureSpawner) block.getState();
+
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, Config.naturelSpawnerInto, spawner.getSpawnedType(), null));
+            }
         }
+    }
+
+    private boolean cantSilkSpawner(Player player) {
+        ItemStack itemStack = player.getInventory().getItemInMainHand();
+        if (!Config.whitelistMaterialSilkSpawner.contains(itemStack.getType())) {
+            return true;
+        }
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        return Config.needSilkTouchEnchant && !itemMeta.hasEnchant(Enchantment.SILK_TOUCH);
+    }
+
+    private void breakOther(Player player, Spawner spawner) {
+        if (spawner.getOwner().equals(player.getUniqueId())) {
+
+            if (spawner.getType() == SpawnerType.GUI) {
+
+                if (Config.ownerCanBreakSpawner) {
+                    spawner.breakBlock();
+                    message(this.plugin, player, Message.BREAK_GUI);
+                    return;
+                }
+
+                message(this.plugin, player, Message.BREAK_ERROR_GUI);
+                return;
+            }
+
+            if (spawner.getType() == SpawnerType.VIRTUAL) {
+
+                message(this.plugin, player, Message.BREAK_ERROR_VIRTUAL);
+                return;
+            }
+        }
+
+        message(this.plugin, player, Message.BREAK_ERROR_OTHER);
+    }
+
+    private void placeSpawner(Player player, PlayerSpawner playerSpawner, BlockBreakEvent event, SpawnerManager manager, Block block) {
+
+        event.setCancelled(true);
+
+        if (manager.getBlacklistMaterials().contains(block.getType())) {
+            message(this.plugin, player, Message.PLACE_ERROR_BLACKLIST);
+            return;
+        }
+
+        Spawner spawner = playerSpawner.getPlacingSpawner();
+
+        if (Config.enableLimit) {
+
+            Chunk chunk = block.getChunk();
+            if (hasSpawnerLimit(event, player, spawner.getEntityType(), chunk)) return;
+        }
+
+        playerSpawner.placeSpawner();
+        spawner.place(block.getLocation());
+        message(this.plugin, player, Message.PLACE_SUCCESS);
     }
 
     @Override
@@ -294,7 +332,14 @@ public class SpawnerListener extends ListenerAdapter {
                 event.setDamage(0);
                 entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
 
-                LivingEntity clonedEntity = entity.getWorld().spawn(entity.getLocation(), entity.getClass());
+                Class<? extends Entity> entityClass = spawner.getEntityType().getEntityClass();
+
+                if (entityClass == null) {
+                    Logger.info("Error with entity class for " + spawner.getEntityType(), Logger.LogType.ERROR);
+                    return;
+                }
+
+                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
                 clonedEntity.setAI(false);
                 spawner.getDeadEntities().add(clonedEntity);
 

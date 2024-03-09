@@ -6,6 +6,7 @@ import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Chunk;
@@ -222,7 +223,8 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
     }
 
-    private Location getSpawnedEntityLocation() {
+    @Override
+    public Location getSpawnedEntityLocation() {
         Location location = this.location.clone().add(0.5, 1, 0.5);
         if (this.blockFace.equals(BlockFace.SOUTH)) location.setYaw(180.f);
         if (this.blockFace.equals(BlockFace.WEST)) location.setYaw(-90.f);
@@ -240,11 +242,17 @@ public class ZSpawner extends ZUtils implements Spawner {
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
-        this.livingEntity = (LivingEntity) world.spawnEntity(location, this.entityType);
+        Class<? extends Entity> entityClass = this.entityType.getEntityClass();
+        if (entityClass == null) {
+            Logger.info("Error with entity class for " + this.entityType, Logger.LogType.ERROR);
+            return;
+        }
+        this.livingEntity = (LivingEntity) world.spawn(location, entityClass);
         this.livingEntity.setAI(false);
         this.livingEntity.setCollidable(false);
         this.livingEntity.setCustomNameVisible(true);
         this.livingEntity.setVisualFire(false);
+        this.livingEntity.setSwimming(false);
         this.livingEntity.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
 
         if (this.livingEntity instanceof Ageable) {
@@ -396,7 +404,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             long ms = ThreadLocalRandom.current().nextLong(Math.min(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()));
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxDelay()));
+            this.amount += getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
             if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
             this.needUpdate = true;
             this.updateEntity();

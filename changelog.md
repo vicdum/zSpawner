@@ -7,3 +7,10 @@
 - [ ] Ajouter le système de whitelist / blacklist de materials pour les materials
 
 # Unreleased
+
+# 4.0.1
+
+- Add Silk Spawner for natural Spawner
+- Fix virtual spawner with random entity spawn
+- Fix squid KnockBack
+- Fix entity spawn on entity kill with Virtual Spawner

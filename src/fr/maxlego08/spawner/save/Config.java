@@ -6,10 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Config {
 
@@ -25,6 +27,12 @@ public class Config {
     public static Map<SpawnerType, Boolean> spawnerDrop = new HashMap<>();
     public static Material virtualMaterial = Material.LODESTONE;
     public static String virtualName = "&6x%amount%";
+
+    public static boolean enableSilkSpawner = false;
+    public static boolean needSilkTouchEnchant = false;
+    public static boolean silkNaturalSpawner = false;
+    public static List<Material> whitelistMaterialSilkSpawner = new ArrayList<>();
+    public static SpawnerType naturelSpawnerInto = SpawnerType.CLASSIC;
 
     /**
      * static Singleton instance.
@@ -93,5 +101,11 @@ public class Config {
 
         virtualMaterial = Material.valueOf(configuration.getString("virtual.material", "LODESTONE"));
         virtualName = configuration.getString("virtual.name", "&6x%amount%");
+
+        enableSilkSpawner = configuration.getBoolean("silkSpawner.enable", false);
+        silkNaturalSpawner = configuration.getBoolean("silkSpawner.silkNaturalSpawner", false);
+        needSilkTouchEnchant = configuration.getBoolean("silkSpawner.needSilkTouchEnchant", false);
+        whitelistMaterialSilkSpawner = configuration.getStringList("silkSpawner.whitelistMaterial").stream().map(Material::valueOf).collect(Collectors.toList());
+        naturelSpawnerInto = SpawnerType.valueOf(configuration.getString("silkSpawner.naturelSpawnerInto", "CLASSIC").toUpperCase());
     }
 }
