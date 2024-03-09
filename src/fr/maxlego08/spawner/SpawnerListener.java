@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -331,7 +332,14 @@ public class SpawnerListener extends ListenerAdapter {
                 event.setDamage(0);
                 entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
 
-                LivingEntity clonedEntity = entity.getWorld().spawn(entity.getLocation(), entity.getClass());
+                Class<? extends Entity> entityClass = spawner.getEntityType().getEntityClass();
+
+                if (entityClass == null) {
+                    Logger.info("Error with entity class for " + spawner.getEntityType(), Logger.LogType.ERROR);
+                    return;
+                }
+
+                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
                 clonedEntity.setAI(false);
                 spawner.getDeadEntities().add(clonedEntity);
 
