@@ -81,4 +81,7 @@ public interface Spawner extends Updatable {
     void autoKill();
 
     String getSpawnerKey();
+
+    Location getSpawnedEntityLocation();
+
 }

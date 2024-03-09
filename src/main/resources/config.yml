@@ -332,3 +332,22 @@ virtual:
     maxDelay: 15000 # 15 seconds
     minSpawn: 1 # Minimum spawn entity
     maxSpawn: 2 # Maximum spawn entity
+
+# Silk spawners
+silkSpawner:
+
+  # Activate the silk spawner
+  enable: false
+
+  # List of materials that can mine a spawner
+  whitelistMaterial:
+    - GOLDEN_PICKAXE
+
+  # Check if the item needs the SilkTouch enchant.
+  needSilkTouchEnchant: true
+
+  # Allows to recover natural spawners
+  silkNaturalSpawner: true
+
+  # Transform the natural spawner to one of the spawner types of zSpawner, CLASSIC, VIRTUAL or GUI
+  naturelSpawnerInto: CLASSIC

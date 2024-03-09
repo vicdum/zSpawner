@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.listener;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -158,6 +159,10 @@ public abstract class ListenerAdapter extends ZUtils {
     }
 
     protected void onTeleport(EntityTeleportEvent event, Entity entity) {
+
+    }
+
+    public void onKnockBack(EntityKnockbackByEntityEvent event, LivingEntity entity) {
 
     }
 }

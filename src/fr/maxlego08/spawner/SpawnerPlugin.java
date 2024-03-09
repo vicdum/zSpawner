@@ -51,6 +51,7 @@ public class SpawnerPlugin extends ZPlugin {
         this.addSave(this.spawnerStorage);
 
         this.addListener(new SpawnerListener(this));
+        this.addListener(new SpawnerListenerPaper());
 
         Config.getInstance().load(this);
         this.manager.loadButtons();
