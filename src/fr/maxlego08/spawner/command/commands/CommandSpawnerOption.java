@@ -29,7 +29,7 @@ public class CommandSpawnerOption extends VCommand {
         this.addRequireArg("option", (sender, args) -> Arrays.stream(SpawnerOptionSetter.values()).map(e -> e.name().toLowerCase()).collect(Collectors.toList()));
         this.addRequireArg("value", (sender, args) -> {
             try {
-                SpawnerOptionSetter spawnerOptionSetter = SpawnerOptionSetter.valueOf(args[3]);
+                SpawnerOptionSetter spawnerOptionSetter = SpawnerOptionSetter.valueOf(args[3].toUpperCase());
                 if (spawnerOptionSetter.getType() == Boolean.class) {
                     return Arrays.asList("true", "false");
                 } else {

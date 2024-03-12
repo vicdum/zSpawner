@@ -60,12 +60,23 @@ public class SpawnerListener extends ListenerAdapter {
         this.plugin = plugin;
     }
 
+    private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
+        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(block.getLocation(), SpawnerType.VIRTUAL);
+        if (optional.isPresent()) {
+            event.setCancelled(true);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     protected void onBlockPlace(BlockPlaceEvent event, Player player) {
 
         ItemStack itemStack = event.getItemInHand();
         EquipmentSlot equipmentSlot = event.getHand();
         Block block = event.getBlock();
+
+        if (checkBlockPlaceVirtualSpawner(event, block)) return;
 
         Optional<SpawnerResult> optionalSpawner = this.plugin.getManager().getSpawnerResult(itemStack);
         if (!optionalSpawner.isPresent()) return;
