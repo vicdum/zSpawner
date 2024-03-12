@@ -14,6 +14,7 @@
 
 - Add option ``breakUpVirtualSpawner``
 - Fixed the possibility of placing a block at the entity position for a virtual spawner
+- Fixed the autocompletion for ``/spawners option``
 
 # 4.0.1
 
