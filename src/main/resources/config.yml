@@ -351,3 +351,6 @@ silkSpawner:
 
   # Transform the natural spawner to one of the spawner types of zSpawner, CLASSIC, VIRTUAL or GUI
   naturelSpawnerInto: CLASSIC
+
+# Break blocks or entity of a virtual will spawn
+breakUpVirtualSpawner: true

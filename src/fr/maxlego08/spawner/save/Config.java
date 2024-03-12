@@ -33,6 +33,7 @@ public class Config {
     public static boolean silkNaturalSpawner = false;
     public static List<Material> whitelistMaterialSilkSpawner = new ArrayList<>();
     public static SpawnerType naturelSpawnerInto = SpawnerType.CLASSIC;
+    public static boolean breakUpVirtualSpawner;
 
     /**
      * static Singleton instance.
@@ -90,6 +91,7 @@ public class Config {
             }
         }
 
+        breakUpVirtualSpawner = configuration.getBoolean("breakUpVirtualSpawner", true);
         dropNaturalSpawnerOnExplose = configuration.getBoolean("dropNaturalSpawnerOnExplose", true);
         disableNaturalSpawnerExplosion = configuration.getBoolean("disableNaturalSpawnerExplosion", true);
 

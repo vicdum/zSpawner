@@ -146,6 +146,19 @@ public class ZSpawner extends ZUtils implements Spawner {
 
             block.setType(Config.virtualMaterial, true);
             spawnEntity();
+
+            if (Config.breakUpVirtualSpawner) {
+
+                Location maxLocation = this.location.clone().add(0, this.livingEntity == null ? 2 : Math.ceil(this.livingEntity.getHeight()), 0);
+                Cuboid cuboid = new Cuboid(this.location.clone().add(0, 1, 0), maxLocation);
+
+                cuboid.forEach(cuboidBlock -> {
+                    if (cuboidBlock.getType() != Material.BEDROCK) {
+                        cuboidBlock.breakNaturally(true, true);
+                    }
+                });
+            }
+
         } else {
 
             block.setType(Material.SPAWNER, true);

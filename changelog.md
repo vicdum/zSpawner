@@ -1,12 +1,19 @@
 # ToDo
 
 - [x] Gérer les explosions du block, pouvoir activer / désactiver
-- [ ] Ajouter un système de silk spawner
+- [x] Ajouter un système de silk spawner
 - [ ] Proposer un système d'upgrade de spawner par spawner
-- [ ] Vérifier le placage des blocks dans le cuboid
+- [x] Vérifier le placage des blocks dans le cuboid
 - [ ] Ajouter le système de whitelist / blacklist de materials pour les materials
+- [ ] Ajouter une option pour avoir des spawners stackable à l'infini
+- [ ] Ajouter une option pour que les mobs qui spawn d'un spawner vont être sans IA
+- [ ] Ajouter une option pour désactiver l'ajout des loots de mobs dans le spawners infini
+- [ ] Ajouter une option pour permettre la mort des mobs sans avoir l'animation de morts, uniquement utiliser le EntityDamageEvent
 
 # Unreleased
+
+- Add option ``breakUpVirtualSpawner``
+- Fixed the possibility of placing a block at the entity position for a virtual spawner
 
 # 4.0.1
 

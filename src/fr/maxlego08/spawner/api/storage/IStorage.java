@@ -52,4 +52,6 @@ public interface IStorage {
     void deleteSpawnerItem(Spawner spawner, SpawnerItem spawnerItem);
 
     List<Spawner> getSpawners();
+
+    Optional<Spawner> getSpawner(Location location, SpawnerType spawnerType);
 }
