@@ -9,9 +9,11 @@ import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -489,6 +491,12 @@ public class ZSpawner extends ZUtils implements Spawner {
         LivingEntity clonedEntity = world.spawn(getSpawnedEntityLocation(), this.livingEntity.getClass());
         clonedEntity.setAI(false);
         this.getDeadEntities().add(clonedEntity);
+
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(this.ownerId);
+        if (offlinePlayer.isOnline()) {
+            clonedEntity.setKiller(offlinePlayer.getPlayer());
+        }
+
         clonedEntity.damage(livingEntity.getHealth() * 2);
 
         this.entityDeath();
