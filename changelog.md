@@ -12,6 +12,10 @@
 
 # Unreleased
 
+# 4.04
+
+- Some fixs
+
 # 4.0.3
 
 - Update auto kill, if the player is online then the mob will be killed by the owner of the spawner
