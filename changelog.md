@@ -10,6 +10,10 @@
 - [ ] Ajouter une option pour désactiver l'ajout des loots de mobs dans le spawners infini
 - [ ] Ajouter une option pour permettre la mort des mobs sans avoir l'animation de morts, uniquement utiliser le EntityDamageEvent
 
+- [ ] Ajouter une option pour que les spawners virtuel puissent être ouvert par tout le monde et récupérer par tout le monde
+- [ ] Vérifier si l'autokill fonctionne correctement par défaut, sans activé l'option mais juste avec la configuraiton
+
+
 # Unreleased
 
 # 4.04
