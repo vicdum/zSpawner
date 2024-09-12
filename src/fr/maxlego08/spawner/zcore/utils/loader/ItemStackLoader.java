@@ -94,7 +94,7 @@ public class ItemStackLoader extends ZUtils implements Loader<ItemStack> {
 
 		boolean isGlowing = configuration.getBoolean(path + "glow");
 
-		if (isGlowing && NMSUtils.getNMSVersion() != 1.7) {
+		if (isGlowing ) {
 
 			meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
 			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -148,7 +148,7 @@ public class ItemStackLoader extends ZUtils implements Loader<ItemStack> {
 		List<String> flags = configuration.getStringList(path + "flags");
 
 		// Permet de charger les diffÃ©rents flags
-		if (flags.size() != 0 && NMSUtils.getNMSVersion() != 1.7) {
+		if (flags.size() != 0 ) {
 
 			for (String flagString : flags) {
 
@@ -192,7 +192,7 @@ public class ItemStackLoader extends ZUtils implements Loader<ItemStack> {
 			configuration.set(path + "name", meta.getDisplayName().replace("§", "&"));
 		if (meta.hasLore())
 			configuration.set(path + "lore", colorReverse(meta.getLore()));
-		if (NMSUtils.getNMSVersion() != 1.7 && meta.getItemFlags().size() != 0)
+		if (meta.getItemFlags().size() != 0)
 			configuration.set(path + "flags",
 					meta.getItemFlags().stream().map(flag -> flag.name()).collect(Collectors.toList()));
 		if (meta.hasEnchants()) {
@@ -208,7 +208,7 @@ public class ItemStackLoader extends ZUtils implements Loader<ItemStack> {
 
 			configuration.set(path + "enchants", enchantList);
 		}
-		if (NMSUtils.hasBarrel() && meta.hasCustomModelData()) {
+		if (NmsVersion.getCurrentVersion().isBarrel() && meta.hasCustomModelData()) {
 			configuration.set(path + "modelID", meta.getCustomModelData());
 		}
 

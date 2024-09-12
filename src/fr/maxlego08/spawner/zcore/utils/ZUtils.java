@@ -140,7 +140,7 @@ public abstract class ZUtils extends MessageUtils {
 	private static transient Material[] byId;
 
 	static {
-		if (!NMSUtils.isNewVersion()) {
+		if (!NmsVersion.nmsVersion.isNewMaterial()) {
 			byId = new Material[0];
 			for (Material material : Material.values()) {
 				if (byId.length > material.getId()) {
@@ -942,7 +942,7 @@ public abstract class ZUtils extends MessageUtils {
 	public ItemStack playerHead(ItemStack itemStack, OfflinePlayer player) {
 		String name = itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()
 				? itemStack.getItemMeta().getDisplayName() : null;
-		if (NMSUtils.isNewVersion()) {
+		if (NmsVersion.nmsVersion.isNewMaterial()) {
 			if (itemStack.getType().equals(Material.PLAYER_HEAD) && name != null && name.startsWith("HEAD")) {
 				SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
 				name = name.replace("HEAD", "");
@@ -975,7 +975,7 @@ public abstract class ZUtils extends MessageUtils {
 	 * @return itemstack
 	 */
 	protected ItemStack playerHead() {
-		return NMSUtils.isNewVersion() ? new ItemStack(Material.PLAYER_HEAD)
+		return NmsVersion.nmsVersion.isNewMaterial() ? new ItemStack(Material.PLAYER_HEAD)
 				: new ItemStack(getMaterial(397), 1, (byte) 3);
 	}
 
@@ -1063,7 +1063,7 @@ public abstract class ZUtils extends MessageUtils {
 	 */
 	protected boolean isPlayerHead(ItemStack itemStack) {
 		Material material = itemStack.getType();
-		if (NMSUtils.isNewVersion())
+		if (NmsVersion.nmsVersion.isNewMaterial())
 			return material.equals(Material.PLAYER_HEAD);
 		return (material.equals(getMaterial(397))) && (itemStack.getDurability() == 3);
 	}
@@ -1082,7 +1082,7 @@ public abstract class ZUtils extends MessageUtils {
 			throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		Class<?> clazz = object.getClass();
 		Field objectField = field.equals("commandMap") ? clazz.getDeclaredField(field)
-				: field.equals("knownCommands") ? NMSUtils.isNewVersion()
+				: field.equals("knownCommands") ? NmsVersion.nmsVersion.isNewMaterial()
 						? clazz.getSuperclass().getDeclaredField(field) : clazz.getDeclaredField(field) : null;
 		objectField.setAccessible(true);
 		Object result = objectField.get(object);
