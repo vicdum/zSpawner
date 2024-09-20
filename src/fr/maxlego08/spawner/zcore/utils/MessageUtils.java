@@ -3,7 +3,7 @@ package fr.maxlego08.spawner.zcore.utils;
 import fr.maxlego08.menu.api.utils.MetaUpdater;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
-import fr.maxlego08.spawner.zcore.utils.nms.NMSUtils;
+import fr.maxlego08.spawner.zcore.utils.nms.NmsVersion;
 import fr.maxlego08.spawner.zcore.utils.players.ActionBar;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,7 +12,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
 /**
  * Allows you to manage messages sent to players and the console
