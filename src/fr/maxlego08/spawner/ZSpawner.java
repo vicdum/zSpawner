@@ -29,6 +29,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -488,7 +489,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
 
         World world = this.location.getWorld();
-        LivingEntity clonedEntity = world.spawn(getSpawnedEntityLocation(), this.livingEntity.getClass());
+        LivingEntity clonedEntity = (LivingEntity) world.spawn(getSpawnedEntityLocation(), Objects.requireNonNull(this.livingEntity.getType().getEntityClass()));
         clonedEntity.setAI(false);
         this.getDeadEntities().add(clonedEntity);
 
