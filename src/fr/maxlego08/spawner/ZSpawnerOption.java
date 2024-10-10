@@ -164,19 +164,11 @@ public class ZSpawnerOption implements SpawnerOption {
 
     @Override
     public String toString() {
-        return "ZSpawnerOption{" +
-                "distance=" + distance +
-                ", experienceMultiplier=" + experienceMultiplier +
-                ", lootMultiplier=" + lootMultiplier +
-                ", autoKill=" + autoKill +
-                ", autoSell=" + autoSell +
-                ", maxEntity=" + maxEntity +
-                ", minDelay=" + minDelay +
-                ", maxDelay=" + maxDelay +
-                ", minSpawn=" + minSpawn +
-                ", maxSpawn=" + maxSpawn +
-                ", mobPerMinute=" + mobPerMinute +
-                ", needUpdate=" + needUpdate +
-                '}';
+        return "ZSpawnerOption{" + "distance=" + distance + ", experienceMultiplier=" + experienceMultiplier + ", lootMultiplier=" + lootMultiplier + ", autoKill=" + autoKill + ", autoSell=" + autoSell + ", maxEntity=" + maxEntity + ", minDelay=" + minDelay + ", maxDelay=" + maxDelay + ", minSpawn=" + minSpawn + ", maxSpawn=" + maxSpawn + ", mobPerMinute=" + mobPerMinute + ", needUpdate=" + needUpdate + '}';
+    }
+
+    @Override
+    public ZSpawnerOption cloneOption() {
+        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute);
     }
 }

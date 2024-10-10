@@ -278,6 +278,10 @@ blacklistBlocks:
   - IRON_BLOCK
   - NETHERITE_BLOCK
 
+blacklist-materials:
+  - BOW
+  - GOLDEN_SWORD
+
 disableSpawnerExplosion:
   GUI: true
   CLASSIC: true

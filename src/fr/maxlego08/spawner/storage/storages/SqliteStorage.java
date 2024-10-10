@@ -258,7 +258,7 @@ public class SqliteStorage extends ZUtils implements IStorage {
             preparedStatement.setString(1, spawnerId.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                // Vous devrez créer une classe concrète qui implémente SpawnerOption ou ajuster cette partie selon votre structure de données.
+
                 return new ZSpawnerOption(resultSet.getDouble("distance"), resultSet.getDouble("experienceMultiplier"), resultSet.getDouble("lootMultiplier"), resultSet.getBoolean("autoKill"), resultSet.getBoolean("autoSell"), resultSet.getInt("maxEntity"), resultSet.getInt("minDelay"), resultSet.getInt("maxDelay"), resultSet.getInt("minSpawn"), resultSet.getInt("maxSpawn"), resultSet.getInt("mobPerMinute"));
             }
         } catch (SQLException exception) {

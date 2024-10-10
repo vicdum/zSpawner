@@ -1,0 +1,29 @@
+items:
+  MIN_DELAY:
+    type: MIN_DELAY
+    value: 10 # Will remove 10 milliseconds at minimum delay
+    max-value: 5000 # Value to which the value cannot be lowered
+    item:
+      material: SUNFLOWER
+      name: "#e5fa25sᴘᴀᴡɴᴇʀ ᴏᴘᴛɪᴏɴ&8: #fa9325ᴍɪɴ ᴅᴇʟᴀʏ"
+      lore:
+        - ""
+        - "#92bed8ɪɴғᴏʀᴍᴀᴛɪᴏɴs&8:"
+        - "#8c8c8c• &7Reduced the minimum time of spawn by &f10 &7milliseconds"
+        - ""
+        - "&7&oYou must right click on your"
+        - "&7&ospawner to apply the option"
+  MAX_DELAY:
+    type: MAX_DELAY
+    value: 10 # Will remove 10 milliseconds at maximum delay
+    max-value: 8000 # Value to which the value cannot be lowered
+    item:
+      material: SUNFLOWER
+      name: "#e5fa25sᴘᴀᴡɴᴇʀ ᴏᴘᴛɪᴏɴ&8: #fa9325ᴍᴀx ᴅᴇʟᴀʏ"
+      lore:
+        - ""
+        - "#92bed8ɪɴғᴏʀᴍᴀᴛɪᴏɴs&8:"
+        - "#8c8c8c• &7Reduced the maximum time of spawn by &f10 &7milliseconds"
+        - ""
+        - "&7&oYou must right click on your"
+        - "&7&ospawner to apply the option"

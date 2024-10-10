@@ -32,6 +32,7 @@ public class Config {
     public static boolean needSilkTouchEnchant = false;
     public static boolean silkNaturalSpawner = false;
     public static List<Material> whitelistMaterialSilkSpawner = new ArrayList<>();
+    public static List<Material> blacklistMaterials = new ArrayList<>();
     public static SpawnerType naturelSpawnerInto = SpawnerType.CLASSIC;
     public static boolean breakUpVirtualSpawner;
 
@@ -108,6 +109,7 @@ public class Config {
         silkNaturalSpawner = configuration.getBoolean("silkSpawner.silkNaturalSpawner", false);
         needSilkTouchEnchant = configuration.getBoolean("silkSpawner.needSilkTouchEnchant", false);
         whitelistMaterialSilkSpawner = configuration.getStringList("silkSpawner.whitelistMaterial").stream().map(Material::valueOf).collect(Collectors.toList());
+        blacklistMaterials = configuration.getStringList("blacklist-materials").stream().map(Material::valueOf).collect(Collectors.toList());
         naturelSpawnerInto = SpawnerType.valueOf(configuration.getString("silkSpawner.naturelSpawnerInto", "CLASSIC").toUpperCase());
     }
 }

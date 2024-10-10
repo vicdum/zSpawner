@@ -44,6 +44,7 @@ public enum Message {
 
     DESCRIPTION_RELOAD("Reload configuration files"),
     DESCRIPTION_GIVE("Give a spawner"),
+    DESCRIPTION_GIVE_OPTION("Give an option item"),
     DESCRIPTION_OPTION("Set virtual spawner option"),
     DESCRIPTION_ADD("Add gui spawner"),
     DESCRIPTION_REMOVE("Remove gui spawner"),
@@ -87,8 +88,8 @@ public enum Message {
     COMMAND_SPAWNER_NOT_FOUND("§cCannot find spawner with key §f%spawnerKey%§c."),
     COMMAND_SPAWNER_TYPE("§cYou cannot perform this action on this spawner."),
     COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
-
-    ;
+    UPGRADE_NOT_FOUND("§cImpossible to find the upgrade §f%name%§c."),
+    UPGRADE_GIVE("§aYou just gave to §f%player% §athe upgrade §f%name%§a.");
 
     private List<String> messages;
     private String message;

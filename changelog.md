@@ -16,6 +16,10 @@
 
 # Unreleased
 
+- Fix error with default spawner option
+- Added blacklist materials for virtual spawner
+- Player with the permission "zspawner.bypass" can now open virtual spawner
+
 # 4.04
 
 - Some fixs

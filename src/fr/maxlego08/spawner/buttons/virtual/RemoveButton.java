@@ -18,7 +18,8 @@ public class RemoveButton extends ZButton {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        plugin.getManager().removeVirtualSpawner(player);
+        player.closeInventory();
+        this.plugin.getManager().removeVirtualSpawner(player);
         super.onClick(player, event, inventory, slot, placeholders);
     }
 

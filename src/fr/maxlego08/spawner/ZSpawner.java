@@ -23,6 +23,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -65,7 +66,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.location = location;
         this.amount = amount;
         this.blockFace = blockFace;
-        this.spawnerOption = this.plugin.getManager().getDefaultOption();
+        this.spawnerOption = this.plugin.getManager().getDefaultOption().cloneOption();
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -379,6 +380,9 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void addItems(List<ItemStack> itemStacks) {
 
         itemStacks.forEach(itemStack -> {
+
+            if (Config.blacklistMaterials.contains(itemStack.getType())) return;
+
             Optional<SpawnerItem> optional = getSpawnerItem(itemStack);
             if (optional.isPresent()) {
                 SpawnerItem spawnerItem = optional.get();
@@ -390,6 +394,10 @@ public class ZSpawner extends ZUtils implements Spawner {
         });
 
         this.needUpdate = true;
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            this.plugin.getInventoryManager().updateInventory(onlinePlayer, plugin);
+        }
     }
 
     @Override

@@ -18,6 +18,7 @@ public class CommandSpawner extends VCommand {
         this.addSubCommand(new CommandSpawnerOption(plugin));
         this.addSubCommand(new CommandSpawnerRemove(plugin));
         this.addSubCommand(new CommandSpawnerShow(plugin));
+        this.addSubCommand(new CommandSpawnerGiveOption(plugin));
     }
 
     @Override

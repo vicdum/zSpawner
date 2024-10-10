@@ -2,9 +2,11 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.spawner.api.item.UpgradeManager;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
+import fr.maxlego08.spawner.item.ZUpgradeManager;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
@@ -24,6 +26,7 @@ public class SpawnerPlugin extends ZPlugin {
     private final SpawnerManager manager = new SpawnerManager(this);
     private final StackableManager stackableManager = new StackableManager(this);
     private final SpawnerPlaceholders spawnerPlaceholders = new SpawnerPlaceholders(this);
+    private final UpgradeManager upgradeManager = new ZUpgradeManager(this);
     private SpawnerStorage spawnerStorage;
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
@@ -55,6 +58,7 @@ public class SpawnerPlugin extends ZPlugin {
 
         Config.getInstance().load(this);
         this.manager.loadButtons();
+        this.upgradeManager.loadItems();
         this.loadFiles();
 
         this.spawnerPlaceholders.register();
@@ -72,6 +76,12 @@ public class SpawnerPlugin extends ZPlugin {
         this.saveFiles();
 
         this.postDisable();
+    }
+
+    @Override
+    public void reloadFiles() {
+        super.reloadFiles();
+        this.upgradeManager.loadItems();
     }
 
     public SpawnerManager getManager() {
@@ -96,5 +106,9 @@ public class SpawnerPlugin extends ZPlugin {
 
     public InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+
+    public UpgradeManager getUpgradeManager() {
+        return upgradeManager;
     }
 }
