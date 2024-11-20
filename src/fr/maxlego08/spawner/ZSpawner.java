@@ -10,7 +10,6 @@ import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -130,8 +129,9 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public boolean sameChunk(int x, int z) {
         if (!this.isPlace()) return false;
-        Chunk chunk = this.location.getChunk();
-        return chunk.getX() == x && chunk.getZ() == z;
+        int chunkX = this.location.getBlockX() >> 4;
+        int chunkZ = this.location.getBlockZ() >> 4;
+        return x == chunkX && z == chunkZ;
     }
 
     @Override
@@ -259,6 +259,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
+
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
         if (entityClass == null) {
             Logger.info("Error with entity class for " + this.entityType, Logger.LogType.ERROR);
