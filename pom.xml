@@ -127,5 +127,12 @@
             <version>1.0.2.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>fr.maxlego08.zshop</groupId>
+            <artifactId>zShop-API</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/zshop-3.1.6.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

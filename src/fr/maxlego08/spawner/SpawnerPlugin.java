@@ -2,6 +2,7 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
@@ -10,9 +11,11 @@ import fr.maxlego08.spawner.item.ZUpgradeManager;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
+import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.Bukkit;
 
 /**
@@ -30,6 +33,7 @@ public class SpawnerPlugin extends ZPlugin {
     private SpawnerStorage spawnerStorage;
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
+    private ShopAction shopAction;
 
     @Override
     public void onEnable() {
@@ -64,6 +68,10 @@ public class SpawnerPlugin extends ZPlugin {
         this.spawnerPlaceholders.register();
 
         Bukkit.getScheduler().runTaskTimer(this, this.manager, 20, 20);
+
+        if (this.isEnable(Plugins.ZSHOP)) {
+            this.shopAction = new ZShopAction(this);
+        }
 
         this.postEnable();
     }
@@ -110,5 +118,9 @@ public class SpawnerPlugin extends ZPlugin {
 
     public UpgradeManager getUpgradeManager() {
         return upgradeManager;
+    }
+
+    public ShopAction getShopAction() {
+        return shopAction;
     }
 }

@@ -8,6 +8,7 @@ import fr.maxlego08.menu.button.loader.NoneLoader;
 import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerOption;
@@ -21,6 +22,7 @@ import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
+import fr.maxlego08.spawner.buttons.virtual.ShopButton;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
@@ -192,6 +194,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ItemsButton.class, "zspawner_items"));
         buttonManager.register(new NoneLoader(this.plugin, RemoveButton.class, "zspawner_remove"));
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
+        buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
     }
 
     public void loadInventories() {
@@ -300,5 +303,34 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
         inventoryManager.getInventory(this.plugin, "show").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
+    }
+
+    public void sellSpawnerInventory(Player player) {
+
+        ShopAction action = this.plugin.getShopAction();
+        if (action == null) {
+            player.closeInventory();
+            message(this.plugin, player, Message.SELL_ERROR);
+            return;
+        }
+
+        PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
+        Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
+        if (spawner == null) {
+            player.closeInventory();
+            message(this.plugin, player, Message.SELL_ERROR);
+            return;
+        }
+
+        var iterator = spawner.getItems().iterator();
+        while (iterator.hasNext()) {
+            var spawnerItem = iterator.next();
+            if (action.deposit(player, spawnerItem.getItemStack(), spawnerItem.getAmount())) {
+                iterator.remove();
+                this.plugin.getStorage().deleteSpawnerItem(spawner, spawnerItem);
+            }
+        }
+
+        openVirtualSpawner(player, spawner, 1);
     }
 }

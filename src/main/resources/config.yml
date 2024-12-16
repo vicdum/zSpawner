@@ -358,3 +358,5 @@ silkSpawner:
 
 # Break blocks or entity of a virtual will spawn
 breakUpVirtualSpawner: true
+
+deposit-reason: "Sale of x%amount% %item% for %price% (Spawner)"

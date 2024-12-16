@@ -89,7 +89,8 @@ public enum Message {
     COMMAND_SPAWNER_TYPE("§cYou cannot perform this action on this spawner."),
     COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
     UPGRADE_NOT_FOUND("§cImpossible to find the upgrade §f%name%§c."),
-    UPGRADE_GIVE("§aYou just gave to §f%player% §athe upgrade §f%name%§a.");
+    UPGRADE_GIVE("§aYou just gave to §f%player% §athe upgrade §f%name%§a."),
+    SELL_ERROR("&cUnable to sell content.");
 
     private List<String> messages;
     private String message;

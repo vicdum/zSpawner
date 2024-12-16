@@ -7,4 +7,6 @@ version: ${project.version}
 api-version: 1.13
 depend:
   - zMenu
+softdepend:
+  - zShop
 commands:
