@@ -16,11 +16,14 @@
 
 # Unreleased
 
+# 4.0.5
+
+- Added Shop button, allows to sell the content of the virtual spawner (only work with zshop for the moment)
 - Fix error with default spawner option
 - Added blacklist materials for virtual spawner
 - Player with the permission "zspawner.bypass" can now open virtual spawner
 
-# 4.04
+# 4.0.4
 
 - Some fixs
 
