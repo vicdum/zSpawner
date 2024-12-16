@@ -8,19 +8,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
 
-public class RemoveButton extends ZButton {
+public class ShopButton extends ZButton {
 
     private final SpawnerPlugin plugin;
 
-    public RemoveButton(Plugin plugin) {
+    public ShopButton(Plugin plugin) {
         this.plugin = (SpawnerPlugin) plugin;
     }
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryDefault inventory, int slot, Placeholders placeholders) {
-        player.closeInventory();
-        this.plugin.getManager().removeVirtualSpawner(player);
         super.onClick(player, event, inventory, slot, placeholders);
+        this.plugin.getManager().sellSpawnerInventory(player);
     }
 
     @Override

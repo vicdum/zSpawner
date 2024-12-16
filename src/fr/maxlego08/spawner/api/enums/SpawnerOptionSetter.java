@@ -34,6 +34,36 @@ public enum SpawnerOptionSetter {
         }
     }
 
+    public boolean canApply(SpawnerOption option, Object value, Object maxValue) {
+        return switch (this) {
+            case AUTO_KILL, AUTO_SELL -> false;
+            case DISTANCE -> option.getDistance() - ((Number) value).doubleValue() >= ((Number) maxValue).doubleValue();
+            case EXPERIENCE_MULTIPLIER -> option.getExperienceMultiplier() - ((Number) value).doubleValue() >= ((Number) maxValue).doubleValue();
+            case LOOT_MULTIPLIER -> option.getLootMultiplier() - ((Number) value).doubleValue() >= ((Number) maxValue).doubleValue();
+            case MAX_ENTITY -> option.getMaxEntity() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+            case MIN_DELAY -> option.getMinDelay() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+            case MAX_DELAY -> option.getMaxDelay() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+            case MIN_SPAWN -> option.getMinSpawn() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+            case MAX_SPAWN -> option.getMaxSpawn() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+            case MOB_PER_MINUTE -> option.getMobPerMinute() - ((Number) value).intValue() >= ((Number) maxValue).intValue();
+        };
+    }
+
+    public void apply(SpawnerOption option, Object value) {
+        switch (this) {
+            case AUTO_KILL, AUTO_SELL -> {}
+            case DISTANCE -> this.setterFunction.accept(option, String.valueOf(option.getDistance() + ((Number) value).doubleValue()));
+            case EXPERIENCE_MULTIPLIER -> this.setterFunction.accept(option, String.valueOf(option.getExperienceMultiplier() + ((Number) value).doubleValue()));
+            case LOOT_MULTIPLIER -> this.setterFunction.accept(option, String.valueOf(option.getLootMultiplier() + ((Number) value).doubleValue()));
+            case MAX_ENTITY -> this.setterFunction.accept(option, String.valueOf(option.getMaxEntity() + ((Number) value).intValue()));
+            case MIN_DELAY -> this.setterFunction.accept(option, String.valueOf(option.getMinDelay() - ((Number) value).intValue())) ;
+            case MAX_DELAY -> this.setterFunction.accept(option, String.valueOf(option.getMaxDelay() - ((Number) value).intValue()));
+            case MIN_SPAWN -> this.setterFunction.accept(option, String.valueOf(option.getMinSpawn() + ((Number) value).intValue())) ;
+            case MAX_SPAWN -> this.setterFunction.accept(option, String.valueOf(option.getMaxSpawn() + ((Number) value).intValue())) ;
+            case MOB_PER_MINUTE -> this.setterFunction.accept(option, String.valueOf(option.getMobPerMinute() + ((Number) value).intValue()));
+        };
+    }
+
     public Class<?> getType() {
         return type;
     }

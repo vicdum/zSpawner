@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -80,6 +81,11 @@ public class ItemsButton extends ZButton implements PaginateButton {
             manager.removeStackLoot(player, spawner, spawnerItem, 64);
         }
 
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer != player) {
+                this.plugin.getInventoryManager().updateInventory(onlinePlayer, plugin);
+            }
+        }
         manager.openVirtualSpawner(player, spawner, page);
     }
 

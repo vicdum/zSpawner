@@ -10,7 +10,6 @@ import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -23,12 +22,14 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -64,7 +65,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.location = location;
         this.amount = amount;
         this.blockFace = blockFace;
-        this.spawnerOption = this.plugin.getManager().getDefaultOption();
+        this.spawnerOption = this.plugin.getManager().getDefaultOption().cloneOption();
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -128,8 +129,9 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public boolean sameChunk(int x, int z) {
         if (!this.isPlace()) return false;
-        Chunk chunk = this.location.getChunk();
-        return chunk.getX() == x && chunk.getZ() == z;
+        int chunkX = this.location.getBlockX() >> 4;
+        int chunkZ = this.location.getBlockZ() >> 4;
+        return x == chunkX && z == chunkZ;
     }
 
     @Override
@@ -257,6 +259,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
+
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
         if (entityClass == null) {
             Logger.info("Error with entity class for " + this.entityType, Logger.LogType.ERROR);
@@ -378,6 +381,9 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void addItems(List<ItemStack> itemStacks) {
 
         itemStacks.forEach(itemStack -> {
+
+            if (Config.blacklistMaterials.contains(itemStack.getType())) return;
+
             Optional<SpawnerItem> optional = getSpawnerItem(itemStack);
             if (optional.isPresent()) {
                 SpawnerItem spawnerItem = optional.get();
@@ -389,6 +395,10 @@ public class ZSpawner extends ZUtils implements Spawner {
         });
 
         this.needUpdate = true;
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            this.plugin.getInventoryManager().updateInventory(onlinePlayer, plugin);
+        }
     }
 
     @Override
@@ -488,7 +498,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         }
 
         World world = this.location.getWorld();
-        LivingEntity clonedEntity = world.spawn(getSpawnedEntityLocation(), this.livingEntity.getClass());
+        LivingEntity clonedEntity = (LivingEntity) world.spawn(getSpawnedEntityLocation(), Objects.requireNonNull(this.livingEntity.getType().getEntityClass()));
         clonedEntity.setAI(false);
         this.getDeadEntities().add(clonedEntity);
 

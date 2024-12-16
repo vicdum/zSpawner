@@ -1,12 +1,18 @@
 package fr.maxlego08.spawner.api;
 
-public interface SpawnerOption extends Updatable{
+public interface SpawnerOption extends Updatable {
 
     double getDistance();
 
+    void setDistance(double distance);
+
     double getExperienceMultiplier();
 
+    void setExperienceMultiplier(double experienceMultiplier);
+
     double getLootMultiplier();
+
+    void setLootMultiplier(double lootMultiplier);
 
     boolean enableAutoKill();
 
@@ -14,35 +20,31 @@ public interface SpawnerOption extends Updatable{
 
     int getMaxEntity();
 
+    void setMaxEntity(int maxEntity);
+
     int getMinDelay();
+
+    void setMinDelay(int minDelay);
 
     int getMaxDelay();
 
+    void setMaxDelay(int maxDelay);
+
     int getMinSpawn();
+
+    void setMinSpawn(int minSpawn);
 
     int getMaxSpawn();
 
+    void setMaxSpawn(int maxSpawn);
+
     int getMobPerMinute();
 
-    void setDistance(double distance);
-
-    void setExperienceMultiplier(double experienceMultiplier);
-
-    void setLootMultiplier(double lootMultiplier);
+    void setMobPerMinute(int mobPerMinute);
 
     void setAutoKill(boolean autoKill);
 
     void setAutoSell(boolean autoSell);
 
-    void setMaxEntity(int maxEntity);
-
-    void setMinDelay(int minDelay);
-
-    void setMaxDelay(int maxDelay);
-
-    void setMinSpawn(int minSpawn);
-
-    void setMaxSpawn(int maxSpawn);
-
-    void setMobPerMinute(int mobPerMinute);
+    SpawnerOption cloneOption();
 }

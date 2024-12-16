@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -352,6 +353,7 @@ public class SpawnerListener extends ListenerAdapter {
 
                 LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
                 clonedEntity.setAI(false);
+                clonedEntity.setVisualFire(false);
                 spawner.getDeadEntities().add(clonedEntity);
 
                 if (event instanceof EntityDamageByEntityEvent) {
@@ -486,7 +488,16 @@ public class SpawnerListener extends ListenerAdapter {
             if (!Objects.equals(event.getHand(), EquipmentSlot.HAND)) return;
 
             IStorage storage = this.plugin.getStorage();
-            storage.getSpawner(block.getLocation()).ifPresent(spawner -> this.openVirtualSpawner(spawner, player, event));
+            storage.getSpawner(block.getLocation()).ifPresent(spawner -> {
+
+                if (spawner.getType() == SpawnerType.VIRTUAL && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                    if (plugin.getUpgradeManager().applyUpgradeItem(spawner, player, event.getItem())) {
+                        return;
+                    }
+                }
+
+                this.openVirtualSpawner(spawner, player, event);
+            });
         }
     }
 
@@ -495,7 +506,7 @@ public class SpawnerListener extends ListenerAdapter {
 
             event.setCancelled(true);
 
-            if (spawner.getOwner().equals(player.getUniqueId())) {
+            if (spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS)) {
                 this.plugin.getManager().openVirtualSpawner(player, spawner, 1);
             }
         }

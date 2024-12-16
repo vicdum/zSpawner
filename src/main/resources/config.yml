@@ -278,6 +278,10 @@ blacklistBlocks:
   - IRON_BLOCK
   - NETHERITE_BLOCK
 
+blacklist-materials:
+  - BOW
+  - GOLDEN_SWORD
+
 disableSpawnerExplosion:
   GUI: true
   CLASSIC: true
@@ -354,3 +358,5 @@ silkSpawner:
 
 # Break blocks or entity of a virtual will spawn
 breakUpVirtualSpawner: true
+
+deposit-reason: "Sale of x%amount% %item% for %price% (Spawner)"
