@@ -16,6 +16,10 @@
 
 # Unreleased
 
+# 4.0.6
+
+- Add zEssentials mailbox on give commands (allows you to receive items in your mailbox if you are full)
+
 # 4.0.5
 
 - Added Shop button, allows to sell the content of the virtual spawner (only work with zshop for the moment)

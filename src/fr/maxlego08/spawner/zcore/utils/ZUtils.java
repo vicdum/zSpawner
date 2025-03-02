@@ -130,20 +130,6 @@ public abstract class ZUtils extends MessageUtils {
     }
 
     /**
-     * Gives an item to the player, if the player's inventory is full then the
-     * item will drop to the ground
-     *
-     * @param player
-     * @param item
-     */
-    protected void give(Player player, ItemStack item) {
-        if (hasInventoryFull(player))
-            player.getWorld().dropItem(player.getLocation(), item);
-        else
-            player.getInventory().addItem(item);
-    }
-
-    /**
      * Allows to return a material according to its ID Works only for plugins
      * from 1.8 to 1.12
      *

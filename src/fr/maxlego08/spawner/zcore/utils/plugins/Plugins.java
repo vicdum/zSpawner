@@ -10,7 +10,8 @@ public enum Plugins {
 	TRANSLATIONAPI("TranslationAPI"),
 	ZTRANSLATOR("zTranslator"),
 
-    ZSHOP("zShop");
+    ZSHOP("zShop"),
+    ZESSENTIALS("ZESSENTIALS");
 
 	private final String name;
 

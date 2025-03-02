@@ -156,7 +156,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     public void giveSpawner(CommandSender sender, Player target, SpawnerType spawnerType, EntityType entityType, boolean silent) {
         ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, null);
-        give(target, itemStack);
+        this.plugin.getPlayerGive().give(target, itemStack);
         message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
         if (!silent) {
             message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
