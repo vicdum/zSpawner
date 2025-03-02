@@ -9,4 +9,5 @@ depend:
   - zMenu
 softdepend:
   - zShop
+  - zEssentials
 commands:

@@ -99,7 +99,7 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.namespacedKey, PersistentDataType.STRING, upgradeName);
         itemStack.setItemMeta(itemMeta);
-        give(player, itemStack);
+        this.plugin.getPlayerGive().give(player, itemStack);
         message(plugin, sender, Message.UPGRADE_GIVE, "%name%", upgradeName, "%player%", player.getName());
     }
 
