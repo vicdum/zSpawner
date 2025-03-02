@@ -27,7 +27,6 @@ import fr.maxlego08.spawner.migrations.OptionMigration;
 import fr.maxlego08.spawner.migrations.SpawnerMigration;
 import fr.maxlego08.spawner.storage.Tables;
 import fr.maxlego08.spawner.zcore.ZPlugin;
-import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
@@ -39,8 +38,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -206,19 +203,19 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     }
 
     public void deleteSpawner(Spawner spawner) {
-        this.requestHelper.delete(Tables.SPAWNERS, table -> table.where("spawnerId", spawner.getSpawnerId()));
+        this.requestHelper.delete(Tables.SPAWNERS, table -> table.where("spawner_id", spawner.getSpawnerId()));
     }
 
     public void upsertSpawner(Spawner spawner) {
         spawner.update();
         this.requestHelper.upsert(Tables.SPAWNERS, table -> {
             table.uuid("owner", spawner.getOwner()).primary();
-            table.uuid("spawnerId", spawner.getSpawnerId()).primary();
+            table.uuid("spawner_id", spawner.getSpawnerId()).primary();
             table.string("location", spawner.getLocation() == null ? null : changeLocationToString(spawner.getLocation()));
             table.string("type", spawner.getType().name());
-            table.bigInt("placedAt", spawner.getPlacedAt());
-            table.string("entityType", spawner.getEntityType().name());
-            table.string("blockFace", spawner.getBlockFace().name());
+            table.bigInt("placed_at", spawner.getPlacedAt());
+            table.string("entity_type", spawner.getEntityType().name());
+            table.string("block_face", spawner.getBlockFace().name());
             table.bigInt("amount", spawner.getAmount());
         });
     }
@@ -226,8 +223,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     public void upsertSpawnerItem(UUID spawnerId, SpawnerItem spawnerItem) {
         spawnerItem.update();
         this.requestHelper.upsert(Tables.ITEMS, table -> {
-            table.uuid("spawnerId", spawnerId).primary();
-            table.string("itemStack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack())).primary();
+            table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
+            table.uuid("spawner_id", spawnerId).primary();
+            table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
             table.bigInt("amount", spawnerItem.getAmount());
         });
     }
@@ -240,40 +238,45 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
         return spawners.stream().map(spawnerDTO -> {
 
-            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawnerId(), spawnerDTO.spawnerId(), spawnerDTO.type(), spawnerDTO.entityType(), spawnerDTO.placedAt(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.blockFace());
+            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.spawner_id(), spawnerDTO.type(), spawnerDTO.entity_type(), spawnerDTO.placed_at(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.block_face());
 
-            spawner.setItems(items.stream().filter(itemDTO -> itemDTO.spawnerId().equals(spawnerDTO.spawnerId())).map(itemDTO -> new ZSpawnerItem(itemDTO.itemStack(), itemDTO.amount())).collect(Collectors.toList()));
+            spawner.setItems(items.stream().filter(itemDTO -> itemDTO.spawner_id().equals(spawnerDTO.spawner_id())).map(itemDTO -> new ZSpawnerItem(itemDTO.unique_id(), itemDTO.item_stack(), itemDTO.amount())).collect(Collectors.toList()));
 
-            options.stream().filter(optionDTO -> optionDTO.spawnerId().equals(spawnerDTO.spawnerId())).findFirst().ifPresent(optionDTO -> {
-                SpawnerOption option = new ZSpawnerOption(optionDTO.distance(), optionDTO.experienceMultiplier(), optionDTO.lootMultiplier(), optionDTO.autoKill(), optionDTO.autoSell(), optionDTO.maxEntity(), optionDTO.minDelay(), optionDTO.maxDelay(), optionDTO.minSpawn(), optionDTO.maxSpawn(), optionDTO.mobPerMinute());
-                spawner.setOption(option);
-            });
+            options.stream().filter(optionDTO -> optionDTO.spawner_id().equals(spawnerDTO.spawner_id())).findFirst().ifPresent(optionDTO -> spawner.setOption(toOption(optionDTO)));
 
             return spawner;
         }).collect(Collectors.toList());
     }
 
     public void deleteSpawnerItem(UUID spawnerId, String itemStack) {
-        this.requestHelper.delete(Tables.ITEMS, table -> table.where("spawnerId", spawnerId).where("itemStack", itemStack));
+        this.requestHelper.delete(Tables.ITEMS, table -> table.where("spawner_id", spawnerId).where("item_stack", itemStack));
     }
 
     public void upsertSpawnerOption(UUID spawnerId, SpawnerOption option) {
         option.update();
         this.requestHelper.upsert(Tables.OPTIONS, table -> {
-            table.uuid("spawnerId", spawnerId).primary();
+            table.uuid("spawner_id", spawnerId).primary();
             table.decimal("distance", option.getDistance());
-            table.decimal("experienceMultiplier", option.getExperienceMultiplier());
-            table.decimal("lootMultiplier", option.getLootMultiplier());
-            table.bool("autoKill", option.enableAutoKill());
-            table.bool("autoSell", option.enableAutoSell());
-            table.bigInt("maxEntity", option.getMaxEntity());
-            table.bigInt("minDelay", option.getMinDelay());
-            table.bigInt("maxDelay", option.getMaxDelay());
-            table.bigInt("minSpawn", option.getMinSpawn());
-            table.bigInt("maxSpawn", option.getMaxSpawn());
-            table.bigInt("mobPerMinute", option.getMobPerMinute());
+            table.decimal("experience_multiplier", option.getExperienceMultiplier());
+            table.decimal("loot_multiplier", option.getLootMultiplier());
+            table.bool("auto_kill", option.enableAutoKill());
+            table.bool("auto_sell", option.enableAutoSell());
+            table.bigInt("max_entity", option.getMaxEntity());
+            table.bigInt("min_delay", option.getMinDelay());
+            table.bigInt("max_delay", option.getMaxDelay());
+            table.bigInt("min_spawn", option.getMinSpawn());
+            table.bigInt("max_spawn", option.getMaxSpawn());
+            table.bigInt("mob_per_minute", option.getMobPerMinute());
         });
     }
 
+    @Override
+    public Optional<SpawnerOption> getOption(UUID uuid) {
+        var options = this.requestHelper.select(Tables.OPTIONS, OptionDTO.class, table -> table.where("spawner_id", uuid));
+        return options.isEmpty() ? Optional.empty() : Optional.of(toOption(options.getFirst()));
+    }
 
+    private SpawnerOption toOption(OptionDTO optionDTO) {
+        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute());
+    }
 }

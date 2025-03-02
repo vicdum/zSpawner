@@ -7,18 +7,18 @@ public class OptionMigration extends Migration {
     @Override
     public void up() {
         create(Tables.OPTIONS,table -> {
-            table.uuid("spawnerId").foreignKey("%prefix%spawners").primary();
+            table.uuid("spawner_id").foreignKey("%prefix%spawners").primary();
             table.decimal("distance");
-            table.decimal("experienceMultiplier");
-            table.decimal("lootMultiplier");
-            table.bool("autoKill");
-            table.bool("autoSell");
-            table.integer("maxEntity");
-            table.integer("minDelay");
-            table.integer("maxDelay");
-            table.integer("minSpawn");
-            table.integer("maxSpawn");
-            table.integer("mobPerMinute");
+            table.decimal("experience_multiplier");
+            table.decimal("loot_multiplier");
+            table.bool("auto_kill");
+            table.bool("auto_sell");
+            table.integer("max_entity");
+            table.integer("min_delay");
+            table.integer("max_delay");
+            table.integer("min_spawn");
+            table.integer("max_spawn");
+            table.integer("mob_per_minute");
         });
     }
 }

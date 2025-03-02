@@ -83,8 +83,8 @@ public class SpawnerListener extends ListenerAdapter {
         if (optionalSpawner.isEmpty()) return;
         SpawnerResult spawnerResult = optionalSpawner.get();
 
-        SpawnerType spawnerType = spawnerResult.getSpawnerType();
-        EntityType entityType = spawnerResult.getEntityType();
+        SpawnerType spawnerType = spawnerResult.spawnerType();
+        EntityType entityType = spawnerResult.entityType();
 
         IStorage storage = this.plugin.getStorage();
         StackableManager stackableManager = this.plugin.getStackableManager();
@@ -126,12 +126,13 @@ public class SpawnerListener extends ListenerAdapter {
 
 
         BlockFace blockFace = getCardinalDirection(player);
-        Spawner spawner = new ZSpawner(plugin, spawnerResult.getSpawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
+        Spawner spawner = new ZSpawner(plugin, spawnerResult.spawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
         spawner.place(block.getLocation());
 
         storage.addSpawner(spawner);
-    }
 
+        runAsync(this.plugin, () -> this.plugin.getStorage().getOption(spawnerResult.spawnerId()).ifPresent(spawner::setOption));
+    }
 
     @Override
     protected void onBlockBreak(BlockBreakEvent event, Player player) {

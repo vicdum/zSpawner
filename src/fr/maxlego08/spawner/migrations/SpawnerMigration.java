@@ -9,12 +9,12 @@ public class SpawnerMigration extends Migration {
     public void up() {
         create(Tables.SPAWNERS, table -> {
             table.uuid("owner").unique().primary();
-            table.uuid("spawnerId").unique();
+            table.uuid("spawner_id").unique();
             table.string("location", 255);
             table.string("type", 255);
-            table.bigInt("placedAt");
-            table.string("entityType", 255);
-            table.string("blockFace", 255);
+            table.bigInt("placed_at");
+            table.string("entity_type", 255);
+            table.string("block_face", 255);
             table.integer("amount");
         });
     }
