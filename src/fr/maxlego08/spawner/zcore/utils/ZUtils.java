@@ -101,15 +101,17 @@ public abstract class ZUtils extends MessageUtils {
         return ItemStackUtils.deserializeItemStack(item);
     }
 
+
     /**
-     * Allows to obtain a random number between a and b
+     * Returns a random integer between two specified values, inclusive.
      *
-     * @param a
-     * @param b
-     * @return number between a and b
+     * @param a - the first boundary value
+     * @param b - the second boundary value
+     * @return a random integer between a and b, inclusive; returns a if both values are equal
      */
     protected int getNumberBetween(int a, int b) {
-        return ThreadLocalRandom.current().nextInt(a, b);
+        if (a == b) return a;
+        return ThreadLocalRandom.current().nextInt(Math.min(a, b), Math.max(a, b));
     }
 
     /**
@@ -237,7 +239,7 @@ public abstract class ZUtils extends MessageUtils {
      * @return formatting current duplicate
      */
     protected String format(double decimal) {
-        return format(decimal, "#.##");
+        return format(decimal, "#.#");
     }
 
     /**
@@ -835,19 +837,11 @@ public abstract class ZUtils extends MessageUtils {
         return message;
     }
 
-    /**
-     * @param l
-     * @return
-     */
     protected String format(long l) {
-        return format(l, ' ');
+        return format(l, '.');
     }
 
-    /**
-     * @param l
-     * @param c
-     * @return
-     */
+
     protected String format(long l, char c) {
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
         DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();

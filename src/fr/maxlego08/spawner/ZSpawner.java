@@ -265,16 +265,18 @@ public class ZSpawner extends ZUtils implements Spawner {
             Logger.info("Error with entity class for " + this.entityType, Logger.LogType.ERROR);
             return;
         }
-        this.livingEntity = (LivingEntity) world.spawn(location, entityClass);
-        this.livingEntity.setAI(false);
-        this.livingEntity.setCollidable(false);
-        this.livingEntity.setCustomNameVisible(true);
-        this.livingEntity.setVisualFire(false);
-        this.livingEntity.setSwimming(false);
-        this.livingEntity.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+        this.livingEntity = (LivingEntity) world.spawn(location, entityClass, e -> {
+            if (e instanceof LivingEntity currentLiving) {
+                currentLiving.setAI(false);
+                currentLiving.setCollidable(false);
+                currentLiving.setCustomNameVisible(true);
+                currentLiving.setVisualFire(false);
+                currentLiving.setSwimming(false);
+                currentLiving.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+            }
+        });
 
-        if (this.livingEntity instanceof Ageable) {
-            Ageable ageable = (Ageable) this.livingEntity;
+        if (this.livingEntity instanceof Ageable ageable) {
             ageable.setAdult();
         }
 

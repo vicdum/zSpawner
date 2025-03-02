@@ -80,7 +80,7 @@ public class SpawnerListener extends ListenerAdapter {
         if (checkBlockPlaceVirtualSpawner(event, block)) return;
 
         Optional<SpawnerResult> optionalSpawner = this.plugin.getManager().getSpawnerResult(itemStack);
-        if (!optionalSpawner.isPresent()) return;
+        if (optionalSpawner.isEmpty()) return;
         SpawnerResult spawnerResult = optionalSpawner.get();
 
         SpawnerType spawnerType = spawnerResult.getSpawnerType();
@@ -169,7 +169,7 @@ public class SpawnerListener extends ListenerAdapter {
                     }
                 }
 
-                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {
                     spawner.setAmount(spawner.getAmount() - 1);
@@ -184,11 +184,9 @@ public class SpawnerListener extends ListenerAdapter {
             }
 
             // On est dans le cas d'un spawner naturel
-            if (block.getType() == Material.SPAWNER && Config.enableSilkSpawner && block.getState() instanceof CreatureSpawner && Config.silkNaturalSpawner) {
+            if (block.getType() == Material.SPAWNER && Config.enableSilkSpawner && block.getState() instanceof CreatureSpawner spawner && Config.silkNaturalSpawner) {
 
                 if (cantSilkSpawner(player)) return;
-
-                CreatureSpawner spawner = (CreatureSpawner) block.getState();
 
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, Config.naturelSpawnerInto, spawner.getSpawnedType(), null));
             }
@@ -273,7 +271,7 @@ public class SpawnerListener extends ListenerAdapter {
                     spawner.breakBlock();
                     storage.removeSpawner(spawner);
 
-                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
+                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner));
                     return false;
                 }
             }
@@ -328,9 +326,8 @@ public class SpawnerListener extends ListenerAdapter {
                 return;
             }
 
-            if (event instanceof EntityDamageByEntityEvent) {
+            if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
 
-                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
                 Entity damager = damageByEntityEvent.getDamager();
 
                 if (damager instanceof Wolf || damager instanceof IronGolem) {
@@ -356,9 +353,8 @@ public class SpawnerListener extends ListenerAdapter {
                 clonedEntity.setVisualFire(false);
                 spawner.getDeadEntities().add(clonedEntity);
 
-                if (event instanceof EntityDamageByEntityEvent) {
+                if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
 
-                    EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
                     Entity damager = damageByEntityEvent.getDamager();
 
                     if (damager instanceof Wolf || damager instanceof IronGolem) {
@@ -410,7 +406,7 @@ public class SpawnerListener extends ListenerAdapter {
                 }
             }*/
 
-            if (itemStacks.size() > 0) {
+            if (!itemStacks.isEmpty()) {
                 spawner.addItems(itemStacks);
             }
 
@@ -492,6 +488,7 @@ public class SpawnerListener extends ListenerAdapter {
 
                 if (spawner.getType() == SpawnerType.VIRTUAL && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                     if (plugin.getUpgradeManager().applyUpgradeItem(spawner, player, event.getItem())) {
+                        event.setCancelled(true);
                         return;
                     }
                 }

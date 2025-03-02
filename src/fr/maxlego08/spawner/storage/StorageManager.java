@@ -4,7 +4,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.api.storage.StorageType;
-import fr.maxlego08.spawner.storage.storages.SqliteStorage;
+import fr.maxlego08.spawner.storage.storages.DatabaseStorage;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -25,7 +25,7 @@ public class StorageManager implements SpawnerStorage {
         this.storageType = StorageType.valueOf(configuration.getString("storage", "SQLITE"));
         long updateInterval = configuration.getLong("updateInterval", 12000);
 
-        this.storage = new SqliteStorage(plugin, true);
+        this.storage = new DatabaseStorage(plugin);
 
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         this.scheduledTask = executorService.scheduleAtFixedRate(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);

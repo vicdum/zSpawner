@@ -16,6 +16,11 @@
 
 # Unreleased
 
+- Improvement and correction of the spawner option system
+- Added placeholders to display the options in a spawner item
+- Added an information button to display the options of a spawner
+- Use Sarah for database management (you can now use MYSQL)
+
 # 4.0.6
 
 - Add zEssentials mailbox on give commands (allows you to receive items in your mailbox if you are full)

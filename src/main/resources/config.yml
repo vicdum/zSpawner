@@ -41,17 +41,18 @@ storage: SQLITE
 
 # Updates data every 120,000 milliseconds (2 minutes).
 # If the storage is in JSON, then the file will save
-# If the storage is SQLITE or MYSQL then the drawers will be updated if they need to be
+# If the storage is SQLITE or MYSQL then the spawners will be updated if they need to be
 updateInterval: 120000
 
 # Configuration for SQLITE and MYSQL storage
 # Attention, storage in MYSQL is not yet available !
 sql:
-  tablePrefix: "zspawner"
+  tablePrefix: "zspawner_"
   user: homestead
   password: secret
   port: 3306
   host: 192.168.10.10
+  debug: true
   database: zspawner
 
 items:

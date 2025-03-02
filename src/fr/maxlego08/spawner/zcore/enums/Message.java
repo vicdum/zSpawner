@@ -90,7 +90,12 @@ public enum Message {
     COMMAND_OPTION_SUCCESS("§aYou just modified the §f%name% §aoption with the value §f%value%§a for the spawner §6%spawnerKey% §aof the player §b%player%§a."),
     UPGRADE_NOT_FOUND("§cImpossible to find the upgrade §f%name%§c."),
     UPGRADE_GIVE("§aYou just gave to §f%player% §athe upgrade §f%name%§a."),
-    SELL_ERROR("&cUnable to sell content.");
+    UPGRADE_APPLY("§aYou just applied the upgrade §f%name% §ato your spawner."),
+    UPGRADE_NOT_APPLICABLE("§cThe upgrade §f%name% §ccannot be applied to your spawner."),
+    SELL_ERROR("&cUnable to sell content."),
+    YES("&aYes"),
+    NO("&cNo"),
+    ;
 
     private List<String> messages;
     private String message;

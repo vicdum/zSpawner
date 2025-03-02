@@ -69,8 +69,9 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
             SpawnerOptionSetter spawnerOptionSetter = SpawnerOptionSetter.valueOf(configuration.getString(path + "type").toUpperCase());
             Object value = configuration.get(path + "value");
             Object maxValue = configuration.get(path + "max-value");
+            String displayName = configuration.getString(path + "display-name", upgradeName);
 
-            this.upgrades.put(upgradeName, new ZUpgradeItem(spawnerOptionSetter, value, maxValue, itemStack));
+            this.upgrades.put(upgradeName, new ZUpgradeItem(displayName, spawnerOptionSetter, value, maxValue, itemStack));
         }
     }
 
@@ -100,7 +101,8 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
         persistentDataContainer.set(this.namespacedKey, PersistentDataType.STRING, upgradeName);
         itemStack.setItemMeta(itemMeta);
         this.plugin.getPlayerGive().give(player, itemStack);
-        message(plugin, sender, Message.UPGRADE_GIVE, "%name%", upgradeName, "%player%", player.getName());
+
+        message(plugin, sender, Message.UPGRADE_GIVE, "%name%", upgradeItem.getDisplayName(), "%player%", player.getName());
     }
 
     @Override
@@ -118,14 +120,20 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
 
         UpgradeItem upgradeItem = optional.get();
 
-        if (!upgradeItem.canApply(spawner)) return false;
+        if (!upgradeItem.canApply(spawner)) {
+            message(plugin, player, Message.UPGRADE_NOT_APPLICABLE, "%name%", upgradeItem.getDisplayName());
+            return false;
+        }
 
         if (!upgradeItem.apply(spawner)) return false;
 
         removeItemInHand(player, 1);
         Location location = spawner.getLocation().getBlock().getLocation();
-        location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, location.add(0.5, 0.5, 0.5), 20, 0.55, 0.55, 0.55);
+        var particleLocation = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY() + 1, location.getBlockZ() + 0.5);
+        location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleLocation, 25, 0.55, 0.55, 0.55);
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f);
+
+        message(plugin, player, Message.UPGRADE_APPLY, "%name%", upgradeItem.getDisplayName());
 
         return true;
     }
