@@ -8,8 +8,8 @@ public class SpawnerMigration extends Migration {
     @Override
     public void up() {
         create(Tables.SPAWNERS, table -> {
-            table.uuid("owner").unique().primary();
-            table.uuid("spawner_id").unique();
+            table.uuid("owner").primary();
+            table.uuid("spawner_id").unique().primary();
             table.string("location", 255);
             table.string("type", 255);
             table.bigInt("placed_at");

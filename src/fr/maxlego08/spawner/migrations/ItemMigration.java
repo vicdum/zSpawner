@@ -8,7 +8,7 @@ public class ItemMigration extends Migration {
     public void up() {
         create(Tables.ITEMS, table -> {
             table.uuid("unique_id").primary();
-            table.uuid("spawner_id").foreignKey("%prefix%spawners").primary();
+            table.uuid("spawner_id").primary();
             table.text("item_stack");
             table.bigInt("amount");
         });

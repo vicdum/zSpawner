@@ -6,8 +6,10 @@ import fr.maxlego08.sarah.DatabaseConnection;
 import fr.maxlego08.sarah.HikariDatabaseConnection;
 import fr.maxlego08.sarah.MigrationManager;
 import fr.maxlego08.sarah.RequestHelper;
+import fr.maxlego08.sarah.SchemaBuilder;
 import fr.maxlego08.sarah.SqliteConnection;
 import fr.maxlego08.sarah.database.DatabaseType;
+import fr.maxlego08.sarah.database.Schema;
 import fr.maxlego08.sarah.logger.JULogger;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.ZSpawner;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DatabaseStorage extends ZUtils implements IStorage {
@@ -57,6 +60,11 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     @Override
     public Optional<Spawner> getSpawner(Location location) {
         return this.spawners.stream().filter(spawner -> spawner.isPlace() && spawner.getCuboid().contains(location)).findFirst();
+    }
+
+    @Override
+    public Optional<Spawner> getSpawner(UUID uniqueId) {
+        return this.spawners.stream().filter(e -> e.getSpawnerId().equals(uniqueId)).findFirst();
     }
 
     @Override
@@ -171,12 +179,38 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void update(boolean async) {
-        Runnable runnable = () -> this.spawners.forEach(spawner -> {
-            if (spawner.needUpdate()) this.upsertSpawner(spawner);
-            SpawnerOption spawnerOption = spawner.getOption();
-            if (spawnerOption.needUpdate()) this.upsertSpawnerOption(spawner.getSpawnerId(), spawnerOption);
-            spawner.getItems().stream().filter(SpawnerItem::needUpdate).forEach(spawnerItem -> this.upsertSpawnerItem(spawner.getSpawnerId(), spawnerItem));
-        });
+        Runnable runnable = () -> {
+
+            List<Schema> schemasItems = new ArrayList<>();
+            List<Schema> schemas = new ArrayList<>();
+            List<Schema> schemasOptions = new ArrayList<>();
+
+            this.spawners.forEach(spawner -> {
+                if (spawner.needUpdate()) {
+                    spawner.update();
+                    schemas.add(SchemaBuilder.upsert(Tables.SPAWNERS, toSchema(spawner)));
+                }
+                SpawnerOption spawnerOption = spawner.getOption();
+                if (spawnerOption.needUpdate()) {
+                    spawnerOption.update();
+                    schemasOptions.add(SchemaBuilder.upsert(Tables.OPTIONS, toSchema(spawner.getSpawnerId(), spawnerOption)));
+                }
+
+                for (SpawnerItem spawnerItem : spawner.getItems()) {
+                    spawnerItem.update();
+                    schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
+                        table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
+                        table.uuid("spawner_id", spawner.getSpawnerId()).primary();
+                        table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
+                        table.bigInt("amount", spawnerItem.getAmount());
+                    }));
+                }
+            });
+
+            this.requestHelper.upsertMultiple(schemas);
+            this.requestHelper.upsertMultiple(schemasItems);
+            this.requestHelper.upsertMultiple(schemasOptions);
+        };
 
         if (async) ZPlugin.service.execute(runnable);
         else runnable.run();
@@ -208,7 +242,11 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     public void upsertSpawner(Spawner spawner) {
         spawner.update();
-        this.requestHelper.upsert(Tables.SPAWNERS, table -> {
+        this.requestHelper.upsert(Tables.SPAWNERS, toSchema(spawner));
+    }
+
+    private Consumer<Schema> toSchema(Spawner spawner) {
+        return table -> {
             table.uuid("owner", spawner.getOwner()).primary();
             table.uuid("spawner_id", spawner.getSpawnerId()).primary();
             table.string("location", spawner.getLocation() == null ? null : changeLocationToString(spawner.getLocation()));
@@ -217,19 +255,8 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.string("entity_type", spawner.getEntityType().name());
             table.string("block_face", spawner.getBlockFace().name());
             table.bigInt("amount", spawner.getAmount());
-        });
+        };
     }
-
-    public void upsertSpawnerItem(UUID spawnerId, SpawnerItem spawnerItem) {
-        spawnerItem.update();
-        this.requestHelper.upsert(Tables.ITEMS, table -> {
-            table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
-            table.uuid("spawner_id", spawnerId).primary();
-            table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
-            table.bigInt("amount", spawnerItem.getAmount());
-        });
-    }
-
 
     public List<Spawner> getAllSpawners() {
         var spawners = this.requestHelper.selectAll(Tables.SPAWNERS, SpawnerDTO.class);
@@ -254,7 +281,11 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     public void upsertSpawnerOption(UUID spawnerId, SpawnerOption option) {
         option.update();
-        this.requestHelper.upsert(Tables.OPTIONS, table -> {
+        this.requestHelper.upsert(Tables.OPTIONS, toSchema(spawnerId, option));
+    }
+
+    private Consumer<Schema> toSchema(UUID spawnerId, SpawnerOption option) {
+        return table -> {
             table.uuid("spawner_id", spawnerId).primary();
             table.decimal("distance", option.getDistance());
             table.decimal("experience_multiplier", option.getExperienceMultiplier());
@@ -267,7 +298,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.bigInt("min_spawn", option.getMinSpawn());
             table.bigInt("max_spawn", option.getMaxSpawn());
             table.bigInt("mob_per_minute", option.getMobPerMinute());
-        });
+        };
     }
 
     @Override

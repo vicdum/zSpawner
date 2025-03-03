@@ -87,6 +87,13 @@ public class SpawnerListener extends ListenerAdapter {
         EntityType entityType = spawnerResult.entityType();
 
         IStorage storage = this.plugin.getStorage();
+
+        if (storage.getSpawner(spawnerResult.spawnerId()).isPresent()) {
+            message(this.plugin, player, Message.PLACE_ERROR_EXIST);
+            event.setCancelled(true);
+            return;
+        }
+
         StackableManager stackableManager = this.plugin.getStackableManager();
 
         if (stackableManager.isEnable() && spawnerType == SpawnerType.CLASSIC) {
@@ -123,7 +130,6 @@ public class SpawnerListener extends ListenerAdapter {
             Chunk chunk = block.getChunk();
             if (hasSpawnerLimit(event, player, entityType, chunk)) return;
         }
-
 
         BlockFace blockFace = getCardinalDirection(player);
         Spawner spawner = new ZSpawner(plugin, spawnerResult.spawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);

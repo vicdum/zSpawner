@@ -27,6 +27,8 @@ public interface IStorage {
 
     Optional<Spawner> getSpawner(Location location);
 
+    Optional<Spawner> getSpawner(UUID uniqueId);
+
     Optional<Spawner> getSpawnerByEntity(LivingEntity entity);
 
     Optional<Spawner> getSpawnerByDeadEntity(Entity entity);

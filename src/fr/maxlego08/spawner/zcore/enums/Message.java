@@ -95,6 +95,7 @@ public enum Message {
     SELL_ERROR("&cUnable to sell content."),
     YES("&aYes"),
     NO("&cNo"),
+    PLACE_ERROR_EXIST("&cThe spawner already exists, you can’t place it."),
     ;
 
     private List<String> messages;
