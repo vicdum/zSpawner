@@ -197,19 +197,21 @@ public class DatabaseStorage extends ZUtils implements IStorage {
                 }
 
                 for (SpawnerItem spawnerItem : spawner.getItems()) {
-                    spawnerItem.update();
-                    schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
-                        table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
-                        table.uuid("spawner_id", spawner.getSpawnerId()).primary();
-                        table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
-                        table.bigInt("amount", spawnerItem.getAmount());
-                    }));
+                    if (spawnerItem.needUpdate()) {
+                        spawnerItem.update();
+                        schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
+                            table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
+                            table.uuid("spawner_id", spawner.getSpawnerId()).primary();
+                            table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
+                            table.bigInt("amount", spawnerItem.getAmount());
+                        }));
+                    }
                 }
             });
 
-            this.requestHelper.upsertMultiple(schemas);
-            this.requestHelper.upsertMultiple(schemasItems);
-            this.requestHelper.upsertMultiple(schemasOptions);
+            if (!schemas.isEmpty()) this.requestHelper.upsertMultiple(schemas);
+            if (!schemasItems.isEmpty()) this.requestHelper.upsertMultiple(schemasItems);
+            if (!schemasOptions.isEmpty()) this.requestHelper.upsertMultiple(schemasOptions);
         };
 
         if (async) ZPlugin.service.execute(runnable);

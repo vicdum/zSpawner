@@ -47,6 +47,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -357,7 +358,12 @@ public class SpawnerListener extends ListenerAdapter {
 
                 LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
                 clonedEntity.setAI(false);
+                clonedEntity.setCollidable(false);
+                clonedEntity.setCustomNameVisible(true);
                 clonedEntity.setVisualFire(false);
+                clonedEntity.setSwimming(false);
+                clonedEntity.setSilent(true);
+                clonedEntity.setMetadata("zspawner-death", new FixedMetadataValue(this.plugin, true));
                 spawner.getDeadEntities().add(clonedEntity);
 
                 if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {

@@ -24,6 +24,8 @@ import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.materials.SpawnerItemLoader;
+import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
@@ -211,6 +213,10 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public void loadButtons() {
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.registerMaterialLoader(new SpawnerItemLoader(this.plugin));
+        inventoryManager.registerMaterialLoader(new SpawnerOptionItemLoader(this.plugin));
+
         ButtonManager buttonManager = this.plugin.getButtonManager();
         buttonManager.register(new NoneLoader(this.plugin, SpawnersButton.class, "zspawner_spawners"));
         buttonManager.register(new NoneLoader(this.plugin, SortButton.class, "zspawner_sort"));

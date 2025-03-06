@@ -272,6 +272,7 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setCustomNameVisible(true);
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
+                currentLiving.setSilent(true);
                 currentLiving.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
             }
         });
