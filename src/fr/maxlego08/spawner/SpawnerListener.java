@@ -359,7 +359,6 @@ public class SpawnerListener extends ListenerAdapter {
                 LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
                 clonedEntity.setAI(false);
                 clonedEntity.setCollidable(false);
-                clonedEntity.setCustomNameVisible(true);
                 clonedEntity.setVisualFire(false);
                 clonedEntity.setSwimming(false);
                 clonedEntity.setSilent(true);
