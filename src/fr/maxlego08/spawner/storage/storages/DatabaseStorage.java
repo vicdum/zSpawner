@@ -30,6 +30,7 @@ import fr.maxlego08.spawner.migrations.SpawnerMigration;
 import fr.maxlego08.spawner.storage.Tables;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
+import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,6 +40,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,23 +133,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             this.spawners.clear();
 
             FileConfiguration configuration = plugin.getConfig();
-            String tablePrefix = configuration.getString("sql.tablePrefix", "zspawner_");
             StorageType storageType = StorageType.valueOf(configuration.getString("storage", "SQLITE"));
 
-            String user = configuration.getString("sql.user");
-            String password = configuration.getString("sql.password");
-            String database = configuration.getString("sql.database");
-            String host = configuration.getString("sql.host");
-            int port = configuration.getInt("sql.port");
-            boolean debug = configuration.getBoolean("sql.debug");
-
-            DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType == StorageType.SQLITE ? DatabaseType.SQLITE : DatabaseType.MYSQL);
-            DatabaseConnection databaseConnection = storageType == StorageType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
-            databaseConnection.connect();
-
-            if (!databaseConnection.isValid()) {
-                throw new RuntimeException("Impossible to connect to database!");
-            }
+            DatabaseConnection databaseConnection = getDatabaseConnection(configuration, storageType);
 
             this.requestHelper = new RequestHelper(databaseConnection, JULogger.from(plugin.getLogger()));
 
@@ -164,6 +152,26 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
             Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.forEach(Spawner::load));
         });
+    }
+
+    private @NotNull DatabaseConnection getDatabaseConnection(FileConfiguration configuration, StorageType storageType) {
+        GlobalDatabaseConfiguration globalDatabaseConfiguration = new GlobalDatabaseConfiguration(configuration);
+        String tablePrefix = globalDatabaseConfiguration.getTablePrefix();
+        String host = globalDatabaseConfiguration.getHost();
+        int port = globalDatabaseConfiguration.getPort();
+        String user = globalDatabaseConfiguration.getUser();
+        String password = globalDatabaseConfiguration.getPassword();
+        String database = globalDatabaseConfiguration.getDatabase();
+        boolean debug = globalDatabaseConfiguration.isDebug();
+
+        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType == StorageType.SQLITE ? DatabaseType.SQLITE : DatabaseType.MYSQL);
+        DatabaseConnection databaseConnection = storageType == StorageType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
+        databaseConnection.connect();
+
+        if (!databaseConnection.isValid()) {
+            throw new RuntimeException("Impossible to connect to database!");
+        }
+        return databaseConnection;
     }
 
     @Override

@@ -46,8 +46,8 @@ updateInterval: 120000
 
 # Configuration for SQLITE and MYSQL storage
 # Attention, storage in MYSQL is not yet available !
-sql:
-  tablePrefix: "zspawner_"
+database-configuration:
+  table-prefix: "zspawner_"
   user: homestead
   password: secret
   port: 3306
