@@ -5,6 +5,13 @@ import org.bukkit.inventory.ItemStack;
 
 public interface PlayerGive {
 
-    public void give(Player player, ItemStack itemStack);
+    /**
+     * Gives an item to the player, if the player's inventory is full then the
+     * item will drop to the ground
+     *
+     * @param player    the player to give the item to
+     * @param itemStack the item to give
+     */
+    void give(Player player, ItemStack itemStack);
 
 }
