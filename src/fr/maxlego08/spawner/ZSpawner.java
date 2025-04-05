@@ -23,6 +23,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -259,6 +260,13 @@ public class ZSpawner extends ZUtils implements Spawner {
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
+        world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
+            System.out.println("Alors ? " + entity);
+            if (entity.getType() == this.entityType) {
+                System.out.println("Je remove !!");
+                entity.remove();
+            }
+        });
 
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
         if (entityClass == null) {
@@ -279,6 +287,10 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         if (this.livingEntity instanceof Ageable ageable) {
             ageable.setAdult();
+        }
+
+        if (this.livingEntity instanceof Slime slime){
+            slime.setSize(1);
         }
 
         if (this.livingEntity instanceof ZombieVillager) {
@@ -503,6 +515,11 @@ public class ZSpawner extends ZUtils implements Spawner {
         World world = this.location.getWorld();
         LivingEntity clonedEntity = (LivingEntity) world.spawn(getSpawnedEntityLocation(), Objects.requireNonNull(this.livingEntity.getType().getEntityClass()));
         clonedEntity.setAI(false);
+
+        if (clonedEntity instanceof Slime slime){
+            slime.setSize(1);
+        }
+
         this.getDeadEntities().add(clonedEntity);
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(this.ownerId);

@@ -1,6 +1,5 @@
 package fr.maxlego08.spawner.listener;
 
-import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.entity.Entity;
@@ -23,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -48,6 +48,11 @@ public class AdapterListener extends ZUtils implements Listener {
     }
 
     @EventHandler
+    public void onConnect(SlimeSplitEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onSlimeSplit(event, event.getEntity()));
+    }
+
+    @EventHandler
     public void onConnect(PlayerJoinEvent event) {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onConnect(event, event.getPlayer()));
     }
@@ -56,17 +61,6 @@ public class AdapterListener extends ZUtils implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onQuit(event, event.getPlayer()));
     }
-
-    /*
-     * @EventHandler public void onMove(PlayerMoveEvent event) {
-     * this.plugin.getListenerAdapters().forEach(adapter ->
-     * adapter.onMove(event, event.getPlayer())); if
-     * (event.getFrom().getBlockX() >> 1 == event.getTo().getBlockX() >> 1 &&
-     * event.getFrom().getBlockZ() >> 1 == event.getTo().getBlockZ() >> 1 &&
-     * event.getFrom().getWorld() == event.getTo().getWorld()) return;
-     * this.plugin.getListenerAdapters().forEach(adapter ->
-     * adapter.onPlayerWalk(event, event.getPlayer(), 1)); }
-     */
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {

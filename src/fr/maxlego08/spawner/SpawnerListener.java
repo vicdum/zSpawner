@@ -27,6 +27,7 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.Action;
@@ -39,6 +40,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -470,7 +472,6 @@ public class SpawnerListener extends ListenerAdapter {
 
         Optional<Spawner> optional = storage.getSpawner(block.getLocation());
         if (optional.isPresent()) event.setCancelled(true);
-
     }
 
     @Override
@@ -551,5 +552,11 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onQuit(PlayerQuitEvent event, Player player) {
         this.plugin.getManager().getPlayerSpawners().remove(player.getUniqueId());
+    }
+
+    @Override
+    protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
+        IStorage storage = this.plugin.getStorage();
+        storage.getSpawner(entity.getLocation()).ifPresent(spawner -> event.setCancelled(true));
     }
 }
