@@ -16,10 +16,13 @@
 
 # Unreleased
 
+# 4.0.7
+
 - Improvement and correction of the spawner option system
 - Added placeholders to display the options in a spawner item
 - Added an information button to display the options of a spawner
 - Use Sarah for database management (you can now use MYSQL)
+- Fixed slime spawn
 
 # 4.0.6
 
