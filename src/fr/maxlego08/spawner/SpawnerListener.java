@@ -24,6 +24,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,6 +40,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -570,5 +572,14 @@ public class SpawnerListener extends ListenerAdapter {
             event.setCancelled(true);
             entity.setSize(1);
         });
+    }
+
+    @Override
+    public void onEntityDrop(EntityDropItemEvent event, Entity entity, Item itemDrop) {
+
+        IStorage storage = this.plugin.getStorage();
+        if (entity instanceof LivingEntity living) {
+            storage.getSpawnerByEntity(living).ifPresent(spawner -> event.setCancelled(true));
+        }
     }
 }

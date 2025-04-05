@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
@@ -227,6 +228,14 @@ public class AdapterListener extends ZUtils implements Listener {
         if (event.isCancelled()) return;
 
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onTeleport(event, event.getEntity()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onTeleport(EntityDropItemEvent event) {
+
+        if (event.isCancelled()) return;
+
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onEntityDrop(event, event.getEntity(), event.getItemDrop()));
     }
 
 }
