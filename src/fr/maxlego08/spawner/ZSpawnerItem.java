@@ -5,19 +5,24 @@ import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 public class ZSpawnerItem extends ZUtils implements SpawnerItem {
 
+    private UUID uuid;
     private final ItemStack itemStack;
     private long amount;
     private boolean needUpdate = false;
 
     public ZSpawnerItem(ItemStack itemStack, long amount) {
+        this.uuid = UUID.randomUUID();
         this.itemStack = itemStack;
         this.amount = amount;
         this.needUpdate = true;
     }
 
-    public ZSpawnerItem(String itemStack, long amount) {
+    public ZSpawnerItem(UUID uuid, String itemStack, long amount) {
+        this.uuid = uuid;
         this.itemStack = ItemStackUtils.deserializeItemStack(itemStack);
         this.amount = amount;
     }
@@ -63,5 +68,10 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     @Override
     public void update() {
         this.needUpdate = false;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return this.uuid;
     }
 }

@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.api.storage;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -12,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IStorage {
 
@@ -24,6 +26,8 @@ public interface IStorage {
     long countSpawners(OfflinePlayer player, SpawnerType spawnerType);
 
     Optional<Spawner> getSpawner(Location location);
+
+    Optional<Spawner> getSpawner(UUID uniqueId);
 
     Optional<Spawner> getSpawnerByEntity(LivingEntity entity);
 
@@ -54,4 +58,6 @@ public interface IStorage {
     List<Spawner> getSpawners();
 
     Optional<Spawner> getSpawner(Location location, SpawnerType spawnerType);
+
+    Optional<SpawnerOption> getOption(UUID uuid);
 }

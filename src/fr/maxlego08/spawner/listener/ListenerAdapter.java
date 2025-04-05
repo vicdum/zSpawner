@@ -13,6 +13,7 @@ import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -25,6 +26,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -98,16 +100,13 @@ public abstract class ListenerAdapter extends ZUtils {
     protected void onMobSpawn(CreatureSpawnEvent event) {
     }
 
-    protected void onDamageByEntity(EntityDamageByEntityEvent event, DamageCause cause, double damage, LivingEntity damager,
-                                    LivingEntity entity) {
+    protected void onDamageByEntity(EntityDamageByEntityEvent event, DamageCause cause, double damage, LivingEntity damager, LivingEntity entity) {
     }
 
-    protected void onPlayerDamagaByPlayer(EntityDamageByEntityEvent event, DamageCause cause, double damage,
-                                          Player damager, Player entity) {
+    protected void onPlayerDamagaByPlayer(EntityDamageByEntityEvent event, DamageCause cause, double damage, Player damager, Player entity) {
     }
 
-    protected void onPlayerDamagaByArrow(EntityDamageByEntityEvent event, DamageCause cause, double damage,
-                                         Projectile damager, Player entity) {
+    protected void onPlayerDamagaByArrow(EntityDamageByEntityEvent event, DamageCause cause, double damage, Projectile damager, Player entity) {
     }
 
     protected void onItemisOnGround(PlayerDropItemEvent event, Player player, Item item, Location location) {
@@ -163,6 +162,10 @@ public abstract class ListenerAdapter extends ZUtils {
     }
 
     public void onKnockBack(EntityKnockbackByEntityEvent event, LivingEntity entity) {
+
+    }
+
+    protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
 
     }
 }

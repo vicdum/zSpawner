@@ -27,6 +27,7 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.Action;
@@ -39,6 +40,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -47,6 +49,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +83,20 @@ public class SpawnerListener extends ListenerAdapter {
         if (checkBlockPlaceVirtualSpawner(event, block)) return;
 
         Optional<SpawnerResult> optionalSpawner = this.plugin.getManager().getSpawnerResult(itemStack);
-        if (!optionalSpawner.isPresent()) return;
+        if (optionalSpawner.isEmpty()) return;
         SpawnerResult spawnerResult = optionalSpawner.get();
 
-        SpawnerType spawnerType = spawnerResult.getSpawnerType();
-        EntityType entityType = spawnerResult.getEntityType();
+        SpawnerType spawnerType = spawnerResult.spawnerType();
+        EntityType entityType = spawnerResult.entityType();
 
         IStorage storage = this.plugin.getStorage();
+
+        if (storage.getSpawner(spawnerResult.spawnerId()).isPresent()) {
+            message(this.plugin, player, Message.PLACE_ERROR_EXIST);
+            event.setCancelled(true);
+            return;
+        }
+
         StackableManager stackableManager = this.plugin.getStackableManager();
 
         if (stackableManager.isEnable() && spawnerType == SpawnerType.CLASSIC) {
@@ -124,14 +134,14 @@ public class SpawnerListener extends ListenerAdapter {
             if (hasSpawnerLimit(event, player, entityType, chunk)) return;
         }
 
-
         BlockFace blockFace = getCardinalDirection(player);
-        Spawner spawner = new ZSpawner(plugin, spawnerResult.getSpawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
+        Spawner spawner = new ZSpawner(plugin, spawnerResult.spawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
         spawner.place(block.getLocation());
 
         storage.addSpawner(spawner);
-    }
 
+        runAsync(this.plugin, () -> this.plugin.getStorage().getOption(spawnerResult.spawnerId()).ifPresent(spawner::setOption));
+    }
 
     @Override
     protected void onBlockBreak(BlockBreakEvent event, Player player) {
@@ -169,7 +179,7 @@ public class SpawnerListener extends ListenerAdapter {
                     }
                 }
 
-                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
+                block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner));
 
                 if (stackableManager.isEnable() && spawner.getAmount() > 1) {
                     spawner.setAmount(spawner.getAmount() - 1);
@@ -184,11 +194,9 @@ public class SpawnerListener extends ListenerAdapter {
             }
 
             // On est dans le cas d'un spawner naturel
-            if (block.getType() == Material.SPAWNER && Config.enableSilkSpawner && block.getState() instanceof CreatureSpawner && Config.silkNaturalSpawner) {
+            if (block.getType() == Material.SPAWNER && Config.enableSilkSpawner && block.getState() instanceof CreatureSpawner spawner && Config.silkNaturalSpawner) {
 
                 if (cantSilkSpawner(player)) return;
-
-                CreatureSpawner spawner = (CreatureSpawner) block.getState();
 
                 block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(player, Config.naturelSpawnerInto, spawner.getSpawnedType(), null));
             }
@@ -273,7 +281,7 @@ public class SpawnerListener extends ListenerAdapter {
                     spawner.breakBlock();
                     storage.removeSpawner(spawner);
 
-                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId()));
+                    block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner));
                     return false;
                 }
             }
@@ -328,9 +336,8 @@ public class SpawnerListener extends ListenerAdapter {
                 return;
             }
 
-            if (event instanceof EntityDamageByEntityEvent) {
+            if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
 
-                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
                 Entity damager = damageByEntityEvent.getDamager();
 
                 if (damager instanceof Wolf || damager instanceof IronGolem) {
@@ -351,14 +358,26 @@ public class SpawnerListener extends ListenerAdapter {
                     return;
                 }
 
-                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
-                clonedEntity.setAI(false);
-                clonedEntity.setVisualFire(false);
+                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass, e -> {
+                    if (e instanceof LivingEntity living) {
+
+                        living.setAI(false);
+                        living.setCollidable(false);
+                        living.setVisualFire(false);
+                        living.setSwimming(false);
+                        living.setSilent(true);
+                        living.setMetadata("zspawner-death", new FixedMetadataValue(this.plugin, true));
+
+                        if (living instanceof Slime slime) {
+                            slime.setSize(1);
+                        }
+                    }
+                });
+
                 spawner.getDeadEntities().add(clonedEntity);
 
-                if (event instanceof EntityDamageByEntityEvent) {
+                if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
 
-                    EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
                     Entity damager = damageByEntityEvent.getDamager();
 
                     if (damager instanceof Wolf || damager instanceof IronGolem) {
@@ -410,7 +429,7 @@ public class SpawnerListener extends ListenerAdapter {
                 }
             }*/
 
-            if (itemStacks.size() > 0) {
+            if (!itemStacks.isEmpty()) {
                 spawner.addItems(itemStacks);
             }
 
@@ -462,7 +481,6 @@ public class SpawnerListener extends ListenerAdapter {
 
         Optional<Spawner> optional = storage.getSpawner(block.getLocation());
         if (optional.isPresent()) event.setCancelled(true);
-
     }
 
     @Override
@@ -492,6 +510,7 @@ public class SpawnerListener extends ListenerAdapter {
 
                 if (spawner.getType() == SpawnerType.VIRTUAL && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                     if (plugin.getUpgradeManager().applyUpgradeItem(spawner, player, event.getItem())) {
+                        event.setCancelled(true);
                         return;
                     }
                 }
@@ -542,5 +561,14 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onQuit(PlayerQuitEvent event, Player player) {
         this.plugin.getManager().getPlayerSpawners().remove(player.getUniqueId());
+    }
+
+    @Override
+    protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
+        IStorage storage = this.plugin.getStorage();
+        storage.getSpawner(entity.getLocation()).ifPresent(spawner -> {
+            event.setCancelled(true);
+            entity.setSize(1);
+        });
     }
 }

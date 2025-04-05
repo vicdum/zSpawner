@@ -23,6 +23,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -259,23 +260,37 @@ public class ZSpawner extends ZUtils implements Spawner {
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
+        world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
+            System.out.println("Alors ? " + entity);
+            if (entity.getType() == this.entityType) {
+                System.out.println("Je remove !!");
+                entity.remove();
+            }
+        });
 
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
         if (entityClass == null) {
             Logger.info("Error with entity class for " + this.entityType, Logger.LogType.ERROR);
             return;
         }
-        this.livingEntity = (LivingEntity) world.spawn(location, entityClass);
-        this.livingEntity.setAI(false);
-        this.livingEntity.setCollidable(false);
-        this.livingEntity.setCustomNameVisible(true);
-        this.livingEntity.setVisualFire(false);
-        this.livingEntity.setSwimming(false);
-        this.livingEntity.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+        this.livingEntity = (LivingEntity) world.spawn(location, entityClass, e -> {
+            if (e instanceof LivingEntity currentLiving) {
+                currentLiving.setAI(false);
+                currentLiving.setCollidable(false);
+                currentLiving.setCustomNameVisible(true);
+                currentLiving.setVisualFire(false);
+                currentLiving.setSwimming(false);
+                currentLiving.setSilent(true);
+                currentLiving.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+            }
+        });
 
-        if (this.livingEntity instanceof Ageable) {
-            Ageable ageable = (Ageable) this.livingEntity;
+        if (this.livingEntity instanceof Ageable ageable) {
             ageable.setAdult();
+        }
+
+        if (this.livingEntity instanceof Slime slime){
+            slime.setSize(1);
         }
 
         if (this.livingEntity instanceof ZombieVillager) {
@@ -500,6 +515,11 @@ public class ZSpawner extends ZUtils implements Spawner {
         World world = this.location.getWorld();
         LivingEntity clonedEntity = (LivingEntity) world.spawn(getSpawnedEntityLocation(), Objects.requireNonNull(this.livingEntity.getType().getEntityClass()));
         clonedEntity.setAI(false);
+
+        if (clonedEntity instanceof Slime slime){
+            slime.setSize(1);
+        }
+
         this.getDeadEntities().add(clonedEntity);
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(this.ownerId);

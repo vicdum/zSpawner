@@ -20,9 +20,12 @@ import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.ShowButton;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
+import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.materials.SpawnerItemLoader;
+import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
@@ -61,7 +64,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
     private List<Material> blacklistMaterials = new ArrayList<>();
-    private SpawnerOption spawnerOption;
+    private SpawnerOption defaultSpawnerOption;
 
     public SpawnerManager(SpawnerPlugin plugin) {
         super(plugin);
@@ -106,7 +109,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public SpawnerOption getDefaultOption() {
-        return this.spawnerOption;
+        return this.defaultSpawnerOption;
     }
 
     public Optional<SpawnerResult> getSpawnerResult(ItemStack itemStack) {
@@ -121,17 +124,39 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         return Optional.empty();
     }
 
-    public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, UUID spawnerId) {
+    public void registerPlaceholders(Placeholders placeholders, Spawner spawner) {
+        SpawnerOption spawnerOption = spawner == null ? this.defaultSpawnerOption : spawner.getOption();
+        placeholders.register("auto-kill", spawnerOption.enableAutoKill() ? Message.YES.msg() : Message.NO.msg());
+        placeholders.register("auto-sell", spawnerOption.enableAutoSell() ? Message.YES.msg() : Message.NO.msg());
+        placeholders.register("max-entity", format(spawnerOption.getMaxEntity()));
+        placeholders.register("distance", format(spawnerOption.getDistance()));
+        placeholders.register("experience-multiplier", format(spawnerOption.getExperienceMultiplier()));
+        placeholders.register("loot-multiplier", format(spawnerOption.getLootMultiplier()));
+        placeholders.register("min-delay", format(spawnerOption.getMinDelay()));
+        placeholders.register("min-delay-second", format(spawnerOption.getMinDelay() / 1000.0));
+        placeholders.register("max-delay", format(spawnerOption.getMaxDelay()));
+        placeholders.register("max-delay-second", format(spawnerOption.getMaxDelay() / 1000.0));
+        placeholders.register("min-spawn", String.valueOf(spawnerOption.getMinSpawn()));
+        placeholders.register("max-spawn", String.valueOf(spawnerOption.getMaxSpawn()));
+        placeholders.register("mob-per-minute", String.valueOf(spawnerOption.getMobPerMinute()));
+    }
+
+    public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
+
         MenuItemStack menuItemStack = this.spawnerTypeItemStacks.get(spawnerType);
         Placeholders placeholders = new Placeholders();
+
         placeholders.register("type", name(entityType.name()));
+        placeholders.register("translation", entityType.translationKey());
+        registerPlaceholders(placeholders, spawner);
+
         ItemStack itemStack = menuItemStack.build(player, false, placeholders);
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.spawnerTypeKey, PersistentDataType.STRING, spawnerType.name());
         persistentDataContainer.set(this.spawnerEntityKey, PersistentDataType.STRING, entityType.name());
-        if (spawnerId != null) {
-            persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawnerId.toString());
+        if (spawner != null) {
+            persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawner.getSpawnerId().toString());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -157,9 +182,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     public void giveSpawner(CommandSender sender, Player target, SpawnerType spawnerType, EntityType entityType, boolean silent) {
         ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, null);
         this.plugin.getPlayerGive().give(target, itemStack);
-        message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
+        message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
         if (!silent) {
-            message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()));
+            message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
         }
     }
 
@@ -183,11 +208,15 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         }
         this.entitiesMaterials = loadEntityMaterials();
         this.blacklistMaterials = loadBlacklist();
-        this.spawnerOption = loadDefaultSpawnerOption();
+        this.defaultSpawnerOption = loadDefaultSpawnerOption();
         this.loadInventories();
     }
 
     public void loadButtons() {
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.registerMaterialLoader(new SpawnerItemLoader(this.plugin));
+        inventoryManager.registerMaterialLoader(new SpawnerOptionItemLoader(this.plugin));
+
         ButtonManager buttonManager = this.plugin.getButtonManager();
         buttonManager.register(new NoneLoader(this.plugin, SpawnersButton.class, "zspawner_spawners"));
         buttonManager.register(new NoneLoader(this.plugin, SortButton.class, "zspawner_sort"));
@@ -195,6 +224,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, RemoveButton.class, "zspawner_remove"));
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
+        buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
     }
 
     public void loadInventories() {
@@ -254,21 +284,27 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public void removeVirtualSpawner(Player player) {
+
         PlayerSpawner playerSpawner = this.playerSpawners.get(player.getUniqueId());
         if (playerSpawner == null) return;
+
         Spawner spawner = playerSpawner.getVirtualSpawner();
         if (spawner == null) return;
+
         if (!spawner.getItems().isEmpty()) {
             message(this.plugin, player, Message.VIRTUAL_REMOVE_ERROR_EMPTY);
             return;
         }
+
         if (inventoryIsFull(player)) {
             message(this.plugin, player, Message.VIRTUAL_REMOVE_ERROR_FULL);
             return;
         }
         spawner.breakBlock();
-        ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner.getSpawnerId());
-        player.getInventory().addItem(itemStack);
+
+        ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner);
+        this.plugin.getPlayerGive().give(player, itemStack);
+
         ZPlugin.service.execute(() -> this.plugin.getStorage().removeSpawner(spawner));
         message(this.plugin, player, Message.VIRTUAL_REMOVE_SUCCESS);
     }

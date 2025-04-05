@@ -22,14 +22,6 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.4.1</version>
@@ -57,14 +49,28 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <relocations>
+                        <relocation>
+                            <pattern>fr.maxlego08.sarah</pattern>
+                            <shadedPattern>fr.maxlego08.spawner.sarah</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>14</source>
-                    <target>14</target>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -122,12 +128,6 @@
             <version>9.4.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Maxlego08</groupId>
-            <artifactId>zMenu-API</artifactId>
-            <version>1.0.2.7</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>fr.maxlego08.zshop</groupId>
             <artifactId>zShop-API</artifactId>
             <version>1.0.0</version>
@@ -140,6 +140,17 @@
             <version>1.0.1.9</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/zEssentialsAPI.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Maxlego08</groupId>
+            <artifactId>Sarah</artifactId>
+            <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Maxlego08</groupId>
+            <artifactId>zMenu-API</artifactId>
+            <version>1.0.3.8</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -9,6 +9,8 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
+import fr.maxlego08.spawner.placeholder.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -62,7 +64,7 @@ public class ItemsButton extends ZButton implements PaginateButton {
             ItemMeta itemMeta = itemStack.getItemMeta();
             plugin.getInventoryManager().getMeta().updateLore(itemMeta, lore.stream().map(string -> {
                 string = string.replace("%quantity%", format(spawnerItem.getAmount()));
-                return string;
+                return Placeholder.getPlaceholder().setPlaceholders(player, string);
             }).collect(Collectors.toList()), player);
             itemStack.setItemMeta(itemMeta);
 

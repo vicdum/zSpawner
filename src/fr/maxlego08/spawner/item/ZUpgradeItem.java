@@ -7,12 +7,14 @@ import fr.maxlego08.spawner.api.item.UpgradeItem;
 
 public class ZUpgradeItem implements UpgradeItem {
 
+    private final String displayName;
     private final SpawnerOptionSetter spawnerOptionSetter;
     private final Object value;
     private final Object maxValue;
     private final MenuItemStack itemStack;
 
-    public ZUpgradeItem(SpawnerOptionSetter spawnerOptionSetter, Object value, Object maxValue, MenuItemStack itemStack) {
+    public ZUpgradeItem(String displayName, SpawnerOptionSetter spawnerOptionSetter, Object value, Object maxValue, MenuItemStack itemStack) {
+        this.displayName = displayName;
         this.spawnerOptionSetter = spawnerOptionSetter;
         this.value = value;
         this.maxValue = maxValue;
@@ -52,5 +54,10 @@ public class ZUpgradeItem implements UpgradeItem {
     public boolean apply(Spawner spawner) {
         this.spawnerOptionSetter.apply(spawner.getOption(), this.value);
         return true;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 }
