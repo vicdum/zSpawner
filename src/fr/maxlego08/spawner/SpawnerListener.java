@@ -358,13 +358,22 @@ public class SpawnerListener extends ListenerAdapter {
                     return;
                 }
 
-                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass);
-                clonedEntity.setAI(false);
-                clonedEntity.setCollidable(false);
-                clonedEntity.setVisualFire(false);
-                clonedEntity.setSwimming(false);
-                clonedEntity.setSilent(true);
-                clonedEntity.setMetadata("zspawner-death", new FixedMetadataValue(this.plugin, true));
+                LivingEntity clonedEntity = (LivingEntity) entity.getWorld().spawn(entity.getLocation(), entityClass, e -> {
+                    if (e instanceof LivingEntity living) {
+
+                        living.setAI(false);
+                        living.setCollidable(false);
+                        living.setVisualFire(false);
+                        living.setSwimming(false);
+                        living.setSilent(true);
+                        living.setMetadata("zspawner-death", new FixedMetadataValue(this.plugin, true));
+
+                        if (living instanceof Slime slime) {
+                            slime.setSize(1);
+                        }
+                    }
+                });
+
                 spawner.getDeadEntities().add(clonedEntity);
 
                 if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
@@ -557,6 +566,9 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
         IStorage storage = this.plugin.getStorage();
-        storage.getSpawner(entity.getLocation()).ifPresent(spawner -> event.setCancelled(true));
+        storage.getSpawner(entity.getLocation()).ifPresent(spawner -> {
+            event.setCancelled(true);
+            entity.setSize(1);
+        });
     }
 }
