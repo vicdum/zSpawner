@@ -16,6 +16,12 @@
 
 # Unreleased
 
+# 4.0.8
+
+- Update to last zMenu version
+- Fix slime virtual spawner
+- Cancel virtual chicken laying 
+
 # 4.0.7
 
 - Improvement and correction of the spawner option system
