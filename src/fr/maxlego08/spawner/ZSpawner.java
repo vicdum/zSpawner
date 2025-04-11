@@ -261,9 +261,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            System.out.println("Alors ? " + entity);
             if (entity.getType() == this.entityType) {
-                System.out.println("Je remove !!");
                 entity.remove();
             }
         });
@@ -289,7 +287,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             ageable.setAdult();
         }
 
-        if (this.livingEntity instanceof Slime slime){
+        if (this.livingEntity instanceof Slime slime) {
             slime.setSize(1);
         }
 
@@ -516,7 +514,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         LivingEntity clonedEntity = (LivingEntity) world.spawn(getSpawnedEntityLocation(), Objects.requireNonNull(this.livingEntity.getType().getEntityClass()));
         clonedEntity.setAI(false);
 
-        if (clonedEntity instanceof Slime slime){
+        if (clonedEntity instanceof Slime slime) {
             slime.setSize(1);
         }
 

@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -43,6 +44,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -166,6 +168,10 @@ public abstract class ListenerAdapter extends ZUtils {
     }
 
     protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
+
+    }
+
+    public void onEntityDrop(EntityDropItemEvent event, Entity entity, Item itemDrop) {
 
     }
 }
