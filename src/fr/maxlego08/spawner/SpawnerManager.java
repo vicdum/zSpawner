@@ -24,6 +24,7 @@ import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.ZPlugin;
@@ -225,6 +226,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
         buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
+        buttonManager.register(new ToggleDropLoader(this.plugin));
     }
 
     public void loadInventories() {
@@ -328,7 +330,6 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         playerSpawner.setTargetPlayer(offlinePlayer);
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
         inventoryManager.getInventory(this.plugin, "show").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
-
     }
 
     public void removeSpawnerGui(Spawner spawner, Player player, OfflinePlayer target, int page) {

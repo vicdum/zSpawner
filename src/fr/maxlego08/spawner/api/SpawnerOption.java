@@ -46,5 +46,9 @@ public interface SpawnerOption extends Updatable {
 
     void setAutoSell(boolean autoSell);
 
+    boolean dropLoots();
+
+    void setDropLoots(boolean dropLoots);
+
     SpawnerOption cloneOption();
 }

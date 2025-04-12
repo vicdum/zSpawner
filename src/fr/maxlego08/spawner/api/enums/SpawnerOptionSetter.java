@@ -15,6 +15,8 @@ public enum SpawnerOptionSetter {
 
     AUTO_SELL(Boolean.class, (option, value) -> option.setAutoSell(Boolean.parseBoolean(value))),
 
+    DROP_LOOTS(Boolean.class, (option, value) -> option.setDropLoots(Boolean.parseBoolean(value))),
+
     MAX_ENTITY(Integer.class, (option, value) -> option.setMaxEntity(Integer.parseInt(value))),
 
     MIN_DELAY(Integer.class, (option, value) -> option.setMinDelay(Integer.parseInt(value))),
@@ -47,7 +49,7 @@ public enum SpawnerOptionSetter {
     public boolean canApply(SpawnerOption option, Object value, Object maxValueO) {
         if (maxValueO instanceof Number maxValue && value instanceof Number number) {
             return switch (this) {
-                case AUTO_KILL, AUTO_SELL -> false;
+                case AUTO_KILL, AUTO_SELL, DROP_LOOTS -> false;
                 case DISTANCE -> option.getDistance() - number.doubleValue() >= maxValue.doubleValue();
                 case EXPERIENCE_MULTIPLIER -> maxValue.doubleValue() >= option.getExperienceMultiplier() + number.doubleValue();
                 case LOOT_MULTIPLIER -> option.getLootMultiplier() + number.doubleValue() >= maxValue.doubleValue();
@@ -64,7 +66,7 @@ public enum SpawnerOptionSetter {
 
     public void apply(SpawnerOption option, Object value) {
         switch (this) {
-            case AUTO_KILL, AUTO_SELL -> {
+            case AUTO_KILL, AUTO_SELL, DROP_LOOTS -> {
             }
             case DISTANCE ->
                     this.setterFunction.accept(option, String.valueOf(option.getDistance() + ((Number) value).doubleValue()));

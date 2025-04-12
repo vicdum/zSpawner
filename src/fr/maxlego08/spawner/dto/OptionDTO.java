@@ -14,6 +14,7 @@ public record OptionDTO(
         int max_delay,
         int min_spawn,
         int max_spawn,
-        int mob_per_minute
+        int mob_per_minute,
+        boolean drop_loots
 ) {
 }
