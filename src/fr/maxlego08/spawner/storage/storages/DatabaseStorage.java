@@ -275,7 +275,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
         return spawners.stream().map(spawnerDTO -> {
 
-            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.spawner_id(), spawnerDTO.type(), spawnerDTO.entity_type(), spawnerDTO.placed_at(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.block_face());
+            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.owner(), spawnerDTO.type(), spawnerDTO.entity_type(), spawnerDTO.placed_at(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.block_face());
 
             spawner.setItems(items.stream().filter(itemDTO -> itemDTO.spawner_id().equals(spawnerDTO.spawner_id())).map(itemDTO -> new ZSpawnerItem(itemDTO.unique_id(), itemDTO.item_stack(), itemDTO.amount())).collect(Collectors.toList()));
 
