@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class SpawnerOptionItemLoader implements MaterialLoader {
+public class SpawnerOptionItemLoader extends MaterialLoader {
 
     private final SpawnerPlugin plugin;
 

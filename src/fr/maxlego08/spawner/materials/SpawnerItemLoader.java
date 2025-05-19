@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 
-public class SpawnerItemLoader implements MaterialLoader {
+public class SpawnerItemLoader extends MaterialLoader {
 
     private final SpawnerPlugin plugin;
 
