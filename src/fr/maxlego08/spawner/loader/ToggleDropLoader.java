@@ -6,29 +6,14 @@ import fr.maxlego08.menu.api.loader.ButtonLoader;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.buttons.virtual.ToggleDropButton;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 
-public class ToggleDropLoader implements ButtonLoader {
+public class ToggleDropLoader extends ButtonLoader {
 
     private final SpawnerPlugin plugin;
 
     public ToggleDropLoader(SpawnerPlugin plugin) {
+        super(plugin, "zspawner_toggle_drop");
         this.plugin = plugin;
-    }
-
-    @Override
-    public Class<? extends Button> getButton() {
-        return ToggleDropButton.class;
-    }
-
-    @Override
-    public String getName() {
-        return "zspawner_toggle_drop";
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return this.plugin;
     }
 
     @Override

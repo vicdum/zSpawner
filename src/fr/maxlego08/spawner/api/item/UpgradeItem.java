@@ -1,6 +1,6 @@
 package fr.maxlego08.spawner.api.item;
 
-import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.enums.SpawnerOptionSetter;
 

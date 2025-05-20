@@ -8,19 +8,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
 public class SpawnerItemLoader extends MaterialLoader {
 
     private final SpawnerPlugin plugin;
 
     public SpawnerItemLoader(SpawnerPlugin plugin) {
+        super("zspawner");
         this.plugin = plugin;
-    }
-
-    @Override
-    public String getKey() {
-        return "zspawner";
     }
 
     @Override

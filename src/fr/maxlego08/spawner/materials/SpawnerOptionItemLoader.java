@@ -11,12 +11,8 @@ public class SpawnerOptionItemLoader extends MaterialLoader {
     private final SpawnerPlugin plugin;
 
     public SpawnerOptionItemLoader(SpawnerPlugin plugin) {
+        super("zspawner-option");
         this.plugin = plugin;
-    }
-
-    @Override
-    public String getKey() {
-        return "zspawner-option";
     }
 
     @Override

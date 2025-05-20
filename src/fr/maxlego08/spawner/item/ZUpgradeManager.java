@@ -1,10 +1,7 @@
 package fr.maxlego08.spawner.item;
 
-import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.InventoryManager;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.loader.MenuItemStackLoader;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.enums.SpawnerOptionSetter;
@@ -44,7 +41,6 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
     @Override
     public void loadItems() {
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
-        Loader<MenuItemStack> loader = new MenuItemStackLoader(inventoryManager);
         File file = new File(this.plugin.getDataFolder(), "option-items.yml");
         if (!file.exists()) {
             plugin.saveResource("option-items.yml", false);
@@ -59,12 +55,7 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
         for (String upgradeName : configurationSection.getKeys(false)) {
 
             String path = "items." + upgradeName + ".";
-            MenuItemStack itemStack = null;
-            try {
-                itemStack = loader.load(configuration, path + "item.", file);
-            } catch (InventoryException exception) {
-                exception.printStackTrace();
-            }
+            MenuItemStack itemStack = inventoryManager.loadItemStack(configuration, path + "item.", file);
 
             SpawnerOptionSetter spawnerOptionSetter = SpawnerOptionSetter.valueOf(configuration.getString(path + "type").toUpperCase());
             Object value = configuration.get(path + "value");
