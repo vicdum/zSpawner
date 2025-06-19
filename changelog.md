@@ -1,20 +1,24 @@
 # ToDo
 
-- [x] Gérer les explosions du block, pouvoir activer / désactiver
-- [x] Ajouter un système de silk spawner
-- [ ] Proposer un système d'upgrade de spawner par spawner
-- [x] Vérifier le placage des blocks dans le cuboid
-- [ ] Ajouter le système de whitelist / blacklist de materials pour les materials
-- [ ] Ajouter une option pour avoir des spawners stackable à l'infini
-- [ ] Ajouter une option pour que les mobs qui spawn d'un spawner vont être sans IA
-- [ ] Ajouter une option pour désactiver l'ajout des loots de mobs dans le spawners infini
+- [x] Gï¿½rer les explosions du block, pouvoir activer / dï¿½sactiver
+- [x] Ajouter un systï¿½me de silk spawner
+- [ ] Proposer un systï¿½me d'upgrade de spawner par spawner
+- [x] Vï¿½rifier le placage des blocks dans le cuboid
+- [ ] Ajouter le systï¿½me de whitelist / blacklist de materials pour les materials
+- [ ] Ajouter une option pour avoir des spawners stackable ï¿½ l'infini
+- [ ] Ajouter une option pour que les mobs qui spawn d'un spawner vont ï¿½tre sans IA
+- [ ] Ajouter une option pour dï¿½sactiver l'ajout des loots de mobs dans le spawners infini
 - [ ] Ajouter une option pour permettre la mort des mobs sans avoir l'animation de morts, uniquement utiliser le EntityDamageEvent
 
-- [ ] Ajouter une option pour que les spawners virtuel puissent être ouvert par tout le monde et récupérer par tout le monde
-- [ ] Vérifier si l'autokill fonctionne correctement par défaut, sans activé l'option mais juste avec la configuraiton
+- [ ] Ajouter une option pour que les spawners virtuel puissent ï¿½tre ouvert par tout le monde et rï¿½cupï¿½rer par tout le monde
+- [ ] Vï¿½rifier si l'autokill fonctionne correctement par dï¿½faut, sans activï¿½ l'option mais juste avec la configuraiton
 
 
 # Unreleased
+
+# 4.0.9
+
+- Update to zMenu 1.1.0.0
 
 # 4.0.8
 

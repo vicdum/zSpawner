@@ -1,13 +1,11 @@
 package fr.maxlego08.spawner;
 
-import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.api.MenuItemStack;
+import fr.maxlego08.menu.api.exceptions.InventoryException;
+import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import fr.maxlego08.menu.button.loader.NoneLoader;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.loader.MenuItemStackLoader;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
@@ -24,6 +22,7 @@ import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.ZPlugin;
@@ -192,14 +191,13 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         this.spawnerTypeItemStacks.clear();
         File file = new File(this.plugin.getDataFolder(), "config.yml");
         if (!file.exists()) this.plugin.saveDefaultConfig();
-        Loader<MenuItemStack> loader = new MenuItemStackLoader(this.plugin.getInventoryManager());
         YamlConfiguration configuration = (YamlConfiguration) this.plugin.getConfig();
         ConfigurationSection configurationSection = configuration.getConfigurationSection("items");
         if (configurationSection != null) {
             configurationSection.getKeys(false).forEach(type -> {
                 try {
                     SpawnerType spawnerType = SpawnerType.valueOf(type);
-                    MenuItemStack menuItemStack = loader.load(configuration, "items." + type + ".", file);
+                    MenuItemStack menuItemStack = this.plugin.getInventoryManager().loadItemStack(configuration, "items." + type + ".", file);
                     this.spawnerTypeItemStacks.put(spawnerType, menuItemStack);
                 } catch (Exception exception) {
                     exception.printStackTrace();
@@ -225,6 +223,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
         buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
+        buttonManager.register(new ToggleDropLoader(this.plugin));
     }
 
     public void loadInventories() {
@@ -328,7 +327,6 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         playerSpawner.setTargetPlayer(offlinePlayer);
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
         inventoryManager.getInventory(this.plugin, "show").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
-
     }
 
     public void removeSpawnerGui(Spawner spawner, Player player, OfflinePlayer target, int page) {

@@ -16,8 +16,9 @@ public class ZSpawnerOption implements SpawnerOption {
     public int maxSpawn;
     public int mobPerMinute;
     public boolean needUpdate;
+    public boolean dropLoots;
 
-    public ZSpawnerOption(double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute) {
+    public ZSpawnerOption(double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute, boolean dropLoots) {
         this.distance = distance;
         this.experienceMultiplier = experienceMultiplier;
         this.lootMultiplier = lootMultiplier;
@@ -29,6 +30,7 @@ public class ZSpawnerOption implements SpawnerOption {
         this.minSpawn = minSpawn;
         this.maxSpawn = maxSpawn;
         this.mobPerMinute = mobPerMinute;
+        this.dropLoots = dropLoots;
     }
 
     @Override
@@ -153,6 +155,17 @@ public class ZSpawnerOption implements SpawnerOption {
     }
 
     @Override
+    public boolean dropLoots() {
+        return this.dropLoots;
+    }
+
+    @Override
+    public void setDropLoots(boolean dropLoots) {
+        this.dropLoots = dropLoots;
+        this.needUpdate = true;
+    }
+
+    @Override
     public boolean needUpdate() {
         return this.needUpdate;
     }
@@ -164,11 +177,25 @@ public class ZSpawnerOption implements SpawnerOption {
 
     @Override
     public String toString() {
-        return "ZSpawnerOption{" + "distance=" + distance + ", experienceMultiplier=" + experienceMultiplier + ", lootMultiplier=" + lootMultiplier + ", autoKill=" + autoKill + ", autoSell=" + autoSell + ", maxEntity=" + maxEntity + ", minDelay=" + minDelay + ", maxDelay=" + maxDelay + ", minSpawn=" + minSpawn + ", maxSpawn=" + maxSpawn + ", mobPerMinute=" + mobPerMinute + ", needUpdate=" + needUpdate + '}';
+        return "ZSpawnerOption{" +
+                "distance=" + distance +
+                ", experienceMultiplier=" + experienceMultiplier +
+                ", lootMultiplier=" + lootMultiplier +
+                ", autoKill=" + autoKill +
+                ", autoSell=" + autoSell +
+                ", maxEntity=" + maxEntity +
+                ", minDelay=" + minDelay +
+                ", maxDelay=" + maxDelay +
+                ", minSpawn=" + minSpawn +
+                ", maxSpawn=" + maxSpawn +
+                ", mobPerMinute=" + mobPerMinute +
+                ", needUpdate=" + needUpdate +
+                ", dropLoots=" + dropLoots +
+                '}';
     }
 
     @Override
     public ZSpawnerOption cloneOption() {
-        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute);
+        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots);
     }
 }

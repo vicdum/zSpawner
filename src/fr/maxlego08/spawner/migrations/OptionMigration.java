@@ -6,7 +6,7 @@ import fr.maxlego08.spawner.storage.Tables;
 public class OptionMigration extends Migration {
     @Override
     public void up() {
-        create(Tables.OPTIONS,table -> {
+        createOrAlter(Tables.OPTIONS, table -> {
             table.uuid("spawner_id").primary();
             table.decimal("distance");
             table.decimal("experience_multiplier");
@@ -19,6 +19,7 @@ public class OptionMigration extends Migration {
             table.integer("min_spawn");
             table.integer("max_spawn");
             table.integer("mob_per_minute");
+            table.bool("drop_loots").defaultValue(false);
         });
     }
 }

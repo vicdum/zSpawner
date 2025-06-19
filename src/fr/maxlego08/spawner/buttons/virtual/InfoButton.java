@@ -1,7 +1,7 @@
 package fr.maxlego08.spawner.buttons.virtual;
 
+import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import fr.maxlego08.menu.button.ZButton;
 import fr.maxlego08.spawner.SpawnerManager;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-public class InfoButton extends ZButton {
+public class InfoButton extends Button {
 
     private final SpawnerPlugin plugin;
 

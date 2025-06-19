@@ -6,17 +6,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class SpawnerOptionItemLoader implements MaterialLoader {
+public class SpawnerOptionItemLoader extends MaterialLoader {
 
     private final SpawnerPlugin plugin;
 
     public SpawnerOptionItemLoader(SpawnerPlugin plugin) {
+        super("zspawner-option");
         this.plugin = plugin;
-    }
-
-    @Override
-    public String getKey() {
-        return "zspawner-option";
     }
 
     @Override

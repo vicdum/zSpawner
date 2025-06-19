@@ -431,12 +431,13 @@ public class SpawnerListener extends ListenerAdapter {
                 }
             }*/
 
-            if (!itemStacks.isEmpty()) {
-                spawner.addItems(itemStacks);
+            if (!spawner.getOption().dropLoots()) {
+                if (!itemStacks.isEmpty()) {
+                    spawner.addItems(itemStacks);
+                }
+
+                event.getDrops().clear();
             }
-
-            event.getDrops().clear();
-
         });
     }
 

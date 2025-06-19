@@ -238,7 +238,7 @@ public abstract class ZUtils extends MessageUtils {
      * @param decimal
      * @return formatting current duplicate
      */
-    protected String format(double decimal) {
+    public String format(double decimal) {
         return format(decimal, "#.#");
     }
 

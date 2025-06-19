@@ -1,7 +1,9 @@
 package fr.maxlego08.spawner;
 
+import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.storage.IStorage;
+import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -32,6 +34,13 @@ public class SpawnerPlaceholders {
                 return "BARRIER";
             }
         });
+
+        placeholder.register("is_drop_loot", ((player, args) -> {
+            PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
+            Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
+            if (spawner == null) return "false";
+            return String.valueOf(spawner.getOption().dropLoots());
+        }));
     }
 
 }

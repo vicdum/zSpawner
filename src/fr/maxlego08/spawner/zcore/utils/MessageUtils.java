@@ -145,7 +145,7 @@ public abstract class MessageUtils extends LocationUtils {
         return getMessage(message.getMessage(), args);
     }
 
-    protected String getMessage(String message, Object... args) {
+    public String getMessage(String message, Object... args) {
 
         if (args.length % 2 != 0)
             throw new IllegalArgumentException("Number of invalid arguments. Arguments must be in pairs.");

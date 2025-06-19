@@ -33,23 +33,15 @@ public class CommandSpawnerOption extends VCommand {
                 if (spawnerOptionSetter.getType() == Boolean.class) {
                     return Arrays.asList("true", "false");
                 } else {
-                    switch (spawnerOptionSetter) {
-                        case LOOT_MULTIPLIER:
-                        case EXPERIENCE_MULTIPLIER:
-                            return IntStream.rangeClosed(10, 30).mapToObj(i -> String.format("%d,%d", i / 10, i % 10)).collect(Collectors.toList());
-                        case MIN_DELAY:
-                        case MAX_DELAY:
-                        case MAX_ENTITY:
-                            return IntStream.rangeClosed(1, 30).mapToObj(i -> String.valueOf(i * 1000)).collect(Collectors.toList());
-                        case DISTANCE:
-                            return Arrays.asList("1", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20");
-                        case MAX_SPAWN:
-                        case MIN_SPAWN:
-                            return Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9");
-                        case MOB_PER_MINUTE:
-                        default:
-                            return Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-                    }
+                    return switch (spawnerOptionSetter) {
+                        case LOOT_MULTIPLIER, EXPERIENCE_MULTIPLIER ->
+                                IntStream.rangeClosed(10, 30).mapToObj(i -> String.format("%d,%d", i / 10, i % 10)).collect(Collectors.toList());
+                        case MIN_DELAY, MAX_DELAY, MAX_ENTITY ->
+                                IntStream.rangeClosed(1, 30).mapToObj(i -> String.valueOf(i * 1000)).collect(Collectors.toList());
+                        case DISTANCE -> Arrays.asList("1", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20");
+                        case MAX_SPAWN, MIN_SPAWN -> Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9");
+                        default -> Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+                    };
                 }
             } catch (Exception exception) {
                 return new ArrayList<>();
@@ -66,7 +58,7 @@ public class CommandSpawnerOption extends VCommand {
         String value = this.argAsString(3);
 
         Optional<Spawner> optional = plugin.getStorage().getSpawners(offlinePlayer).stream().filter(e -> e.getSpawnerKey().equals(spawnerKey)).findFirst();
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);
             return CommandType.DEFAULT;
         }

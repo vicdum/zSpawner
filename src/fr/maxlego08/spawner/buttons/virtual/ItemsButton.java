@@ -1,15 +1,13 @@
 package fr.maxlego08.spawner.buttons.virtual;
 
 import fr.maxlego08.menu.api.button.PaginateButton;
-import fr.maxlego08.menu.button.ZButton;
-import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
-import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
+import fr.maxlego08.menu.api.engine.InventoryEngine;
+import fr.maxlego08.menu.api.engine.Pagination;
 import fr.maxlego08.spawner.SpawnerManager;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
-import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.placeholder.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemsButton extends ZButton implements PaginateButton {
+public class ItemsButton extends PaginateButton {
 
     private final SpawnerPlugin plugin;
 
@@ -42,7 +40,7 @@ public class ItemsButton extends ZButton implements PaginateButton {
     }
 
     @Override
-    public void onRender(Player player, InventoryDefault inventory) {
+    public void onRender(Player player, InventoryEngine inventory) {
 
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
         Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
@@ -63,7 +61,7 @@ public class ItemsButton extends ZButton implements PaginateButton {
 
             ItemMeta itemMeta = itemStack.getItemMeta();
             plugin.getInventoryManager().getMeta().updateLore(itemMeta, lore.stream().map(string -> {
-                string = string.replace("%quantity%", format(spawnerItem.getAmount()));
+                string = string.replace("%quantity%", plugin.getManager().format(spawnerItem.getAmount()));
                 return Placeholder.getPlaceholder().setPlaceholders(player, string);
             }).collect(Collectors.toList()), player);
             itemStack.setItemMeta(itemMeta);

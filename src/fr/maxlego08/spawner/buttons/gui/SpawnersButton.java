@@ -1,11 +1,10 @@
 package fr.maxlego08.spawner.buttons.gui;
 
-import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.menu.api.button.PaginateButton;
+import fr.maxlego08.menu.api.engine.InventoryEngine;
+import fr.maxlego08.menu.api.engine.Pagination;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import fr.maxlego08.menu.button.ZButton;
-import fr.maxlego08.menu.inventory.inventories.InventoryDefault;
-import fr.maxlego08.menu.zcore.utils.inventory.Pagination;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
@@ -20,7 +19,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SpawnersButton extends ZButton implements PaginateButton {
+public class SpawnersButton extends PaginateButton {
 
     private final SpawnerPlugin plugin;
 
@@ -34,7 +33,7 @@ public class SpawnersButton extends ZButton implements PaginateButton {
     }
 
     @Override
-    public void onRender(Player player, InventoryDefault inventory) {
+    public void onRender(Player player, InventoryEngine inventory) {
         Sort sort = this.plugin.getManager().getPlayerSort(player);
         List<Spawner> spawners = this.plugin.getStorage().getSpawners(player, SpawnerType.GUI).stream().sorted(sort.getComparator()).collect(Collectors.toList());
         Pagination<Spawner> pagination = new Pagination<>();
@@ -51,7 +50,7 @@ public class SpawnersButton extends ZButton implements PaginateButton {
             placeholders.register("type", spawner.getEntityType().name().toLowerCase());
             if (spawner.isPlace()) {
                 Location location = spawner.getLocation();
-                placeholders.register("location", getMessage(Message.SPAWNER_LOCATION.getMessage(), "%world%", location.getWorld().getName(), "%x%", location.getBlockX(), "%y%", location.getBlockY(), "%z%", location.getBlockZ()));
+                placeholders.register("location", this.plugin.getManager().getMessage(Message.SPAWNER_LOCATION.getMessage(), "%world%", location.getWorld().getName(), "%x%", location.getBlockX(), "%y%", location.getBlockY(), "%z%", location.getBlockZ()));
             } else {
                 placeholders.register("location", Message.SPAWNER_UNPLACED.getMessage());
             }
