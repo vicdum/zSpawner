@@ -1,15 +1,11 @@
 # GitHub Actions için Workflow'un adı
-name: Minecraft Plugin CI & Release
+name: Minecraft Plugin CI & Release on Push
 
 # Bu Workflow'un ne zaman çalışacağını belirleyen tetikleyiciler
 on:
   push:
-    # 'main' branch'ine her push yapıldığında çalıştır (Sadece derleme ve test için)
+    # Sadece 'main' branch'ine her push yapıldığında çalıştır
     branches: [ "main" ]
-    # v1.0.0, v1.2.5 gibi bir etiket (tag) push edildiğinde çalıştır (Release oluşturmak için)
-    tags:
-      - 'v*.*.*'
-  # 'main' branch'ine pull request açıldığında çalıştır
   pull_request:
     branches: [ "main" ]
 
@@ -26,7 +22,6 @@ jobs:
         uses: actions/checkout@v4
 
       # 2. Adım: Java'yı kurar. Eklentinizin hedeflediği Minecraft sürümüne göre Java sürümünü değiştirin.
-      # Modern sürümler (1.17+) için Java 17, eski sürümler için Java 8 veya 11 gerekebilir.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -46,11 +41,11 @@ jobs:
           path: target/*.jar
 
   # --- RELEASE OLUŞTURMA İŞİ ---
-  # Bu iş, SADECE yeni bir etiket (tag) atıldığında çalışır.
+  # Bu iş, SADECE 'main' branch'ine bir push yapıldığında çalışır.
   release:
     name: Create GitHub Release
-    # Sadece etiket atıldığında çalışmasını garantiler
-    if: startsWith(github.ref, 'refs/tags/')
+    # Sadece 'main' branch'ine push yapıldığında çalışmasını garantiler
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     # 'build' işinin başarıyla bitmesini bekler
     needs: build
     runs-on: ubuntu-latest
@@ -64,8 +59,16 @@ jobs:
           name: plugin-jar
 
       # 2. Adım: İndirilen JAR dosyasını kullanarak otomatik GitHub Release oluşturur.
-      - name: Create Release and Upload JAR
+      - name: Create Pre-release and Upload JAR
         uses: softprops/action-gh-release@v2
         with:
-          # Release'e eklenecek dosyaları belirtir. Buradaki *.jar, indirilen eklenti dosyasıdır.
+          # Release'e eklenecek dosyaları belirtir.
           files: "*.jar"
+          # Bu sürümü "Pre-release" (Ön sürüm) olarak işaretler.
+          prerelease: true
+          # Her sürüm için benzersiz bir etiket ve başlık oluşturur.
+          tag_name: "build-${{ github.run_number }}"
+          name: "Geliştirme Sürümü (Build ${{ github.run_number }})"
+          body: |
+            Bu, `main` branch'ine yapılan son push ile otomatik olarak oluşturulmuş bir geliştirme sürümüdür.
+            Commit SHA: `${{ github.sha }}`
