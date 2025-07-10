@@ -1,0 +1,71 @@
+# GitHub Actions için Workflow'un adı
+name: Minecraft Plugin CI & Release
+
+# Bu Workflow'un ne zaman çalışacağını belirleyen tetikleyiciler
+on:
+  push:
+    # 'main' branch'ine her push yapıldığında çalıştır (Sadece derleme ve test için)
+    branches: [ "main" ]
+    # v1.0.0, v1.2.5 gibi bir etiket (tag) push edildiğinde çalıştır (Release oluşturmak için)
+    tags:
+      - 'v*.*.*'
+  # 'main' branch'ine pull request açıldığında çalıştır
+  pull_request:
+    branches: [ "main" ]
+
+# Çalıştırılacak işler (jobs)
+jobs:
+  # --- DERLEME İŞİ ---
+  # Bu iş, her push ve pull request'te çalışarak kodun sağlamlığını kontrol eder.
+  build:
+    name: Build Plugin
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Adım: Proje dosyalarını sanal makineye kopyalar
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Adım: Java'yı kurar. Eklentinizin hedeflediği Minecraft sürümüne göre Java sürümünü değiştirin.
+      # Modern sürümler (1.17+) için Java 17, eski sürümler için Java 8 veya 11 gerekebilir.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Adım: Projeyi Maven ile derler ve JAR paketini oluşturur.
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      # 4. Adım: Oluşturulan JAR dosyasını bir sonraki iş (release) için geçici olarak saklar.
+      - name: Upload artifact for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jar
+          path: target/*.jar
+
+  # --- RELEASE OLUŞTURMA İŞİ ---
+  # Bu iş, SADECE yeni bir etiket (tag) atıldığında çalışır.
+  release:
+    name: Create GitHub Release
+    # Sadece etiket atıldığında çalışmasını garantiler
+    if: startsWith(github.ref, 'refs/tags/')
+    # 'build' işinin başarıyla bitmesini bekler
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Release oluşturmak için izin gerekir
+    steps:
+      # 1. Adım: 'build' işinde oluşturulan JAR dosyasını indirir
+      - name: Download plugin JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+
+      # 2. Adım: İndirilen JAR dosyasını kullanarak otomatik GitHub Release oluşturur.
+      - name: Create Release and Upload JAR
+        uses: softprops/action-gh-release@v2
+        with:
+          # Release'e eklenecek dosyaları belirtir. Buradaki *.jar, indirilen eklenti dosyasıdır.
+          files: "*.jar"
