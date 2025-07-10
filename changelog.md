@@ -7,7 +7,7 @@
 - [ ] Ajouter le syst�me de whitelist / blacklist de materials pour les materials
 - [ ] Ajouter une option pour avoir des spawners stackable � l'infini
 - [ ] Ajouter une option pour que les mobs qui spawn d'un spawner vont �tre sans IA
-- [ ] Ajouter une option pour d�sactiver l'ajout des loots de mobs dans le spawners infini
+- [ ] Ajouter une option pour d�sactiver l'ajout des loots de mobs dans le spawners infini 
 - [ ] Ajouter une option pour permettre la mort des mobs sans avoir l'animation de morts, uniquement utiliser le EntityDamageEvent
 
 - [ ] Ajouter une option pour que les spawners virtuel puissent �tre ouvert par tout le monde et r�cup�rer par tout le monde
