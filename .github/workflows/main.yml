@@ -1,18 +1,13 @@
 # GitHub Actions için Workflow'un adı
 name: Minecraft Plugin CI & Release on Push
 
-# Bu Workflow'un ne zaman çalışacağını belirleyen tetikleyiciler
 on:
   push:
-    # Sadece 'main' branch'ine her push yapıldığında çalıştır
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
-# Çalıştırılacak işler (jobs)
 jobs:
-  # --- DERLEME İŞİ ---
-  # Bu iş, her push ve pull request'te çalışarak kodun sağlamlığını kontrol eder.
   build:
     name: Build Plugin
     runs-on: ubuntu-latest
@@ -21,7 +16,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Adım: Java'yı kurar. Eklentinizin hedeflediği Minecraft sürümüne göre Java sürümünü değiştirin.
+      # YENİ HATA AYIKLAMA ADIMI
+      # Bu adım, sanal makinedeki tüm dosyaları listeleyerek loglara yazdırır.
+      # Böylece 'libs' klasörünün varlığını kontrol edebiliriz.
+      - name: List files in workspace
+        run: ls -R
+
+      # 2. Adım: Java'yı kurar.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -33,40 +34,31 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      # 4. Adım: Oluşturulan JAR dosyasını bir sonraki iş (release) için geçici olarak saklar.
+      # 4. Adım: Oluşturulan JAR dosyasını geçici olarak saklar.
       - name: Upload artifact for release
         uses: actions/upload-artifact@v4
         with:
           name: plugin-jar
           path: target/*.jar
-
-  # --- RELEASE OLUŞTURMA İŞİ ---
-  # Bu iş, SADECE 'main' branch'ine bir push yapıldığında çalışır.
+          
+  # Release işi aynı kalabilir...
   release:
     name: Create GitHub Release
-    # Sadece 'main' branch'ine push yapıldığında çalışmasını garantiler
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    # 'build' işinin başarıyla bitmesini bekler
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Release oluşturmak için izin gerekir
+      contents: write
     steps:
-      # 1. Adım: 'build' işinde oluşturulan JAR dosyasını indirir
       - name: Download plugin JAR
         uses: actions/download-artifact@v4
         with:
           name: plugin-jar
-
-      # 2. Adım: İndirilen JAR dosyasını kullanarak otomatik GitHub Release oluşturur.
       - name: Create Pre-release and Upload JAR
         uses: softprops/action-gh-release@v2
         with:
-          # Release'e eklenecek dosyaları belirtir.
           files: "*.jar"
-          # Bu sürümü "Pre-release" (Ön sürüm) olarak işaretler.
           prerelease: true
-          # Her sürüm için benzersiz bir etiket ve başlık oluşturur.
           tag_name: "build-${{ github.run_number }}"
           name: "Geliştirme Sürümü (Build ${{ github.run_number }})"
           body: |
