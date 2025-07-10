@@ -1,31 +1,74 @@
-name: Build and Create Artifact
+# GitHub Actions için Workflow'un adı
+name: Minecraft Plugin CI & Release on Push
 
+# Bu Workflow'un ne zaman çalışacağını belirleyen tetikleyiciler
 on:
   push:
-    branches:
-      - master
+    # Sadece 'main' branch'ine her push yapıldığında çalıştır
+    branches: [ "master" ]
   pull_request:
-    branches:
-      - master
+    branches: [ "master" ]
 
+# Çalıştırılacak işler (jobs)
 jobs:
+  # --- DERLEME İŞİ ---
+  # Bu iş, her push ve pull request'te çalışarak kodun sağlamlığını kontrol eder.
   build:
+    name: Build Plugin
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.2.2
+      # 1. Adım: Proje dosyalarını sanal makineye kopyalar
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # 2. Adım: Java'yı kurar. Eklentinizin hedeflediği Minecraft sürümüne göre Java sürümünü değiştirin.
       - name: Set up JDK 17
-        uses: actions/setup-java@v4.7.0
+        uses: actions/setup-java@v4
         with:
-          distribution: adopt
-          java-version: 17
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      # 3. Adım: Projeyi Maven ile derler ve JAR paketini oluşturur.
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
 
-      - name: Upload JAR Artifact
-        uses: actions/upload-artifact@v4.6.2
+      # 4. Adım: Oluşturulan JAR dosyasını bir sonraki iş (release) için geçici olarak saklar.
+      - name: Upload artifact for release
+        uses: actions/upload-artifact@v4
         with:
-          name: LimboReconnect
-          path: build/libs/LimboReconnect*.jar
+          name: plugin-jar
+          path: target/*.jar
+
+  # --- RELEASE OLUŞTURMA İŞİ ---
+  # Bu iş, SADECE 'main' branch'ine bir push yapıldığında çalışır.
+  release:
+    name: Create GitHub Release
+    # Sadece 'main' branch'ine push yapıldığında çalışmasını garantiler
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # 'build' işinin başarıyla bitmesini bekler
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Release oluşturmak için izin gerekir
+    steps:
+      # 1. Adım: 'build' işinde oluşturulan JAR dosyasını indirir
+      - name: Download plugin JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+
+      # 2. Adım: İndirilen JAR dosyasını kullanarak otomatik GitHub Release oluşturur.
+      - name: Create Pre-release and Upload JAR
+        uses: softprops/action-gh-release@v2
+        with:
+          # Release'e eklenecek dosyaları belirtir.
+          files: "*.jar"
+          # Bu sürümü "Pre-release" (Ön sürüm) olarak işaretler.
+          prerelease: true
+          # Her sürüm için benzersiz bir etiket ve başlık oluşturur.
+          tag_name: "build-${{ github.run_number }}"
+          name: "Geliştirme Sürümü (Build ${{ github.run_number }})"
+          body: |
+            Bu, `main` branch'ine yapılan son push ile otomatik olarak oluşturulmuş bir geliştirme sürümüdür.
+            Commit SHA: `${{ github.sha }}`
