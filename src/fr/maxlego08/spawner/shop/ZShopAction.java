@@ -2,8 +2,8 @@ package fr.maxlego08.spawner.shop;
 
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
-import fr.maxlego08.zshop.api.ShopManager;
-import fr.maxlego08.zshop.api.buttons.ItemButton;
+import fr.maxlego08.shop.api.ShopManager;
+import fr.maxlego08.shop.api.buttons.ItemButton;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
