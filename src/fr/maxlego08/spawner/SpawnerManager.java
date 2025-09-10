@@ -339,13 +339,13 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         inventoryManager.getInventory(this.plugin, "show").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
     }
 
-    public void sellSpawnerInventory(Player player) {
+    public boolean sellSpawnerInventory(Player player) {
 
         ShopAction action = this.plugin.getShopAction();
         if (action == null) {
             player.closeInventory();
             message(this.plugin, player, Message.SELL_ERROR);
-            return;
+            return false;
         }
 
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
@@ -353,18 +353,21 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         if (spawner == null) {
             player.closeInventory();
             message(this.plugin, player, Message.SELL_ERROR);
-            return;
+            return false;
         }
 
+        var isSuccess = false;
         var iterator = spawner.getItems().iterator();
         while (iterator.hasNext()) {
             var spawnerItem = iterator.next();
             if (action.deposit(player, spawnerItem.getItemStack(), spawnerItem.getAmount())) {
                 iterator.remove();
                 this.plugin.getStorage().deleteSpawnerItem(spawner, spawnerItem);
+                isSuccess = true;
             }
         }
 
         openVirtualSpawner(player, spawner, 1);
+        return isSuccess;
     }
 }

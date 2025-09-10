@@ -18,8 +18,9 @@ public class ShopButton extends Button {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, InventoryEngine inventory, int slot, Placeholders placeholders) {
-        super.onClick(player, event, inventory, slot, placeholders);
-        this.plugin.getManager().sellSpawnerInventory(player);
+        if (this.plugin.getManager().sellSpawnerInventory(player)) {
+            super.onClick(player, event, inventory, slot, placeholders);
+        }
     }
 
     @Override
