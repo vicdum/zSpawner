@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -261,7 +261,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            if (entity.getType() == this.entityType && !entity.hasMetadata("zspawner")) {
+            if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
                 entity.remove();
             }
         });
@@ -279,7 +279,7 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
-                currentLiving.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+                currentLiving.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
             }
         });
 

@@ -20,6 +20,7 @@ import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 
 /**
  * System to create your plugins very simply Projet:
@@ -38,6 +39,7 @@ public class SpawnerPlugin extends ZPlugin {
     private ButtonManager buttonManager;
     private ShopAction shopAction;
     private PlayerGive playerGive = new DefaultGive();
+    private NamespacedKey spawnerKey;
 
     @Override
     public void onEnable() {
@@ -46,6 +48,8 @@ public class SpawnerPlugin extends ZPlugin {
         placeholder.setPrefix("zspawner");
 
         this.preEnable();
+
+        this.spawnerKey = new NamespacedKey(this, "zspawner");
 
         this.saveDefaultConfig();
 
@@ -62,7 +66,7 @@ public class SpawnerPlugin extends ZPlugin {
         this.addSave(this.spawnerStorage);
 
         this.addListener(new SpawnerListener(this));
-        this.addListener(new SpawnerListenerPaper());
+        this.addListener(new SpawnerListenerPaper(this));
 
         Config.getInstance().load(this);
         this.manager.loadButtons();
@@ -136,5 +140,9 @@ public class SpawnerPlugin extends ZPlugin {
 
     public PlayerGive getPlayerGive() {
         return playerGive;
+    }
+
+    public NamespacedKey getSpawnerKey() {
+        return spawnerKey;
     }
 }

@@ -324,7 +324,7 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onTeleport(EntityTeleportEvent event, Entity entity) {
-        if (entity.hasMetadata("zspawner")) event.setCancelled(true);
+        if (entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) event.setCancelled(true);
     }
 
     @Override
