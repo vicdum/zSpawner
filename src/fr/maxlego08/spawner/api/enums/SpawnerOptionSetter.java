@@ -27,7 +27,10 @@ public enum SpawnerOptionSetter {
 
     MAX_SPAWN(Integer.class, (option, value) -> option.setMaxSpawn(Integer.parseInt(value))),
 
-    MOB_PER_MINUTE(Integer.class, (option, value) -> option.setMobPerMinute(Integer.parseInt(value)));
+    MOB_PER_MINUTE(Integer.class, (option, value) -> option.setMobPerMinute(Integer.parseInt(value))),
+
+    REMAINING(Integer.class, (option, value) -> option.setRemainingEntity(Integer.parseInt(value))),
+    ;
 
     private final Class<?> type;
     private final BiConsumer<SpawnerOption, String> setterFunction;
@@ -59,6 +62,7 @@ public enum SpawnerOptionSetter {
                 case MIN_SPAWN -> maxValue.intValue() >= option.getMinSpawn() + number.intValue();
                 case MAX_SPAWN -> maxValue.intValue() >= option.getMaxSpawn() + number.intValue();
                 case MOB_PER_MINUTE -> maxValue.intValue() >= option.getMobPerMinute() + number.intValue();
+                case REMAINING -> maxValue.intValue() >= option.getRemainingEntity() + number.intValue();
             };
         }
         return false;
@@ -86,6 +90,7 @@ public enum SpawnerOptionSetter {
                     this.setterFunction.accept(option, String.valueOf(option.getMaxSpawn() + ((Number) value).intValue()));
             case MOB_PER_MINUTE ->
                     this.setterFunction.accept(option, String.valueOf(option.getMobPerMinute() + ((Number) value).intValue()));
+            case REMAINING -> this.setterFunction.accept(option, String.valueOf(option.getRemainingEntity() + ((Number) value).intValue()));
         }
     }
 

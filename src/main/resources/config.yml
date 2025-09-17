@@ -337,6 +337,7 @@ virtual:
     maxDelay: 15000 # 15 seconds
     minSpawn: 1 # Minimum spawn entity
     maxSpawn: 2 # Maximum spawn entity
+    remaining: 1000000 # Remaining entities
 
 # Silk spawners
 silkSpawner:

@@ -7,7 +7,7 @@ public class SpawnerMigration extends Migration {
 
     @Override
     public void up() {
-        create(Tables.SPAWNERS, table -> {
+        createOrAlter(Tables.SPAWNERS, table -> {
             table.uuid("owner").primary();
             table.uuid("spawner_id").unique().primary();
             table.string("location", 255);

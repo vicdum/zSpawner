@@ -36,7 +36,7 @@ public class CommandSpawnerOption extends VCommand {
                     return switch (spawnerOptionSetter) {
                         case LOOT_MULTIPLIER, EXPERIENCE_MULTIPLIER ->
                                 IntStream.rangeClosed(10, 30).mapToObj(i -> String.format("%d,%d", i / 10, i % 10)).collect(Collectors.toList());
-                        case MIN_DELAY, MAX_DELAY, MAX_ENTITY ->
+                        case MIN_DELAY, MAX_DELAY, MAX_ENTITY, REMAINING ->
                                 IntStream.rangeClosed(1, 30).mapToObj(i -> String.valueOf(i * 1000)).collect(Collectors.toList());
                         case DISTANCE -> Arrays.asList("1", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20");
                         case MAX_SPAWN, MIN_SPAWN -> Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9");

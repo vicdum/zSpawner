@@ -138,6 +138,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("min-spawn", String.valueOf(spawnerOption.getMinSpawn()));
         placeholders.register("max-spawn", String.valueOf(spawnerOption.getMaxSpawn()));
         placeholders.register("mob-per-minute", String.valueOf(spawnerOption.getMobPerMinute()));
+        placeholders.register("remaining-entities", format(spawnerOption.getRemainingEntity()));
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {

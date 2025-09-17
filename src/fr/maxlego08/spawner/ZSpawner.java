@@ -437,12 +437,21 @@ public class ZSpawner extends ZUtils implements Spawner {
             this.spawnEntity();
         }
 
+        // No more entities available
+        if (spawnerOption.getRemainingEntity() == 0) return;
+
         if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerOption.getMaxEntity()) {
 
             long ms = ThreadLocalRandom.current().nextLong(Math.min(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()));
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
+            int addedEntities = getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
+            
+            addedEntities = Math.min(addedEntities, spawnerOption.getRemainingEntity());
+
+            this.amount += addedEntities;
+            spawnerOption.removeRemainingEntity(addedEntities);
+
             if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
             this.needUpdate = true;
             this.updateEntity();

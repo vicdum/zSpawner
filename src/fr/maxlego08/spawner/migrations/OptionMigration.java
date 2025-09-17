@@ -20,6 +20,7 @@ public class OptionMigration extends Migration {
             table.integer("max_spawn");
             table.integer("mob_per_minute");
             table.bool("drop_loots").defaultValue(false);
+            table.integer("remaining").defaultValue(0);
         });
     }
 }
