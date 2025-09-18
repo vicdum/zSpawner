@@ -6,6 +6,7 @@ import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
+import fr.maxlego08.menu.api.utils.TypedMapAccessor;
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
@@ -23,6 +24,7 @@ import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
 import fr.maxlego08.spawner.drop.CustomVirtualDrop;
+import fr.maxlego08.spawner.drop.VirtualDrop;
 import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
@@ -63,10 +65,10 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private final NamespacedKey spawnerUuidKey;
     private final Map<UUID, PlayerSpawner> playerSpawners = new HashMap<>();
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
+    private final Map<EntityType, VirtualDrop> customVirtualDrops = new HashMap<>();
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
     private List<Material> blacklistMaterials = new ArrayList<>();
     private SpawnerOption defaultSpawnerOption;
-    private final Map<EntityType, List<CustomVirtualDrop>> customVirtualDrops = new HashMap<>();
 
     public SpawnerManager(SpawnerPlugin plugin) {
         super(plugin);
@@ -217,14 +219,15 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public List<ItemStack> generateCustomVirtualDrops(EntityType entityType, Player player) {
-        List<CustomVirtualDrop> drops = this.customVirtualDrops.get(entityType);
-        if (drops == null || drops.isEmpty()) {
+        VirtualDrop virtualDrops = this.customVirtualDrops.get(entityType);
+
+        if (virtualDrops == null || virtualDrops.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<ItemStack> itemStacks = new ArrayList<>();
-        for (CustomVirtualDrop drop : drops) {
-            drop.generate(player, entityType).ifPresent(itemStacks::add);
+        for (CustomVirtualDrop drop : virtualDrops.drops()) {
+            drop.generate(player).ifPresent(itemStacks::add);
         }
 
         return itemStacks;
@@ -391,56 +394,32 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         return isSuccess;
     }
 
-    private Map<EntityType, List<CustomVirtualDrop>> loadCustomVirtualDrops(YamlConfiguration configuration, File file) {
-        Map<EntityType, List<CustomVirtualDrop>> drops = new HashMap<>();
+    private Map<EntityType, VirtualDrop> loadCustomVirtualDrops(YamlConfiguration configuration, File file) {
+        Map<EntityType, VirtualDrop> drops = new HashMap<>();
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
 
-        List<?> customDrops = configuration.getList("custom-virtual-drops");
-        if (customDrops == null) {
-            return drops;
-        }
+        List<Map<?, ?>> customDrops = configuration.getMapList("custom-virtual-drops");
 
-        for (int index = 0; index < customDrops.size(); index++) {
-            String basePath = "custom-virtual-drops." + index + ".";
-            String entityName = configuration.getString(basePath + "entity");
-            if (entityName == null) {
-                continue;
-            }
+        for (Map<?, ?> map : customDrops) {
 
-            EntityType entityType;
-            try {
-                entityType = EntityType.valueOf(entityName.toUpperCase());
-            } catch (IllegalArgumentException exception) {
-                warn("Warning: Entity type " + entityName + " not found for custom virtual drops and will be ignored.");
-                continue;
-            }
-
-            List<?> dropList = configuration.getList(basePath + "drops");
-            if (dropList == null) {
-                continue;
-            }
-
+            var entity = EntityType.valueOf((String) map.get("entity"));
+            var cancelDefaultDrop = map.containsKey("cancel-default-drop") && (boolean) map.get("cancel-default-drop");
+            List<Map<?, ?>> mapDrops = (List<Map<?, ?>>) map.get("drops");
             List<CustomVirtualDrop> customVirtualDrops = new ArrayList<>();
-            for (int dropIndex = 0; dropIndex < dropList.size(); dropIndex++) {
-                String dropPath = basePath + "drops." + dropIndex + ".";
-                double chance = configuration.getDouble(dropPath + "chance", 100.0);
-                int min = configuration.getInt(dropPath + "min", 1);
-                int max = configuration.getInt(dropPath + "max", min);
-
-                try {
-                    MenuItemStack menuItemStack = inventoryManager.loadItemStack(configuration, dropPath + "item.", file);
-                    if (menuItemStack == null) {
-                        continue;
-                    }
-                    customVirtualDrops.add(new CustomVirtualDrop(menuItemStack, chance, min, max));
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+            for (Map<?, ?> mapDrop : mapDrops) {
+                TypedMapAccessor accessor = new TypedMapAccessor((Map<String, Object>) mapDrop);
+                double chance = accessor.getDouble("chance", 100.0);
+                int min = accessor.getInt("min", 1);
+                int max = accessor.getInt("max", min);
+                MenuItemStack menuItemStack = inventoryManager.loadItemStack(file, "", (Map<String, Object>) accessor.getObject("item"));
+                if (menuItemStack == null) {
+                    plugin.getLogger().warning("Warning: Item not found for custom virtual drops and will be ignored.");
+                    continue;
                 }
+                customVirtualDrops.add(new CustomVirtualDrop(menuItemStack, chance, min, max));
             }
 
-            if (!customVirtualDrops.isEmpty()) {
-                drops.put(entityType, customVirtualDrops);
-            }
+            drops.put(entity, new VirtualDrop(cancelDefaultDrop, customVirtualDrops));
         }
 
         return drops;

@@ -344,6 +344,7 @@ virtual:
 # The chance is expressed as a percentage between 0 and 100.
 custom-virtual-drops:
   - entity: MAGMA_CUBE
+    cancel-default-drop: true
     drops:
       - chance: 100
         min: 1
