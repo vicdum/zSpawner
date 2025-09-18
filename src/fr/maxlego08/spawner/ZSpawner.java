@@ -48,7 +48,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     private long placedAt;
     private Location location;
     private boolean needUpdate;
-    private int amount;
+    private int amount = 0;
     private ArmorStand stackArmorstand;
     private LivingEntity livingEntity;
     private long lastSpawnAt;
@@ -70,7 +70,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
-        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 1, blockFace);
+        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace);
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -446,7 +446,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
             int addedEntities = getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
-            
+
             addedEntities = Math.min(addedEntities, spawnerOption.getRemainingEntity());
 
             this.amount += addedEntities;
