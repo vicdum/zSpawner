@@ -22,6 +22,7 @@ import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.drop.CustomVirtualDrop;
 import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
@@ -47,6 +48,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
     private List<Material> blacklistMaterials = new ArrayList<>();
     private SpawnerOption defaultSpawnerOption;
+    private final Map<EntityType, List<CustomVirtualDrop>> customVirtualDrops = new HashMap<>();
 
     public SpawnerManager(SpawnerPlugin plugin) {
         super(plugin);
@@ -208,7 +211,23 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         this.entitiesMaterials = loadEntityMaterials();
         this.blacklistMaterials = loadBlacklist();
         this.defaultSpawnerOption = loadDefaultSpawnerOption();
+        this.customVirtualDrops.clear();
+        this.customVirtualDrops.putAll(loadCustomVirtualDrops(configuration, file));
         this.loadInventories();
+    }
+
+    public List<ItemStack> generateCustomVirtualDrops(EntityType entityType, Player player) {
+        List<CustomVirtualDrop> drops = this.customVirtualDrops.get(entityType);
+        if (drops == null || drops.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ItemStack> itemStacks = new ArrayList<>();
+        for (CustomVirtualDrop drop : drops) {
+            drop.generate(player, entityType).ifPresent(itemStacks::add);
+        }
+
+        return itemStacks;
     }
 
     public void loadButtons() {
@@ -370,5 +389,60 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
         openVirtualSpawner(player, spawner, 1);
         return isSuccess;
+    }
+
+    private Map<EntityType, List<CustomVirtualDrop>> loadCustomVirtualDrops(YamlConfiguration configuration, File file) {
+        Map<EntityType, List<CustomVirtualDrop>> drops = new HashMap<>();
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+
+        List<?> customDrops = configuration.getList("custom-virtual-drops");
+        if (customDrops == null) {
+            return drops;
+        }
+
+        for (int index = 0; index < customDrops.size(); index++) {
+            String basePath = "custom-virtual-drops." + index + ".";
+            String entityName = configuration.getString(basePath + "entity");
+            if (entityName == null) {
+                continue;
+            }
+
+            EntityType entityType;
+            try {
+                entityType = EntityType.valueOf(entityName.toUpperCase());
+            } catch (IllegalArgumentException exception) {
+                warn("Warning: Entity type " + entityName + " not found for custom virtual drops and will be ignored.");
+                continue;
+            }
+
+            List<?> dropList = configuration.getList(basePath + "drops");
+            if (dropList == null) {
+                continue;
+            }
+
+            List<CustomVirtualDrop> customVirtualDrops = new ArrayList<>();
+            for (int dropIndex = 0; dropIndex < dropList.size(); dropIndex++) {
+                String dropPath = basePath + "drops." + dropIndex + ".";
+                double chance = configuration.getDouble(dropPath + "chance", 100.0);
+                int min = configuration.getInt(dropPath + "min", 1);
+                int max = configuration.getInt(dropPath + "max", min);
+
+                try {
+                    MenuItemStack menuItemStack = inventoryManager.loadItemStack(configuration, dropPath + "item.", file);
+                    if (menuItemStack == null) {
+                        continue;
+                    }
+                    customVirtualDrops.add(new CustomVirtualDrop(menuItemStack, chance, min, max));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+
+            if (!customVirtualDrops.isEmpty()) {
+                drops.put(entityType, customVirtualDrops);
+            }
+        }
+
+        return drops;
     }
 }

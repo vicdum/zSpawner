@@ -406,6 +406,15 @@ public class SpawnerListener extends ListenerAdapter {
         storage.getSpawnerByDeadEntity(entity).ifPresent(spawner -> {
 
             spawner.getDeadEntities().remove(entity);
+
+            if (spawner.getType() == SpawnerType.VIRTUAL) {
+                List<ItemStack> customDrops = this.plugin.getManager().generateCustomVirtualDrops(spawner.getEntityType(), event.getEntity().getKiller());
+                if (!customDrops.isEmpty()) {
+                    event.getDrops().clear();
+                    event.getDrops().addAll(customDrops);
+                }
+            }
+
             List<ItemStack> itemStacks = new ArrayList<>(event.getDrops());
 
             /*if (spawner.isEnableAutoSell()) {
