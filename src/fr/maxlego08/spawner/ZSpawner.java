@@ -280,6 +280,12 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
                 currentLiving.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
+                if (currentLiving.isInsideVehicle()) {
+                    var vehicle = currentLiving.getVehicle();
+                    if (vehicle != null) {
+                        vehicle.remove();
+                    }
+                }
             }
         });
 

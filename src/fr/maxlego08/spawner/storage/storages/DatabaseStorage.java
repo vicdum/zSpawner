@@ -308,6 +308,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.bigInt("min_spawn", option.getMinSpawn());
             table.bigInt("max_spawn", option.getMaxSpawn());
             table.bigInt("mob_per_minute", option.getMobPerMinute());
+            table.bigInt("remaining", option.getRemainingEntity());
         };
     }
 

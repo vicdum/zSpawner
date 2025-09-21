@@ -144,7 +144,7 @@ public class AdapterListener extends ZUtils implements Listener {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onPickUp(event, event.getPlayer()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMobSpawn(CreatureSpawnEvent event) {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onMobSpawn(event));
     }
