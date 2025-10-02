@@ -20,7 +20,6 @@ import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.storage.IStorage;
-import fr.maxlego08.spawner.api.storage.StorageType;
 import fr.maxlego08.spawner.dto.ItemDTO;
 import fr.maxlego08.spawner.dto.OptionDTO;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
@@ -133,9 +132,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             this.spawners.clear();
 
             FileConfiguration configuration = plugin.getConfig();
-            StorageType storageType = StorageType.valueOf(configuration.getString("storage", "SQLITE"));
+            DatabaseType databaseType = DatabaseType.valueOf(configuration.getString("storage", "SQLITE"));
 
-            DatabaseConnection databaseConnection = getDatabaseConnection(configuration, storageType);
+            DatabaseConnection databaseConnection = getDatabaseConnection(configuration, databaseType);
 
             this.requestHelper = new RequestHelper(databaseConnection, JULogger.from(plugin.getLogger()));
 
@@ -154,7 +153,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
         });
     }
 
-    private @NotNull DatabaseConnection getDatabaseConnection(FileConfiguration configuration, StorageType storageType) {
+    private @NotNull DatabaseConnection getDatabaseConnection(FileConfiguration configuration, DatabaseType storageType) {
         GlobalDatabaseConfiguration globalDatabaseConfiguration = new GlobalDatabaseConfiguration(configuration);
         String tablePrefix = globalDatabaseConfiguration.getTablePrefix();
         String host = globalDatabaseConfiguration.getHost();
@@ -164,8 +163,8 @@ public class DatabaseStorage extends ZUtils implements IStorage {
         String database = globalDatabaseConfiguration.getDatabase();
         boolean debug = globalDatabaseConfiguration.isDebug();
 
-        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType == StorageType.SQLITE ? DatabaseType.SQLITE : DatabaseType.MYSQL);
-        DatabaseConnection databaseConnection = storageType == StorageType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
+        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType);
+        DatabaseConnection databaseConnection = storageType == DatabaseType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
         databaseConnection.connect();
 
         if (!databaseConnection.isValid()) {

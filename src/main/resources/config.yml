@@ -44,8 +44,7 @@ storage: SQLITE
 # If the storage is SQLITE or MYSQL then the spawners will be updated if they need to be
 updateInterval: 120000
 
-# Configuration for SQLITE and MYSQL storage
-# Attention, storage in MYSQL is not yet available !
+# Configuration for SQLITE, MARIADB and MYSQL storage
 database-configuration:
   table-prefix: "zspawner_"
   user: homestead
