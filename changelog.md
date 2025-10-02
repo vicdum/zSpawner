@@ -16,6 +16,15 @@
 
 # Unreleased
 
+# 4.1.0
+
+- Update to Sarah 1.20. Added MARIADB support
+- Fix zShop API
+- Fix sell button
+- Change metadata key to persistant data container
+- Add virtual spawner spawn limit
+- Add custom drop for virtual spawner
+
 # 4.0.9
 
 - Update to zMenu 1.1.0.0
