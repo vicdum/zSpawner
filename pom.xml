@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.maxlego08.spawner</groupId>
     <artifactId>zSpawner</artifactId>
-    <version>4.0.9</version>
+    <version>4.1.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
@@ -96,6 +96,11 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>groupez-releases</id>
+            <name>GroupeZ Repository</name>
+            <url>https://repo.groupez.dev/releases</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -132,7 +137,7 @@
             <artifactId>zShop-API</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/zshop-3.2.0.jar</systemPath>
+            <systemPath>${project.basedir}/libs/zShop-3.3.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>fr.maxlego08.essentials</groupId>
@@ -142,16 +147,16 @@
             <systemPath>${project.basedir}/libs/zEssentialsAPI.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.github.Maxlego08</groupId>
-            <artifactId>Sarah</artifactId>
-            <version>1.15</version>
+            <groupId>fr.maxlego08.sarah</groupId>
+            <artifactId>sarah</artifactId>
+            <version>1.20</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Maxlego08</groupId>
-            <artifactId>zMenu-API</artifactId>
-            <version>1.1.0.0</version>
+            <groupId>fr.maxlego08.menu</groupId>
+            <artifactId>zmenu-api</artifactId>
+            <version>1.1.0.4</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/zMenu-1.1.0.0.jar</systemPath>
+            <systemPath>${project.basedir}/libs/zMenu-1.1.0.4.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

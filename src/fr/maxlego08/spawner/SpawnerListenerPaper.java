@@ -6,8 +6,14 @@ import org.bukkit.entity.LivingEntity;
 
 public class SpawnerListenerPaper extends ListenerAdapter {
 
+    private final SpawnerPlugin plugin;
+
+    public SpawnerListenerPaper(SpawnerPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public void onKnockBack(EntityKnockbackByEntityEvent event, LivingEntity entity) {
-        if (entity.hasMetadata("zspawner")) event.setCancelled(true);
+        if (entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) event.setCancelled(true);
     }
 }

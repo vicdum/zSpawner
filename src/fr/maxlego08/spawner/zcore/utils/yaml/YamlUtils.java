@@ -139,8 +139,9 @@ public abstract class YamlUtils extends ZUtils {
         int minSpawn = configuration.getInt(path + "minSpawn", 1);
         int maxSpawn = configuration.getInt(path + "maxSpawn", 3);
         boolean dropLoots = configuration.getBoolean(path + "dropLoots", false);
+        int remaining = configuration.getInt(path + "remaining", 1000000);
 
-        return new ZSpawnerOption(distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots);
+        return new ZSpawnerOption(distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots, remaining);
     }
 
 

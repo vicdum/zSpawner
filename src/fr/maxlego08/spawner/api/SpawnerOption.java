@@ -50,5 +50,12 @@ public interface SpawnerOption extends Updatable {
 
     void setDropLoots(boolean dropLoots);
 
+    int getRemainingEntity();
+
+    void setRemainingEntity(int remainingEntity);
+
+    void removeRemainingEntity(int addedEntities);
+
     SpawnerOption cloneOption();
+
 }

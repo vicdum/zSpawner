@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     private long placedAt;
     private Location location;
     private boolean needUpdate;
-    private int amount;
+    private int amount = 0;
     private ArmorStand stackArmorstand;
     private LivingEntity livingEntity;
     private long lastSpawnAt;
@@ -70,7 +70,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
-        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 1, blockFace);
+        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace);
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -261,7 +261,7 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            if (entity.getType() == this.entityType && !entity.hasMetadata("zspawner")) {
+            if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
                 entity.remove();
             }
         });
@@ -279,7 +279,13 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
-                currentLiving.setMetadata("zspawner", new FixedMetadataValue(this.plugin, true));
+                currentLiving.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
+                if (currentLiving.isInsideVehicle()) {
+                    var vehicle = currentLiving.getVehicle();
+                    if (vehicle != null) {
+                        vehicle.remove();
+                    }
+                }
             }
         });
 
@@ -437,12 +443,21 @@ public class ZSpawner extends ZUtils implements Spawner {
             this.spawnEntity();
         }
 
+        // No more entities available
+        if (spawnerOption.getRemainingEntity() == 0) return;
+
         if (System.currentTimeMillis() > this.lastSpawnAt && this.amount < spawnerOption.getMaxEntity()) {
 
             long ms = ThreadLocalRandom.current().nextLong(Math.min(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()), Math.max(spawnerOption.getMinDelay(), spawnerOption.getMaxDelay()));
             this.lastSpawnAt = System.currentTimeMillis() + ms;
 
-            this.amount += getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
+            int addedEntities = getNumberBetween(Math.min(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()), Math.max(spawnerOption.getMinSpawn(), spawnerOption.getMaxSpawn()));
+
+            addedEntities = Math.min(addedEntities, spawnerOption.getRemainingEntity());
+
+            this.amount += addedEntities;
+            spawnerOption.removeRemainingEntity(addedEntities);
+
             if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
             this.needUpdate = true;
             this.updateEntity();

@@ -1,9 +1,9 @@
 package fr.maxlego08.spawner.storage;
 
+import fr.maxlego08.sarah.database.DatabaseType;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
-import fr.maxlego08.spawner.api.storage.StorageType;
 import fr.maxlego08.spawner.storage.storages.DatabaseStorage;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 
 public class StorageManager implements SpawnerStorage {
 
-    private final StorageType storageType;
+    private final DatabaseType storageType;
     private final ScheduledFuture<?> scheduledTask;
     private IStorage storage;
 
     public StorageManager(SpawnerPlugin plugin) {
 
         FileConfiguration configuration = plugin.getConfig();
-        this.storageType = StorageType.valueOf(configuration.getString("storage", "SQLITE"));
+        this.storageType = DatabaseType.valueOf(configuration.getString("storage", "SQLITE"));
         long updateInterval = configuration.getLong("updateInterval", 12000);
 
         this.storage = new DatabaseStorage(plugin);
@@ -42,7 +42,7 @@ public class StorageManager implements SpawnerStorage {
     }
 
     @Override
-    public StorageType getStorageType() {
+    public DatabaseType getStorageType() {
         return this.storageType;
     }
 

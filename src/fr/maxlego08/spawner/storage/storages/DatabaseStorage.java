@@ -20,7 +20,6 @@ import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.storage.IStorage;
-import fr.maxlego08.spawner.api.storage.StorageType;
 import fr.maxlego08.spawner.dto.ItemDTO;
 import fr.maxlego08.spawner.dto.OptionDTO;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
@@ -133,9 +132,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             this.spawners.clear();
 
             FileConfiguration configuration = plugin.getConfig();
-            StorageType storageType = StorageType.valueOf(configuration.getString("storage", "SQLITE"));
+            DatabaseType databaseType = DatabaseType.valueOf(configuration.getString("storage", "SQLITE"));
 
-            DatabaseConnection databaseConnection = getDatabaseConnection(configuration, storageType);
+            DatabaseConnection databaseConnection = getDatabaseConnection(configuration, databaseType);
 
             this.requestHelper = new RequestHelper(databaseConnection, JULogger.from(plugin.getLogger()));
 
@@ -154,7 +153,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
         });
     }
 
-    private @NotNull DatabaseConnection getDatabaseConnection(FileConfiguration configuration, StorageType storageType) {
+    private @NotNull DatabaseConnection getDatabaseConnection(FileConfiguration configuration, DatabaseType storageType) {
         GlobalDatabaseConfiguration globalDatabaseConfiguration = new GlobalDatabaseConfiguration(configuration);
         String tablePrefix = globalDatabaseConfiguration.getTablePrefix();
         String host = globalDatabaseConfiguration.getHost();
@@ -164,8 +163,8 @@ public class DatabaseStorage extends ZUtils implements IStorage {
         String database = globalDatabaseConfiguration.getDatabase();
         boolean debug = globalDatabaseConfiguration.isDebug();
 
-        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType == StorageType.SQLITE ? DatabaseType.SQLITE : DatabaseType.MYSQL);
-        DatabaseConnection databaseConnection = storageType == StorageType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
+        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(tablePrefix, user, password, port, host, database, debug, storageType);
+        DatabaseConnection databaseConnection = storageType == DatabaseType.SQLITE ? new SqliteConnection(databaseConfiguration, plugin.getDataFolder()) : new HikariDatabaseConnection(databaseConfiguration);
         databaseConnection.connect();
 
         if (!databaseConnection.isValid()) {
@@ -308,6 +307,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.bigInt("min_spawn", option.getMinSpawn());
             table.bigInt("max_spawn", option.getMaxSpawn());
             table.bigInt("mob_per_minute", option.getMobPerMinute());
+            table.bigInt("remaining", option.getRemainingEntity());
         };
     }
 
@@ -318,6 +318,6 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     }
 
     private SpawnerOption toOption(OptionDTO optionDTO) {
-        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots());
+        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.remaining());
     }
 }

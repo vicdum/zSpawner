@@ -4,21 +4,22 @@ import fr.maxlego08.spawner.api.SpawnerOption;
 
 public class ZSpawnerOption implements SpawnerOption {
 
-    public double distance;
-    public double experienceMultiplier;
-    public double lootMultiplier;
-    public boolean autoKill;
-    public boolean autoSell;
-    public int maxEntity;
-    public int minDelay;
-    public int maxDelay;
-    public int minSpawn;
-    public int maxSpawn;
-    public int mobPerMinute;
-    public boolean needUpdate;
-    public boolean dropLoots;
+    private double distance;
+    private double experienceMultiplier;
+    private double lootMultiplier;
+    private boolean autoKill;
+    private boolean autoSell;
+    private int maxEntity;
+    private int minDelay;
+    private int maxDelay;
+    private int minSpawn;
+    private int maxSpawn;
+    private int mobPerMinute;
+    private boolean needUpdate;
+    private boolean dropLoots;
+    private int remainingEntity;
 
-    public ZSpawnerOption(double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute, boolean dropLoots) {
+    public ZSpawnerOption(double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute, boolean dropLoots, int remainingEntity) {
         this.distance = distance;
         this.experienceMultiplier = experienceMultiplier;
         this.lootMultiplier = lootMultiplier;
@@ -31,6 +32,7 @@ public class ZSpawnerOption implements SpawnerOption {
         this.maxSpawn = maxSpawn;
         this.mobPerMinute = mobPerMinute;
         this.dropLoots = dropLoots;
+        this.remainingEntity = remainingEntity;
     }
 
     @Override
@@ -176,6 +178,23 @@ public class ZSpawnerOption implements SpawnerOption {
     }
 
     @Override
+    public int getRemainingEntity() {
+        return remainingEntity;
+    }
+
+    @Override
+    public void setRemainingEntity(int remainingEntity) {
+        this.remainingEntity = remainingEntity;
+        this.needUpdate = true;
+    }
+
+    @Override
+    public void removeRemainingEntity(int addedEntities) {
+        this.remainingEntity -= addedEntities;
+        this.needUpdate = true;
+    }
+
+    @Override
     public String toString() {
         return "ZSpawnerOption{" +
                 "distance=" + distance +
@@ -191,11 +210,12 @@ public class ZSpawnerOption implements SpawnerOption {
                 ", mobPerMinute=" + mobPerMinute +
                 ", needUpdate=" + needUpdate +
                 ", dropLoots=" + dropLoots +
+                ", remainingEntity=" + remainingEntity +
                 '}';
     }
 
     @Override
     public ZSpawnerOption cloneOption() {
-        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots);
+        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots, this.remainingEntity);
     }
 }

@@ -35,6 +35,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -324,7 +325,7 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onTeleport(EntityTeleportEvent event, Entity entity) {
-        if (entity.hasMetadata("zspawner")) event.setCancelled(true);
+        if (entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) event.setCancelled(true);
     }
 
     @Override
@@ -406,6 +407,15 @@ public class SpawnerListener extends ListenerAdapter {
         storage.getSpawnerByDeadEntity(entity).ifPresent(spawner -> {
 
             spawner.getDeadEntities().remove(entity);
+
+            if (spawner.getType() == SpawnerType.VIRTUAL) {
+                List<ItemStack> customDrops = this.plugin.getManager().generateCustomVirtualDrops(spawner.getEntityType(), event.getEntity().getKiller());
+                if (!customDrops.isEmpty()) {
+                    event.getDrops().clear();
+                    event.getDrops().addAll(customDrops);
+                }
+            }
+
             List<ItemStack> itemStacks = new ArrayList<>(event.getDrops());
 
             /*if (spawner.isEnableAutoSell()) {

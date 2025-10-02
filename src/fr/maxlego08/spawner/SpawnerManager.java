@@ -6,6 +6,7 @@ import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
+import fr.maxlego08.menu.api.utils.TypedMapAccessor;
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
@@ -22,6 +23,8 @@ import fr.maxlego08.spawner.buttons.virtual.InfoButton;
 import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
 import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
 import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.drop.CustomVirtualDrop;
+import fr.maxlego08.spawner.drop.VirtualDrop;
 import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
@@ -47,6 +50,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +65,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private final NamespacedKey spawnerUuidKey;
     private final Map<UUID, PlayerSpawner> playerSpawners = new HashMap<>();
     private final Map<SpawnerType, MenuItemStack> spawnerTypeItemStacks = new HashMap<>();
+    private final Map<EntityType, VirtualDrop> customVirtualDrops = new HashMap<>();
     private Map<EntityType, String> entitiesMaterials = new HashMap<>();
     private List<Material> blacklistMaterials = new ArrayList<>();
     private SpawnerOption defaultSpawnerOption;
@@ -138,6 +143,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("min-spawn", String.valueOf(spawnerOption.getMinSpawn()));
         placeholders.register("max-spawn", String.valueOf(spawnerOption.getMaxSpawn()));
         placeholders.register("mob-per-minute", String.valueOf(spawnerOption.getMobPerMinute()));
+        placeholders.register("remaining-entities", format(spawnerOption.getRemainingEntity()));
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
@@ -207,7 +213,24 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         this.entitiesMaterials = loadEntityMaterials();
         this.blacklistMaterials = loadBlacklist();
         this.defaultSpawnerOption = loadDefaultSpawnerOption();
+        this.customVirtualDrops.clear();
+        this.customVirtualDrops.putAll(loadCustomVirtualDrops(configuration, file));
         this.loadInventories();
+    }
+
+    public List<ItemStack> generateCustomVirtualDrops(EntityType entityType, Player player) {
+        VirtualDrop virtualDrops = this.customVirtualDrops.get(entityType);
+
+        if (virtualDrops == null || virtualDrops.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ItemStack> itemStacks = new ArrayList<>();
+        for (CustomVirtualDrop drop : virtualDrops.drops()) {
+            drop.generate(player).ifPresent(itemStacks::add);
+        }
+
+        return itemStacks;
     }
 
     public void loadButtons() {
@@ -339,13 +362,13 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         inventoryManager.getInventory(this.plugin, "show").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
     }
 
-    public void sellSpawnerInventory(Player player) {
+    public boolean sellSpawnerInventory(Player player) {
 
         ShopAction action = this.plugin.getShopAction();
         if (action == null) {
             player.closeInventory();
             message(this.plugin, player, Message.SELL_ERROR);
-            return;
+            return false;
         }
 
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
@@ -353,18 +376,52 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         if (spawner == null) {
             player.closeInventory();
             message(this.plugin, player, Message.SELL_ERROR);
-            return;
+            return false;
         }
 
+        var isSuccess = false;
         var iterator = spawner.getItems().iterator();
         while (iterator.hasNext()) {
             var spawnerItem = iterator.next();
             if (action.deposit(player, spawnerItem.getItemStack(), spawnerItem.getAmount())) {
                 iterator.remove();
                 this.plugin.getStorage().deleteSpawnerItem(spawner, spawnerItem);
+                isSuccess = true;
             }
         }
 
         openVirtualSpawner(player, spawner, 1);
+        return isSuccess;
+    }
+
+    private Map<EntityType, VirtualDrop> loadCustomVirtualDrops(YamlConfiguration configuration, File file) {
+        Map<EntityType, VirtualDrop> drops = new HashMap<>();
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+
+        List<Map<?, ?>> customDrops = configuration.getMapList("custom-virtual-drops");
+
+        for (Map<?, ?> map : customDrops) {
+
+            var entity = EntityType.valueOf((String) map.get("entity"));
+            var cancelDefaultDrop = map.containsKey("cancel-default-drop") && (boolean) map.get("cancel-default-drop");
+            List<Map<?, ?>> mapDrops = (List<Map<?, ?>>) map.get("drops");
+            List<CustomVirtualDrop> customVirtualDrops = new ArrayList<>();
+            for (Map<?, ?> mapDrop : mapDrops) {
+                TypedMapAccessor accessor = new TypedMapAccessor((Map<String, Object>) mapDrop);
+                double chance = accessor.getDouble("chance", 100.0);
+                int min = accessor.getInt("min", 1);
+                int max = accessor.getInt("max", min);
+                MenuItemStack menuItemStack = inventoryManager.loadItemStack(file, "", (Map<String, Object>) accessor.getObject("item"));
+                if (menuItemStack == null) {
+                    plugin.getLogger().warning("Warning: Item not found for custom virtual drops and will be ignored.");
+                    continue;
+                }
+                customVirtualDrops.add(new CustomVirtualDrop(menuItemStack, chance, min, max));
+            }
+
+            drops.put(entity, new VirtualDrop(cancelDefaultDrop, customVirtualDrops));
+        }
+
+        return drops;
     }
 }

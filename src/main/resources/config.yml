@@ -44,8 +44,7 @@ storage: SQLITE
 # If the storage is SQLITE or MYSQL then the spawners will be updated if they need to be
 updateInterval: 120000
 
-# Configuration for SQLITE and MYSQL storage
-# Attention, storage in MYSQL is not yet available !
+# Configuration for SQLITE, MARIADB and MYSQL storage
 database-configuration:
   table-prefix: "zspawner_"
   user: homestead
@@ -337,6 +336,20 @@ virtual:
     maxDelay: 15000 # 15 seconds
     minSpawn: 1 # Minimum spawn entity
     maxSpawn: 2 # Maximum spawn entity
+    remaining: 1000000 # Remaining entities
+
+# Define custom drops for virtual spawners.
+# Each entry allows configuring a list of drops for a specific entity type.
+# The chance is expressed as a percentage between 0 and 100.
+custom-virtual-drops:
+  - entity: MAGMA_CUBE
+    cancel-default-drop: true
+    drops:
+      - chance: 100
+        min: 1
+        max: 3
+        item:
+          material: MAGMA_CREAM
 
 # Silk spawners
 silkSpawner:
