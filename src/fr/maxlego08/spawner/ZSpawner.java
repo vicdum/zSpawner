@@ -253,17 +253,22 @@ public class ZSpawner extends ZUtils implements Spawner {
     private void spawnEntity() {
 
         if (this.livingEntity != null) {
-            this.updateEntity();
-            return;
+
+            if (this.livingEntity.isValid()) {
+                this.updateEntity();
+                return;
+            }
+
+            this.livingEntity.remove();
         }
 
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
+            /*if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
                 entity.remove();
-            }
+            }*/
         });
 
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
@@ -272,6 +277,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             return;
         }
         this.livingEntity = (LivingEntity) world.spawn(location, entityClass, e -> {
+            e.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
             if (e instanceof LivingEntity currentLiving) {
                 currentLiving.setAI(false);
                 currentLiving.setCollidable(false);
@@ -279,7 +285,6 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
-                currentLiving.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
                 if (currentLiving.isInsideVehicle()) {
                     var vehicle = currentLiving.getVehicle();
                     if (vehicle != null) {

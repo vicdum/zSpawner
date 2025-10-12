@@ -147,6 +147,13 @@
             <systemPath>${project.basedir}/libs/zEssentialsAPI.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.bgsoftware.superiorskyblock</groupId>
+            <artifactId>SuperiorSkyblock</artifactId>
+            <version>2025</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/SuperiorSkyblock.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>fr.maxlego08.sarah</groupId>
             <artifactId>sarah</artifactId>
             <version>1.20</version>

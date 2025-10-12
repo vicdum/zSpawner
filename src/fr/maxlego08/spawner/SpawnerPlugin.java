@@ -17,6 +17,7 @@ import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
+import fr.maxlego08.spawner.tracker.SuperiorTracker;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.Bukkit;
@@ -85,6 +86,11 @@ public class SpawnerPlugin extends ZPlugin {
         if (this.isEnable(Plugins.ZESSENTIALS)) {
             getLogger().info("Use zEssentials");
             this.playerGive = new ZEssentialsGive();
+        }
+
+        if (this.isEnable(Plugins.SUPERIORSKYBLOCK2)) {
+            getLogger().info("Use SuperiorSkyBlock2");
+            new SuperiorTracker(this);
         }
 
         this.postEnable();
