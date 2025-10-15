@@ -6,6 +6,7 @@ import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import fr.maxlego08.spawner.zcore.enums.Permission;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +30,10 @@ public class ToggleDropButton extends Button {
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
         Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
         if (spawner == null) return;
+
+        if (!spawner.getOwner().equals(player.getUniqueId()) && !player.hasPermission(Permission.ZSPAWNER_BYPASS.getPermission())) {
+            return;
+        }
 
         var option = spawner.getOption();
         option.setDropLoots(!option.dropLoots());

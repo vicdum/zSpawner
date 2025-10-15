@@ -538,7 +538,13 @@ public class SpawnerListener extends ListenerAdapter {
 
             event.setCancelled(true);
 
-            if (spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS)) {
+            boolean hasAccess = spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS);
+
+            if (!hasAccess) {
+                hasAccess = this.plugin.hasTeamAccess(spawner.getOwner(), player.getUniqueId());
+            }
+
+            if (hasAccess) {
                 this.plugin.getManager().openVirtualSpawner(player, spawner, 1);
             }
         }
