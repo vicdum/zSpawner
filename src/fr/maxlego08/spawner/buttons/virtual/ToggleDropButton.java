@@ -1,6 +1,5 @@
 package fr.maxlego08.spawner.buttons.virtual;
 
-import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.engine.InventoryEngine;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
@@ -11,14 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class ToggleDropButton extends Button {
-
-    private final SpawnerPlugin plugin;
+public class ToggleDropButton extends AbstractSpawnerButton {
+    
     private final String textEnable;
     private final String textDisable;
 
     public ToggleDropButton(SpawnerPlugin plugin, String textEnable, String textDisable) {
-        this.plugin = plugin;
+        super(plugin);
         this.textEnable = textEnable;
         this.textDisable = textDisable;
     }
