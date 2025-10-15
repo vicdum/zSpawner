@@ -158,7 +158,7 @@ public class ZSpawner extends ZUtils implements Spawner {
                 Cuboid cuboid = new Cuboid(this.location.clone().add(0, 1, 0), maxLocation);
 
                 cuboid.forEach(cuboidBlock -> {
-                    if (cuboidBlock.getType() != Material.BEDROCK) {
+                    if (cuboidBlock.getType() != Material.BEDROCK && cuboidBlock.getType() != Config.virtualMaterial) {
                         cuboidBlock.breakNaturally(true, true);
                     }
                 });
