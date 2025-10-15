@@ -30,6 +30,7 @@ import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
@@ -312,6 +313,11 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
         Spawner spawner = playerSpawner.getVirtualSpawner();
         if (spawner == null) return;
+
+        if (!spawner.getOwner().equals(player.getUniqueId()) && !hasPermission(player, Permission.ZSPAWNER_BYPASS)) {
+            message(this.plugin, player, Message.COMMAND_NO_PERMISSION);
+            return;
+        }
 
         if (!spawner.getItems().isEmpty()) {
             message(this.plugin, player, Message.VIRTUAL_REMOVE_ERROR_EMPTY);

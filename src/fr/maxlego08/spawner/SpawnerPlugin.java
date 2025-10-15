@@ -7,6 +7,7 @@ import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.storage.SpawnerStorage;
+import fr.maxlego08.spawner.api.team.TeamManager;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.give.DefaultGive;
 import fr.maxlego08.spawner.give.ZEssentialsGive;
@@ -17,11 +18,16 @@ import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
-import fr.maxlego08.spawner.tracker.SuperiorTracker;
+import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * System to create your plugins very simply Projet:
@@ -41,6 +47,7 @@ public class SpawnerPlugin extends ZPlugin {
     private ShopAction shopAction;
     private PlayerGive playerGive = new DefaultGive();
     private NamespacedKey spawnerKey;
+    private final List<TeamManager> teamManagers = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -90,7 +97,7 @@ public class SpawnerPlugin extends ZPlugin {
 
         if (this.isEnable(Plugins.SUPERIORSKYBLOCK2)) {
             getLogger().info("Use SuperiorSkyBlock2");
-            new SuperiorTracker(this);
+            this.registerTeamManager(new SuperiorTeamManager(this));
         }
 
         this.postEnable();
@@ -150,5 +157,22 @@ public class SpawnerPlugin extends ZPlugin {
 
     public NamespacedKey getSpawnerKey() {
         return spawnerKey;
+    }
+
+    public void registerTeamManager(TeamManager teamManager) {
+        if (teamManager != null) {
+            this.teamManagers.add(teamManager);
+        }
+    }
+
+    public List<TeamManager> getTeamManagers() {
+        return Collections.unmodifiableList(this.teamManagers);
+    }
+
+    public boolean hasTeamAccess(UUID ownerId, UUID playerId) {
+        if (ownerId == null || playerId == null) {
+            return false;
+        }
+        return this.teamManagers.stream().anyMatch(teamManager -> teamManager.canAccess(ownerId, playerId));
     }
 }
