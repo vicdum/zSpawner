@@ -414,6 +414,17 @@ public class SpawnerListener extends ListenerAdapter {
                     event.getDrops().clear();
                     event.getDrops().addAll(customDrops);
                 }
+
+                if (Config.givePlayerExperience) {
+                    Player killer = event.getEntity().getKiller();
+                    if (killer != null) {
+                        int droppedExp = event.getDroppedExp();
+                        if (droppedExp > 0) {
+                            event.setDroppedExp(0);
+                            killer.giveExp(droppedExp);
+                        }
+                    }
+                }
             }
 
             List<ItemStack> itemStacks = new ArrayList<>(event.getDrops());

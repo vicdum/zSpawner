@@ -373,4 +373,7 @@ silkSpawner:
 # Break blocks or entity of a virtual will spawn
 breakUpVirtualSpawner: true
 
+# Give experience directly to the player when killing mobs from a virtual spawner.
+give-player-experience: false
+
 deposit-reason: "Sale of x%amount% %item% for %price% (Spawner)"
