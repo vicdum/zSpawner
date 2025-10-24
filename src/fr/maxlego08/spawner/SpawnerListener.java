@@ -53,6 +53,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +71,14 @@ public class SpawnerListener extends ListenerAdapter {
     private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
         Optional<Spawner> optional = this.plugin.getStorage().getSpawner(block.getLocation(), SpawnerType.VIRTUAL);
         if (optional.isPresent()) {
+            event.setCancelled(true);
+            return true;
+        }
+
+        for (Entity entity : block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 1, 0.5), 0.5, 1.5, 0.5)) {
+            if (!(entity instanceof LivingEntity livingEntity)) continue;
+            if (!livingEntity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING)) continue;
+            if (this.plugin.getStorage().getSpawnerByEntity(livingEntity).isEmpty()) continue;
             event.setCancelled(true);
             return true;
         }
