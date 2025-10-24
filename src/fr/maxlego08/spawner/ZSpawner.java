@@ -266,9 +266,11 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
-                entity.remove();
-            }
+            if (entity.getType() != this.entityType) return;
+            if (!entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING)) return;
+            String spawnerId = entity.getPersistentDataContainer().get(this.plugin.getSpawnerKey(), PersistentDataType.STRING);
+            if (spawnerId == null || !spawnerId.equals(this.uniqueId.toString())) return;
+            entity.remove();
         });
 
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
