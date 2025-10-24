@@ -69,8 +69,16 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     }
 
     @Override
-    public Optional<Spawner> getSpawner(Location location, SpawnerType spawnerType) {
-        return this.spawners.stream().filter(spawner -> spawner.getType() == spawnerType && spawner.isPlace() && spawner.getCuboid().contains(location)).findFirst();
+    public Optional<Spawner> getSpawner(SpawnerType spawnerType, Location... locations) {
+        return this.spawners.stream().filter(spawner -> {
+            if (spawner.getType() != spawnerType || !spawner.isPlace()) return false;
+            for (Location location : locations) {
+                if (spawner.getCuboid().contains(location)) {
+                    return true;
+                }
+            }
+            return false;
+        }).findFirst();
     }
 
     @Override

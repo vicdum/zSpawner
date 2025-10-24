@@ -96,6 +96,7 @@ public enum Message {
     YES("&aYes"),
     NO("&cNo"),
     PLACE_ERROR_EXIST("&cThe spawner already exists, you can’t place it."),
+    PLACE_ERROR_SPAWNER("&cYou cannot place a spawner here."),
     ;
 
     private List<String> messages;

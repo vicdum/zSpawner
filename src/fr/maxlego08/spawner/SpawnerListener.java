@@ -69,7 +69,12 @@ public class SpawnerListener extends ListenerAdapter {
     }
 
     private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
-        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(block.getLocation(), SpawnerType.VIRTUAL);
+        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(SpawnerType.VIRTUAL,
+                block.getLocation(),
+                block.getLocation().add(0, 1, 0),
+                block.getLocation().add(0, 2, 0),
+                block.getLocation().add(0, 3, 0)
+        );
         if (optional.isPresent()) {
             event.setCancelled(true);
             return true;
@@ -77,7 +82,8 @@ public class SpawnerListener extends ListenerAdapter {
 
         for (Entity entity : block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 1, 0.5), 0.5, 1.5, 0.5)) {
             if (!(entity instanceof LivingEntity livingEntity)) continue;
-            if (!livingEntity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING)) continue;
+            if (!livingEntity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING))
+                continue;
             if (this.plugin.getStorage().getSpawnerByEntity(livingEntity).isEmpty()) continue;
             event.setCancelled(true);
             return true;
@@ -92,14 +98,17 @@ public class SpawnerListener extends ListenerAdapter {
         EquipmentSlot equipmentSlot = event.getHand();
         Block block = event.getBlock();
 
-        if (checkBlockPlaceVirtualSpawner(event, block)) return;
-
         Optional<SpawnerResult> optionalSpawner = this.plugin.getManager().getSpawnerResult(itemStack);
         if (optionalSpawner.isEmpty()) return;
         SpawnerResult spawnerResult = optionalSpawner.get();
 
         SpawnerType spawnerType = spawnerResult.spawnerType();
         EntityType entityType = spawnerResult.entityType();
+
+        if (checkBlockPlaceVirtualSpawner(event, block)) {
+            message(this.plugin, player, Message.PLACE_ERROR_SPAWNER);
+            return;
+        }
 
         IStorage storage = this.plugin.getStorage();
 
