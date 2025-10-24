@@ -11,6 +11,7 @@ import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.MendingUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,7 +36,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -418,7 +418,7 @@ public class SpawnerListener extends ListenerAdapter {
                 if (Config.givePlayerExperience) {
                     Player killer = event.getEntity().getKiller();
                     if (killer != null) {
-                        int droppedExp = event.getDroppedExp();
+                        int droppedExp = MendingUtil.repairAllMainHandAndArmor(killer, event.getDroppedExp());
                         if (droppedExp > 0) {
                             event.setDroppedExp(0);
                             killer.giveExp(droppedExp);
