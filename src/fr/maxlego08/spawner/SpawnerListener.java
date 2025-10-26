@@ -11,6 +11,7 @@ import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.MendingUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,7 +36,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -53,6 +53,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +69,22 @@ public class SpawnerListener extends ListenerAdapter {
     }
 
     private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
-        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(block.getLocation(), SpawnerType.VIRTUAL);
+        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(SpawnerType.VIRTUAL,
+                block.getLocation(),
+                block.getLocation().add(0, 1, 0),
+                block.getLocation().add(0, 2, 0),
+                block.getLocation().add(0, 3, 0)
+        );
         if (optional.isPresent()) {
+            event.setCancelled(true);
+            return true;
+        }
+
+        for (Entity entity : block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 1, 0.5), 0.5, 1.5, 0.5)) {
+            if (!(entity instanceof LivingEntity livingEntity)) continue;
+            if (!livingEntity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING))
+                continue;
+            if (this.plugin.getStorage().getSpawnerByEntity(livingEntity).isEmpty()) continue;
             event.setCancelled(true);
             return true;
         }
@@ -83,14 +98,17 @@ public class SpawnerListener extends ListenerAdapter {
         EquipmentSlot equipmentSlot = event.getHand();
         Block block = event.getBlock();
 
-        if (checkBlockPlaceVirtualSpawner(event, block)) return;
-
         Optional<SpawnerResult> optionalSpawner = this.plugin.getManager().getSpawnerResult(itemStack);
         if (optionalSpawner.isEmpty()) return;
         SpawnerResult spawnerResult = optionalSpawner.get();
 
         SpawnerType spawnerType = spawnerResult.spawnerType();
         EntityType entityType = spawnerResult.entityType();
+
+        if (checkBlockPlaceVirtualSpawner(event, block)) {
+            message(this.plugin, player, Message.PLACE_ERROR_SPAWNER);
+            return;
+        }
 
         IStorage storage = this.plugin.getStorage();
 
@@ -414,6 +432,17 @@ public class SpawnerListener extends ListenerAdapter {
                     event.getDrops().clear();
                     event.getDrops().addAll(customDrops);
                 }
+
+                if (Config.givePlayerExperience) {
+                    Player killer = event.getEntity().getKiller();
+                    if (killer != null) {
+                        int droppedExp = MendingUtil.repairAllMainHandAndArmor(killer, event.getDroppedExp());
+                        if (droppedExp > 0) {
+                            event.setDroppedExp(0);
+                            killer.giveExp(droppedExp);
+                        }
+                    }
+                }
             }
 
             List<ItemStack> itemStacks = new ArrayList<>(event.getDrops());
@@ -538,7 +567,13 @@ public class SpawnerListener extends ListenerAdapter {
 
             event.setCancelled(true);
 
-            if (spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS)) {
+            boolean hasAccess = spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS);
+
+            if (!hasAccess) {
+                hasAccess = this.plugin.hasTeamAccess(spawner.getOwner(), player.getUniqueId());
+            }
+
+            if (hasAccess) {
                 this.plugin.getManager().openVirtualSpawner(player, spawner, 1);
             }
         }

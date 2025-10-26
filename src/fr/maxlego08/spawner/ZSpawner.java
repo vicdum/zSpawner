@@ -158,7 +158,7 @@ public class ZSpawner extends ZUtils implements Spawner {
                 Cuboid cuboid = new Cuboid(this.location.clone().add(0, 1, 0), maxLocation);
 
                 cuboid.forEach(cuboidBlock -> {
-                    if (cuboidBlock.getType() != Material.BEDROCK) {
+                    if (cuboidBlock.getType() != Material.BEDROCK && cuboidBlock.getType() != Config.virtualMaterial) {
                         cuboidBlock.breakNaturally(true, true);
                     }
                 });
@@ -253,17 +253,25 @@ public class ZSpawner extends ZUtils implements Spawner {
     private void spawnEntity() {
 
         if (this.livingEntity != null) {
-            this.updateEntity();
-            return;
+
+            if (this.livingEntity.isValid()) {
+                this.updateEntity();
+                return;
+            }
+
+            this.livingEntity.remove();
         }
 
         Location location = getSpawnedEntityLocation();
 
         World world = location.getWorld();
         world.getNearbyEntities(location, 0.5, 0.5, 0.5).forEach(entity -> {
-            if (entity.getType() == this.entityType && entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey())) {
-                entity.remove();
-            }
+            if (entity.getType() != this.entityType) return;
+            if (!entity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING))
+                return;
+            String spawnerId = entity.getPersistentDataContainer().get(this.plugin.getSpawnerKey(), PersistentDataType.STRING);
+            if (spawnerId == null || !spawnerId.equals(this.uniqueId.toString())) return;
+            entity.remove();
         });
 
         Class<? extends Entity> entityClass = this.entityType.getEntityClass();
@@ -272,6 +280,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             return;
         }
         this.livingEntity = (LivingEntity) world.spawn(location, entityClass, e -> {
+            e.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
             if (e instanceof LivingEntity currentLiving) {
                 currentLiving.setAI(false);
                 currentLiving.setCollidable(false);
@@ -279,7 +288,6 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
-                currentLiving.getPersistentDataContainer().set(this.plugin.getSpawnerKey(), PersistentDataType.STRING, this.uniqueId.toString());
                 if (currentLiving.isInsideVehicle()) {
                     var vehicle = currentLiving.getVehicle();
                     if (vehicle != null) {

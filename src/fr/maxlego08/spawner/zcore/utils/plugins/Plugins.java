@@ -11,6 +11,7 @@ public enum Plugins {
 	ZTRANSLATOR("zTranslator"),
 
     ZSHOP("zShop"),
+    SUPERIORSKYBLOCK2("SuperiorSkyblock2"),
     ZESSENTIALS("ZESSENTIALS");
 
 	private final String name;

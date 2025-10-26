@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.maxlego08.spawner</groupId>
   <artifactId>zSpawner</artifactId>
-  <version>4.1.0</version>
+  <version>4.1.1</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -133,6 +133,13 @@
       <version>1.0.1.9</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/libs/zEssentialsAPI.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.bgsoftware.superiorskyblock</groupId>
+      <artifactId>SuperiorSkyblock</artifactId>
+      <version>2025</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/libs/SuperiorSkyblock.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>fr.maxlego08.menu</groupId>

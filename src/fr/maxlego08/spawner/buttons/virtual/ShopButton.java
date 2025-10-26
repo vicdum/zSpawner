@@ -1,6 +1,5 @@
 package fr.maxlego08.spawner.buttons.virtual;
 
-import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.engine.InventoryEngine;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
@@ -8,12 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
 
-public class ShopButton extends Button {
-
-    private final SpawnerPlugin plugin;
+public class ShopButton extends AbstractSpawnerButton {
 
     public ShopButton(Plugin plugin) {
-        this.plugin = (SpawnerPlugin) plugin;
+        super((SpawnerPlugin) plugin);
     }
 
     @Override

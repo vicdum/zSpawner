@@ -57,7 +57,7 @@ public interface IStorage {
 
     List<Spawner> getSpawners();
 
-    Optional<Spawner> getSpawner(Location location, SpawnerType spawnerType);
+    Optional<Spawner> getSpawner(SpawnerType spawnerType, Location... locations);
 
     Optional<SpawnerOption> getOption(UUID uuid);
 }

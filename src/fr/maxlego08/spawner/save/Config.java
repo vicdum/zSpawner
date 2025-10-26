@@ -35,6 +35,7 @@ public class Config {
     public static List<Material> blacklistMaterials = new ArrayList<>();
     public static SpawnerType naturelSpawnerInto = SpawnerType.CLASSIC;
     public static boolean breakUpVirtualSpawner;
+    public static boolean givePlayerExperience;
 
     /**
      * static Singleton instance.
@@ -93,6 +94,7 @@ public class Config {
         }
 
         breakUpVirtualSpawner = configuration.getBoolean("breakUpVirtualSpawner", true);
+        givePlayerExperience = configuration.getBoolean("give-player-experience", false);
         dropNaturalSpawnerOnExplose = configuration.getBoolean("dropNaturalSpawnerOnExplose", true);
         disableNaturalSpawnerExplosion = configuration.getBoolean("disableNaturalSpawnerExplosion", true);
 
