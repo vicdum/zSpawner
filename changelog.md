@@ -1,20 +1,11 @@
-# ToDo
-
-- [x] G�rer les explosions du block, pouvoir activer / d�sactiver
-- [x] Ajouter un syst�me de silk spawner
-- [ ] Proposer un syst�me d'upgrade de spawner par spawner
-- [x] V�rifier le placage des blocks dans le cuboid
-- [ ] Ajouter le syst�me de whitelist / blacklist de materials pour les materials
-- [ ] Ajouter une option pour avoir des spawners stackable � l'infini
-- [ ] Ajouter une option pour que les mobs qui spawn d'un spawner vont �tre sans IA
-- [ ] Ajouter une option pour d�sactiver l'ajout des loots de mobs dans le spawners infini
-- [ ] Ajouter une option pour permettre la mort des mobs sans avoir l'animation de morts, uniquement utiliser le EntityDamageEvent
-
-- [ ] Ajouter une option pour que les spawners virtuel puissent �tre ouvert par tout le monde et r�cup�rer par tout le monde
-- [ ] V�rifier si l'autokill fonctionne correctement par d�faut, sans activ� l'option mais juste avec la configuraiton
-
-
 # Unreleased
+
+# 4.1.1
+
+- Added SuperiorSkyBlock tracker support.
+- Added team-based spawner management when using SuperiorSkyBlock.
+- Fixed virtual spawner placement issues.
+- Added an option to give experience directly to the player from virtual spawners.
 
 # 4.1.0
 
@@ -33,7 +24,7 @@
 
 - Update to last zMenu version
 - Fix slime virtual spawner
-- Cancel virtual chicken laying 
+- Cancel virtual chicken laying
 
 # 4.0.7
 
