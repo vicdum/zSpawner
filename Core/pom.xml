@@ -18,37 +18,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.6.1</version>
-                <configuration>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>com/cryptomorin/xseries/messages/**</exclude>
-                                <exclude>com/cryptomorin/xseries/particles/**</exclude>
-                                <exclude>com/cryptomorin/xseries/XBiome*</exclude>
-                                <exclude>com/cryptomorin/xseries/NMSExtras*</exclude>
-                                <exclude>com/cryptomorin/xseries/NoteBlockMusic*</exclude>
-                                <exclude>com/cryptomorin/xseries/SkullCacheListener*</exclude>
-                                <exclude>com/cryptomorin/xseries/XTag*</exclude>
-                                <exclude>com/cryptomorin/xseries/XPotion*</exclude>
-                                <exclude>com/cryptomorin/xseries/XMaterial*</exclude>
-                                <exclude>com/cryptomorin/xseries/XItemStack*</exclude>
-                                <exclude>com/cryptomorin/xseries/XBlock*</exclude>
-                                <exclude>com/cryptomorin/xseries/XEntity*</exclude>
-                                <exclude>com/cryptomorin/xseries/XEnchantment*</exclude>
-                                <exclude>com/cryptomorin/xseries/SkullUtils*</exclude>
-                                <exclude>com/cryptomorin/xseries/ReflectionUtils*</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-
-                    <relocations>
-                        <relocation>
-                            <pattern>fr.maxlego08.sarah</pattern>
-                            <shadedPattern>fr.maxlego08.spawner.sarah</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
 
                 <executions>
                     <execution>
@@ -59,13 +28,21 @@
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <outputFile>${project.build.directory}/${project.build.finalName}.jar</outputFile>
+
                             <artifactSet>
                                 <includes>
                                     <include>fr.maxlego08.spawner:API</include>
                                     <include>fr.maxlego08.sarah:sarah</include>
-                                    <include>com.github.cryptomorin:XSeries</include>
                                 </includes>
                             </artifactSet>
+
+                            <relocations>
+                                <relocation>
+                                    <pattern>fr.maxlego08.sarah</pattern>
+                                    <shadedPattern>fr.maxlego08.spawner.sarah</shadedPattern>
+                                </relocation>
+                            </relocations>
+
                         </configuration>
                     </execution>
                 </executions>
@@ -92,19 +69,6 @@
             <artifactId>placeholderapi</artifactId>
             <version>2.11.6</version>
             <scope>provided</scope>
-        </dependency>
-<!--        -->
-<!--        <dependency>-->
-<!--            <groupId>com.mojang</groupId>-->
-<!--            <artifactId>authlib</artifactId>-->
-<!--            <version>3.11.50</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
-        <dependency>
-            <groupId>com.github.cryptomorin</groupId>
-            <artifactId>XSeries</artifactId>
-            <version>9.4.0</version>
         </dependency>
 
         <dependency>
