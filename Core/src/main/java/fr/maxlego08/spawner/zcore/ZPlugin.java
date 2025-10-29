@@ -3,14 +3,11 @@ package fr.maxlego08.spawner.zcore;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.maxlego08.spawner.exceptions.ListenerNullException;
-import fr.maxlego08.spawner.inventory.VInventory;
-import fr.maxlego08.spawner.inventory.ZInventoryManager;
 import fr.maxlego08.spawner.listener.AdapterListener;
 import fr.maxlego08.spawner.listener.AdapterListenerPaper;
 import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.placeholder.Placeholder;
-import fr.maxlego08.spawner.zcore.enums.EnumInventory;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import fr.maxlego08.spawner.SpawnerPlugin;
@@ -48,7 +45,6 @@ public abstract class ZPlugin extends JavaPlugin {
     private long enableTime;
 
     protected CommandManager commandManager;
-    protected ZInventoryManager inventoryManager;
 
     protected void preEnable() {
 
@@ -66,19 +62,13 @@ public abstract class ZPlugin extends JavaPlugin {
         this.persist = new Persist(this, this.gson);
 
         this.commandManager = new CommandManager((SpawnerPlugin) this);
-        this.inventoryManager = new ZInventoryManager((SpawnerPlugin) this);
 
         /* Add Listener */
         this.addListener(new AdapterListener((SpawnerPlugin) this));
         this.addListener(new AdapterListenerPaper((SpawnerPlugin) this));
-        this.addListener(this.inventoryManager);
     }
 
     protected void postEnable() {
-
-        if (this.inventoryManager != null) {
-            this.inventoryManager.sendLog();
-        }
 
         if (this.commandManager != null) {
             this.commandManager.validCommands();
@@ -204,13 +194,6 @@ public abstract class ZPlugin extends JavaPlugin {
     }
 
     /**
-     * @return the inventoryManager
-     */
-    public ZInventoryManager getZInventoryManager() {
-        return inventoryManager;
-    }
-
-    /**
      * Check if plugin is enable
      *
      * @param pluginName
@@ -240,16 +223,6 @@ public abstract class ZPlugin extends JavaPlugin {
      */
     protected void registerCommand(String command, VCommand vCommand, String... aliases) {
         this.commandManager.registerCommand(this, command, vCommand, Arrays.asList(aliases));
-    }
-
-    /**
-     * Register Inventory
-     *
-     * @param inventory
-     * @param vInventory
-     */
-    protected void registerInventory(EnumInventory inventory, VInventory vInventory) {
-        this.inventoryManager.registerInventory(inventory, vInventory);
     }
 
     /**

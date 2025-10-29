@@ -1,13 +1,6 @@
 package fr.maxlego08.spawner.storage.storages;
 
-import fr.maxlego08.menu.zcore.utils.nms.ItemStackUtils;
-import fr.maxlego08.sarah.DatabaseConfiguration;
-import fr.maxlego08.sarah.DatabaseConnection;
-import fr.maxlego08.sarah.HikariDatabaseConnection;
-import fr.maxlego08.sarah.MigrationManager;
-import fr.maxlego08.sarah.RequestHelper;
-import fr.maxlego08.sarah.SchemaBuilder;
-import fr.maxlego08.sarah.SqliteConnection;
+import fr.maxlego08.sarah.*;
 import fr.maxlego08.sarah.database.DatabaseType;
 import fr.maxlego08.sarah.database.Schema;
 import fr.maxlego08.sarah.logger.JULogger;
@@ -31,6 +24,7 @@ import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
 import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -217,7 +211,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
                         schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
                             table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
                             table.uuid("spawner_id", spawner.getSpawnerId()).primary();
-                            table.string("item_stack", ItemStackUtils.serializeItemStack(spawnerItem.getItemStack()));
+                            table.string("item_stack", Base64ItemStack.encode(spawnerItem.getItemStack()));
                             table.bigInt("amount", spawnerItem.getAmount());
                         }));
                     }
@@ -245,7 +239,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void deleteSpawnerItem(Spawner spawner, SpawnerItem spawnerItem) {
-        ZPlugin.service.execute(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), ItemStackUtils.serializeItemStack(spawnerItem.getItemStack())));
+        ZPlugin.service.execute(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), Base64ItemStack.encode(spawnerItem.getItemStack())));
     }
 
     @Override

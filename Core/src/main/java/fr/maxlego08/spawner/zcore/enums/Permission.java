@@ -1,7 +1,5 @@
 package fr.maxlego08.spawner.zcore.enums;
 
-import org.bukkit.permissions.Permissible;
-
 public enum Permission {
 
     ZSPAWNER_USE,
@@ -14,7 +12,7 @@ public enum Permission {
     ZSPAWNER_OPTION,
     ZSPAWNER_BYPASS,
 	ZSPAWNER_SHOW;
-    private String permission;
+    private final String permission;
 
 	private Permission() {
 		this.permission = this.name().toLowerCase().replace("_", ".");

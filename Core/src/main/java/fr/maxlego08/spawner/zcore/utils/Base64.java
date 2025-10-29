@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.zcore.utils;
 
+import java.util.Arrays;
+
 public final class  Base64 {
 
     static private final int  BASELENGTH         = 128;
@@ -16,9 +18,7 @@ public final class  Base64 {
 
     static {
 
-        for (int i = 0; i < BASELENGTH; ++i) {
-            base64Alphabet[i] = -1;
-        }
+        Arrays.fill(base64Alphabet, (byte) -1);
         for (int i = 'Z'; i >= 'A'; i--) {
             base64Alphabet[i] = (byte) (i-'A');
         }
@@ -46,19 +46,19 @@ public final class  Base64 {
 
     }
 
-    protected static boolean isWhiteSpace(char octect) {
+    private static boolean isWhiteSpace(char octect) {
         return (octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9);
     }
 
-    protected static boolean isPad(char octect) {
+    private static boolean isPad(char octect) {
         return (octect == PAD);
     }
 
-    protected static boolean isData(char octect) {
+    private static boolean isData(char octect) {
         return (octect < BASELENGTH && base64Alphabet[octect] != -1);
     }
 
-    protected static boolean isBase64(char octect) {
+    private static boolean isBase64(char octect) {
         return (isWhiteSpace(octect) || isPad(octect) || isData(octect));
     }
 
@@ -253,7 +253,7 @@ public final class  Base64 {
      * @param data  the byte array of base64 data (with WS)
      * @return      the new length
      */
-    protected static int removeWhiteSpace(char[] data) {
+    private static int removeWhiteSpace(char[] data) {
         if (data == null)
             return 0;
 

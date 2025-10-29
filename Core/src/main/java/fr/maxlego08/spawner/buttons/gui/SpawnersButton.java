@@ -28,11 +28,6 @@ public class SpawnersButton extends PaginateButton {
     }
 
     @Override
-    public boolean hasSpecialRender() {
-        return true;
-    }
-
-    @Override
     public void onRender(Player player, InventoryEngine inventory) {
         Sort sort = this.plugin.getManager().getPlayerSort(player);
         List<Spawner> spawners = this.plugin.getStorage().getSpawners(player, SpawnerType.GUI).stream().sorted(sort.getComparator()).collect(Collectors.toList());

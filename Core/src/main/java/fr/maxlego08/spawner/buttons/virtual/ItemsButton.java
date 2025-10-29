@@ -29,11 +29,6 @@ public class ItemsButton extends PaginateButton {
         this.plugin = (SpawnerPlugin) plugin;
     }
 
-    @Override
-    public boolean hasSpecialRender() {
-        return true;
-    }
-
     private List<SpawnerItem> getSpawnerItems(Player player) {
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
         return playerSpawner != null ? playerSpawner.getVirtualSpawner() != null ? playerSpawner.getVirtualSpawner().getItems() : new ArrayList<>() : new ArrayList<>();

@@ -1,8 +1,8 @@
 package fr.maxlego08.spawner;
 
-import fr.maxlego08.menu.zcore.utils.nms.ItemStackUtils;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -23,7 +23,7 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
 
     public ZSpawnerItem(UUID uuid, String itemStack, long amount) {
         this.uuid = uuid;
-        this.itemStack = ItemStackUtils.deserializeItemStack(itemStack);
+        this.itemStack = Base64ItemStack.decode(itemStack);
         this.amount = amount;
     }
 

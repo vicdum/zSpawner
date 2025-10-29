@@ -28,11 +28,6 @@ public class ShowButton extends PaginateButton {
     }
 
     @Override
-    public boolean hasSpecialRender() {
-        return true;
-    }
-
-    @Override
     public void onRender(Player player, InventoryEngine inventory) {
         List<Spawner> spawners = getSpawners(player);
         Pagination<Spawner> pagination = new Pagination<>();

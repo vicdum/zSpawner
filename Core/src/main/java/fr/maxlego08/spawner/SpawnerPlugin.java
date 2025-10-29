@@ -20,6 +20,7 @@ import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import fr.maxlego08.spawner.zcore.utils.plugins.Metrics;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -84,6 +85,8 @@ public class SpawnerPlugin extends ZPlugin {
         this.spawnerPlaceholders.register();
 
         Bukkit.getScheduler().runTaskTimer(this, this.manager, 20, 20);
+
+        new Metrics(this, 5365);
 
         if (this.isEnable(Plugins.ZSHOP)) {
             getLogger().info("Use zShop");
