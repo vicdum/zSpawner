@@ -9,15 +9,11 @@ import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class StorageManager implements SpawnerStorage {
 
     private final DatabaseType storageType;
-    private final ScheduledFuture<?> scheduledTask;
     private IStorage storage;
 
     public StorageManager(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
@@ -28,8 +24,7 @@ public class StorageManager implements SpawnerStorage {
 
         this.storage = new DatabaseStorage(plugin, foliaManager);
 
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        this.scheduledTask = executorService.scheduleAtFixedRate(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
+        foliaManager.runTimerAsync(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -49,7 +44,6 @@ public class StorageManager implements SpawnerStorage {
 
     @Override
     public void save(Persist persist) {
-        this.scheduledTask.cancel(true);
         this.storage.save();
     }
 

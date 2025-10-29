@@ -39,7 +39,7 @@ import java.util.UUID;
 public class SpawnerPlugin extends ZPlugin {
     private final FoliaCompatibilityManager foliaManager = new FoliaCompatibilityManager(this);
 
-    private final SpawnerManager manager = new SpawnerManager(this);
+    private final SpawnerManager manager = new SpawnerManager(this, this.foliaManager);
     private final StackableManager stackableManager = new StackableManager(this);
     private final SpawnerPlaceholders spawnerPlaceholders = new SpawnerPlaceholders(this);
     private final UpgradeManager upgradeManager = new ZUpgradeManager(this);

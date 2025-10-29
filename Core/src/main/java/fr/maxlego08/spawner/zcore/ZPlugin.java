@@ -2,6 +2,9 @@ package fr.maxlego08.spawner.zcore;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import fr.maxlego08.spawner.SpawnerPlugin;
+import fr.maxlego08.spawner.command.CommandManager;
+import fr.maxlego08.spawner.command.VCommand;
 import fr.maxlego08.spawner.exceptions.ListenerNullException;
 import fr.maxlego08.spawner.listener.AdapterListener;
 import fr.maxlego08.spawner.listener.AdapterListenerPaper;
@@ -9,12 +12,9 @@ import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
 import fr.maxlego08.spawner.placeholder.Placeholder;
 import fr.maxlego08.spawner.zcore.logger.Logger;
-import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
-import fr.maxlego08.spawner.SpawnerPlugin;
-import fr.maxlego08.spawner.command.CommandManager;
-import fr.maxlego08.spawner.command.VCommand;
 import fr.maxlego08.spawner.zcore.utils.gson.LocationAdapter;
 import fr.maxlego08.spawner.zcore.utils.gson.PotionEffectAdapter;
+import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import fr.maxlego08.spawner.zcore.utils.storage.NoReloadable;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
@@ -30,12 +30,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public abstract class ZPlugin extends JavaPlugin {
 
-    public static final ExecutorService service = Executors.newFixedThreadPool(5);
     private final Logger log = new Logger(this.getDescription().getFullName());
     private final List<Savable> savers = new ArrayList<>();
     private final List<ListenerAdapter> listenerAdapters = new ArrayList<>();

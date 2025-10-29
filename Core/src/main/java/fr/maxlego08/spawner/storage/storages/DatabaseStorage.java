@@ -20,7 +20,6 @@ import fr.maxlego08.spawner.migrations.ItemMigration;
 import fr.maxlego08.spawner.migrations.OptionMigration;
 import fr.maxlego08.spawner.migrations.SpawnerMigration;
 import fr.maxlego08.spawner.storage.Tables;
-import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
 import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
@@ -115,7 +114,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     @Override
     public void addSpawner(Spawner spawner) {
         this.spawners.add(spawner);
-        ZPlugin.service.execute(() -> this.upsertSpawner(spawner));
+        this.foliaManager.runAsync(()->this.plugin.getStorage().addSpawner(spawner));
     }
 
     @Override
@@ -126,12 +125,12 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     @Override
     public void removeSpawner(Spawner spawner) {
         this.spawners.remove(spawner);
-        ZPlugin.service.execute(() -> this.deleteSpawner(spawner));
+        this.foliaManager.runAsync(() -> this.deleteSpawner(spawner));
     }
 
     @Override
     public void load() {
-        ZPlugin.service.execute(() -> {
+        this.foliaManager.runAsync(() -> {
 
             this.spawners.clear();
 
@@ -225,8 +224,8 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             if (!schemasOptions.isEmpty()) this.requestHelper.upsertMultiple(schemasOptions);
         };
 
-        if (async) ZPlugin.service.execute(runnable);
-        else runnable.run();
+        if (async) this.foliaManager.runAsync(runnable);
+        else this.foliaManager.runNextTick(runnable);
     }
 
     @Override
@@ -241,7 +240,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void deleteSpawnerItem(Spawner spawner, SpawnerItem spawnerItem) {
-        ZPlugin.service.execute(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), Base64ItemStack.encode(spawnerItem.getItemStack())));
+        this.foliaManager.runAsync(() -> this.deleteSpawnerItem(spawner.getSpawnerId(), Base64ItemStack.encode(spawnerItem.getItemStack())));
     }
 
     @Override

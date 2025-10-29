@@ -7,11 +7,7 @@ import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.api.utils.TypedMapAccessor;
-import fr.maxlego08.spawner.api.ShopAction;
-import fr.maxlego08.spawner.api.Spawner;
-import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.api.SpawnerOption;
-import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
@@ -28,9 +24,9 @@ import fr.maxlego08.spawner.drop.VirtualDrop;
 import fr.maxlego08.spawner.loader.ToggleDropLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
-import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
+import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
@@ -50,17 +46,12 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     private final SpawnerPlugin plugin;
+    private final FoliaCompatibilityManager foliaManager;
     private final NamespacedKey spawnerEntityKey;
     private final NamespacedKey spawnerTypeKey;
     private final NamespacedKey spawnerUuidKey;
@@ -71,9 +62,10 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private List<Material> blacklistMaterials = new ArrayList<>();
     private SpawnerOption defaultSpawnerOption;
 
-    public SpawnerManager(SpawnerPlugin plugin) {
+    public SpawnerManager(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
         super(plugin);
         this.plugin = plugin;
+        this.foliaManager = foliaManager;
         this.spawnerTypeKey = new NamespacedKey(plugin, "type");
         this.spawnerEntityKey = new NamespacedKey(plugin, "entity");
         this.spawnerUuidKey = new NamespacedKey(plugin, "level");
@@ -333,7 +325,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner);
         this.plugin.getPlayerGive().give(player, itemStack);
 
-        ZPlugin.service.execute(() -> this.plugin.getStorage().removeSpawner(spawner));
+        this.foliaManager.runAsync(()->this.plugin.getStorage().removeSpawner(spawner));
         message(this.plugin, player, Message.VIRTUAL_REMOVE_SUCCESS);
     }
 
