@@ -41,6 +41,10 @@
                                     <pattern>fr.maxlego08.sarah</pattern>
                                     <shadedPattern>fr.maxlego08.spawner.sarah</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.tcoded.folialib</pattern>
+                                    <shadedPattern>fr.maxlego08.spawner.lib.folialib</shadedPattern>
+                                </relocation>
                             </relocations>
 
                         </configuration>
@@ -55,6 +59,13 @@
             <groupId>fr.maxlego08.spawner</groupId>
             <artifactId>API</artifactId>
             <version>4.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tcoded</groupId>
+            <artifactId>FoliaLib</artifactId>
+            <version>0.5.1</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

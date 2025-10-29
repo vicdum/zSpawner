@@ -1,26 +1,21 @@
 package fr.maxlego08.spawner.command;
 
+import fr.maxlego08.spawner.SpawnerPlugin;
+import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
+import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
+import org.bukkit.Bukkit;
+import org.bukkit.command.*;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import fr.maxlego08.spawner.zcore.enums.Message;
-import fr.maxlego08.spawner.zcore.logger.Logger;
-import fr.maxlego08.spawner.zcore.utils.ZUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
-import fr.maxlego08.spawner.SpawnerPlugin;
-import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 
 public class CommandManager extends ZUtils implements CommandExecutor, TabCompleter {
 
@@ -39,6 +34,7 @@ public class CommandManager extends ZUtils implements CommandExecutor, TabComple
     }
 	
 	private final SpawnerPlugin plugin;
+    private final FoliaCompatibilityManager foliaManager;
 	private final List<VCommand> commands = new ArrayList<VCommand>();
 
 	/**
@@ -48,6 +44,7 @@ public class CommandManager extends ZUtils implements CommandExecutor, TabComple
 	 */
 	public CommandManager(SpawnerPlugin spawnerPlugin) {
 		this.plugin = spawnerPlugin;
+        this.foliaManager = this.plugin.getFoliaManager();
 	}
 
 	/**
@@ -112,7 +109,7 @@ public class CommandManager extends ZUtils implements CommandExecutor, TabComple
 		for (int index = args.length - 1; index > -1; index--) {
 			if (command.getSubCommands().contains(args[index].toLowerCase())) {
 				if (command.isIgnoreArgs()
-						&& (command.getParent() != null ? canExecute(args, cmd, command.getParent(), index - 1) : true))
+						&& (command.getParent() == null || canExecute(args, cmd, command.getParent(), index - 1)))
 					return true;
 				if (index < args.length - 1)
 					return false;
@@ -161,14 +158,13 @@ public class CommandManager extends ZUtils implements CommandExecutor, TabComple
 		}
 		
 		if (command.getPermission() == null || hasPermission(sender, command.getPermission())) {
-
 			if (command.runAsync) {
-				super.runAsync(this.plugin, () -> {
-					CommandType returnType = command.prePerform(this.plugin, sender, strings);
-					if (returnType == CommandType.SYNTAX_ERROR) {
-						message(this.plugin, sender, Message.COMMAND_SYNTAX_ERROR, "%syntax%", command.getSyntax());
-					}
-				});
+                this.foliaManager.runAsync(() -> {
+                    CommandType returnType = command.prePerform(this.plugin, sender, strings);
+                    if (returnType == CommandType.SYNTAX_ERROR) {
+                        message(this.plugin, sender, Message.COMMAND_SYNTAX_ERROR, "%syntax%", command.getSyntax());
+                    }
+                });
 				return CommandType.DEFAULT;
 			}
 

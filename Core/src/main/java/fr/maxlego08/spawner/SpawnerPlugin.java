@@ -20,9 +20,9 @@ import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.plugins.Metrics;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import java.util.UUID;
  * @author Maxlego08
  */
 public class SpawnerPlugin extends ZPlugin {
+    private final FoliaCompatibilityManager foliaManager = new FoliaCompatibilityManager(this);
 
     private final SpawnerManager manager = new SpawnerManager(this);
     private final StackableManager stackableManager = new StackableManager(this);
@@ -71,10 +72,10 @@ public class SpawnerPlugin extends ZPlugin {
         this.addSave(new MessageLoader(this));
         this.addSave(this.stackableManager);
 
-        this.spawnerStorage = new StorageManager(this);
+        this.spawnerStorage = new StorageManager(this, this.foliaManager);
         this.addSave(this.spawnerStorage);
 
-        this.addListener(new SpawnerListener(this));
+        this.addListener(new SpawnerListener(this, this.foliaManager));
         this.addListener(new SpawnerListenerPaper(this));
 
         Config.getInstance().load(this);
@@ -84,7 +85,7 @@ public class SpawnerPlugin extends ZPlugin {
 
         this.spawnerPlaceholders.register();
 
-        Bukkit.getScheduler().runTaskTimer(this, this.manager, 20, 20);
+        this.foliaManager.runTimer(this.manager, 20, 20);
 
         new Metrics(this, 5365);
 
@@ -161,6 +162,8 @@ public class SpawnerPlugin extends ZPlugin {
     public NamespacedKey getSpawnerKey() {
         return spawnerKey;
     }
+
+    public FoliaCompatibilityManager getFoliaManager() {return this.foliaManager;}
 
     public void registerTeamManager(TeamManager teamManager) {
         if (teamManager != null) {

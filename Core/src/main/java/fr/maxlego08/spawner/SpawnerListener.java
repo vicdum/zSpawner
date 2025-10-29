@@ -12,6 +12,7 @@ import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.MendingUtil;
+import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,29 +22,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Directional;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LightningStrike;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreeperPowerEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityDropItemEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
-import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -63,9 +48,11 @@ import java.util.Optional;
 public class SpawnerListener extends ListenerAdapter {
 
     private final SpawnerPlugin plugin;
+    private final FoliaCompatibilityManager foliaManager;
 
-    public SpawnerListener(SpawnerPlugin plugin) {
+    public SpawnerListener(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
         this.plugin = plugin;
+        this.foliaManager = foliaManager;
     }
 
     private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
@@ -161,7 +148,7 @@ public class SpawnerListener extends ListenerAdapter {
 
         storage.addSpawner(spawner);
 
-        runAsync(this.plugin, () -> this.plugin.getStorage().getOption(spawnerResult.spawnerId()).ifPresent(spawner::setOption));
+        this.foliaManager.runAsync(() -> this.plugin.getStorage().getOption(spawnerResult.spawnerId()).ifPresent(spawner::setOption));
     }
 
     @Override

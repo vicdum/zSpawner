@@ -1,13 +1,11 @@
 package fr.maxlego08.spawner.zcore.utils;
 
 import fr.maxlego08.spawner.zcore.enums.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
-import org.bukkit.plugin.Plugin;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -228,15 +226,6 @@ public abstract class ZUtils extends MessageUtils {
         symbols.setGroupingSeparator(c);
         formatter.setDecimalFormatSymbols(symbols);
         return formatter.format(l);
-    }
-
-    /**
-     * Allows to execute a runnable in an asynmetrical way
-     *
-     * @param runnable
-     */
-    protected void runAsync(Plugin plugin, Runnable runnable) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
     protected BlockFace getCardinalDirection(Player player) {

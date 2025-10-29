@@ -24,8 +24,8 @@ import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.ElapsedTime;
 import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -45,11 +45,13 @@ import java.util.stream.Collectors;
 public class DatabaseStorage extends ZUtils implements IStorage {
 
     private final SpawnerPlugin plugin;
+    private final FoliaCompatibilityManager foliaManager;
     private RequestHelper requestHelper;
     private List<Spawner> spawners = new ArrayList<>();
 
-    public DatabaseStorage(SpawnerPlugin plugin) {
+    public DatabaseStorage(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
         this.plugin = plugin;
+        this.foliaManager = foliaManager;
     }
 
     @Override
@@ -151,7 +153,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             this.spawners = this.getAllSpawners();
             elapsedTime.end();
 
-            Bukkit.getScheduler().runTask(this.plugin, () -> this.spawners.forEach(Spawner::load));
+            this.foliaManager.runNextTick(() -> this.spawners.forEach(Spawner::load));
         });
     }
 
