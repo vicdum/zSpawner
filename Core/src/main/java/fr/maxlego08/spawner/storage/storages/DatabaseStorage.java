@@ -184,7 +184,20 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void purge(World world, boolean destroyBlock) {
-        // ToDo
+        List<Spawner> spawnersToRemove = this.spawners.stream()
+                .filter(spawner -> {
+                    Location location = spawner.getLocation();
+                    return location != null && location.getWorld() != null && location.getWorld().equals(world);
+                })
+                .collect(Collectors.toList());
+
+        spawnersToRemove.forEach(spawner -> {
+            spawner.disable();
+            if (destroyBlock && spawner.getLocation() != null) {
+                spawner.getLocation().getBlock().setType(org.bukkit.Material.AIR);
+            }
+            this.removeSpawner(spawner);
+        });
     }
 
     @Override
