@@ -2,6 +2,7 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.api.utils.MetaUpdater;
 import fr.maxlego08.spawner.api.PlayerGive;
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
@@ -49,6 +50,7 @@ public class SpawnerPlugin extends ZPlugin {
     private ShopAction shopAction;
     private PlayerGive playerGive = new DefaultGive();
     private NamespacedKey spawnerKey;
+    private MetaUpdater metaUpdater;
     private final List<TeamManager> teamManagers = new ArrayList<>();
 
     @Override
@@ -66,6 +68,7 @@ public class SpawnerPlugin extends ZPlugin {
         this.registerCommand("zspawner", new CommandSpawner(this), "spawner", "sp", "spawners");
 
         this.inventoryManager = getProvider(InventoryManager.class);
+        this.metaUpdater = this.inventoryManager.getMeta();
         this.buttonManager = getProvider(ButtonManager.class);
 
         this.addSave(this.manager);
@@ -164,6 +167,8 @@ public class SpawnerPlugin extends ZPlugin {
     }
 
     public FoliaCompatibilityManager getFoliaManager() {return this.foliaManager;}
+
+    public MetaUpdater getMetaUpdater() {return this.metaUpdater;}
 
     public void registerTeamManager(TeamManager teamManager) {
         if (teamManager != null) {

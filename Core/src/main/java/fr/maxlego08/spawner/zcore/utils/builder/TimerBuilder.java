@@ -2,77 +2,278 @@ package fr.maxlego08.spawner.zcore.utils.builder;
 
 import fr.maxlego08.spawner.zcore.enums.Message;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TimerBuilder {
 
-	public static String getFormatLongDays(long temps) {
-		long totalSecs = temps / 1000L;
+    public enum TimeUnit {
+        YEAR(31536000000L, Message.TIME_YEAR, Message.FORMAT_YEAR, Message.FORMAT_YEARS),
+        MONTH(2592000000L, Message.TIME_MONTH, Message.FORMAT_MONTH, Message.FORMAT_MONTHS),
+        WEEK(604800000L, Message.TIME_WEEK, Message.FORMAT_WEEK, Message.FORMAT_WEEKS),
+        DAY(86400000L, Message.TIME_DAY, Message.FORMAT_DAY, Message.FORMAT_DAYS),
+        HOUR(3600000L, Message.TIME_HOUR, Message.FORMAT_HOUR, Message.FORMAT_HOURS),
+        MINUTE(60000L, Message.TIME_MINUTE, Message.FORMAT_MINUTE, Message.FORMAT_MINUTES),
+        SECOND(1000L, Message.TIME_SECOND, Message.FORMAT_SECOND, Message.FORMAT_SECONDS),
+        MILLISECOND(1L, Message.TIME_MILLISECOND, Message.FORMAT_MILLISECOND, Message.FORMAT_MILLISECONDS);
 
-		long days = totalSecs / 86400l;
-		long hours = totalSecs % 86400l / 3600l;
-		long minutes = totalSecs % 3600L / 60L;
-		long seconds = totalSecs % 60L;
+        private final long milliseconds;
+        private final Message timeMessage;
+        private final Message singularFormat;
+        private final Message pluralFormat;
 
-		String message = Message.TIME_DAY.msg();
-		message = message.replace("%second%", (seconds <= 1 ? Message.FORMAT_SECOND : Message.FORMAT_SECONDS).msg());
-		message = message.replace("%minute%", (minutes <= 1 ? Message.FORMAT_MINUTE : Message.FORMAT_MINUTES).msg());
-		message = message.replace("%hour%", (hours <= 1 ? Message.FORMAT_HOUR : Message.FORMAT_HOURS).msg());
-		message = message.replace("%day%", (days <= 1 ? Message.FORMAT_DAY : Message.FORMAT_DAYS).msg());
-		return format(String.format(message, days, hours, minutes, seconds));
-	}
+        TimeUnit(long milliseconds, Message timeMessage, Message singularFormat, Message pluralFormat) {
+            this.milliseconds = milliseconds;
+            this.timeMessage = timeMessage;
+            this.singularFormat = singularFormat;
+            this.pluralFormat = pluralFormat;
+        }
 
-	public static String getFormatLongHours(long temps) {
-		long totalSecs = temps / 1000L;
+        public long getMilliseconds() { return milliseconds; }
+        public long getSeconds() { return milliseconds / 1000L; }
+        public Message getTimeMessage() { return timeMessage; }
+        public String getFormat(long value) {
+            return (value <= 1 ? singularFormat : pluralFormat).msg();
+        }
+    }
 
-		long hours = totalSecs / 3600L;
-		long minutes = totalSecs % 3600L / 60L;
-		long seconds = totalSecs % 60L;
+    /**
+     * Format time with all units up to the specified maximum unit
+     */
+    public static String formatTime(long milliseconds, TimeUnit maxUnit) {
+        List<TimeUnit> unitsToInclude = getUnitsFromMaxUnit(maxUnit);
 
-		String message = Message.TIME_HOUR.msg();
-		message = message.replace("%second%", (seconds <= 1 ? Message.FORMAT_SECOND : Message.FORMAT_SECONDS).msg());
-		message = message.replace("%minute%", (minutes <= 1 ? Message.FORMAT_MINUTE : Message.FORMAT_MINUTES).msg());
-		message = message.replace("%hour%", (hours <= 1 ? Message.FORMAT_HOUR : Message.FORMAT_HOURS).msg());
-		return format(String.format(message, hours, minutes, seconds));
-	}
+        List<Long> values = new ArrayList<>();
+        long remaining = milliseconds;
 
-	public static String getFormatLongMinutes(long temps) {
+        for (TimeUnit unit : unitsToInclude) {
+            long value = remaining / unit.getMilliseconds();
+            values.add(value);
+            remaining %= unit.getMilliseconds();
+        }
 
-		long totalSecs = temps / 1000L;
+        String message = maxUnit.getTimeMessage().msg();
 
-		long minutes = totalSecs % 3600L / 60L;
-		long seconds = totalSecs % 60L;
+        for (int i = 0; i < unitsToInclude.size(); i++) {
+            TimeUnit unit = unitsToInclude.get(i);
+            String placeholder = "%" + unit.name().toLowerCase() + "%";
+            message = message.replace(placeholder, unit.getFormat(values.get(i)));
+        }
 
-		String message = Message.TIME_MINUTE.msg();
-		message = message.replace("%second%", (seconds <= 1 ? Message.FORMAT_SECOND : Message.FORMAT_SECONDS).msg());
-		message = message.replace("%minute%", (minutes <= 1 ? Message.FORMAT_MINUTE : Message.FORMAT_MINUTES).msg());
-		return format(String.format(message, minutes, seconds));
-	}
+        return format(String.format(message, values.toArray()));
+    }
 
-	public static String getFormatLongSecondes(long temps) {
-		long totalSecs = temps / 1000L;
+    public static String formatTimeFromSeconds(long seconds, TimeUnit maxUnit) {
+        return formatTime(seconds * 1000L, maxUnit);
+    }
 
-		long seconds = totalSecs % 60L;
-		String message = Message.TIME_SECOND.msg();
-		message = message.replace("%second%", (seconds <= 1 ? Message.FORMAT_SECOND : Message.FORMAT_SECONDS).msg());
-		return format(String.format(message, seconds));
-	}
+    public static String formatTimeAutoFromSeconds(long seconds) {
+        return formatTimeAuto(seconds * 1000L);
+    }
 
-	public static String getStringTime(long second) {
-		if (second < 60) {
-			return (TimerBuilder.getFormatLongSecondes(second * 1000l));
-		} else if (second >= 60 && second < 3600) {
-			return (TimerBuilder.getFormatLongMinutes(second * 1000l));
-		} else if (second >= 3600 && second < 86400) {
-			return (TimerBuilder.getFormatLongHours(second * 1000l));
-		} else {
-			return (TimerBuilder.getFormatLongDays(second * 1000l));
-		}
-	}
+    public static String formatTimeAuto(long milliseconds) {
+        long seconds = milliseconds / 1000L;
 
-	public static String format(String message) {
-		message = message.replace(" 00 " + Message.FORMAT_SECOND.msg(), "");
-		message = message.replace(" 00 " + Message.FORMAT_HOUR.msg(), "");
-		message = message.replace(" 00 " + Message.FORMAT_DAY.msg(), "");
-		message = message.replace(" 00 " + Message.FORMAT_MINUTE.msg(), "");
-		return message;
-	}
+        if (milliseconds < 1000) {
+            return formatTime(milliseconds, TimeUnit.MILLISECOND);
+        } else if (seconds < 60) {
+            return formatTime(milliseconds, TimeUnit.SECOND);
+        } else if (seconds < 3600) {
+            return formatTime(milliseconds, TimeUnit.MINUTE);
+        } else if (seconds < 86400) {
+            return formatTime(milliseconds, TimeUnit.HOUR);
+        } else if (seconds < 604800) { // Less than a week
+            return formatTime(milliseconds, TimeUnit.DAY);
+        } else if (seconds < 2592000) { // Less than a month
+            return formatTime(milliseconds, TimeUnit.WEEK);
+        } else if (seconds < 31536000) { // Less than a year
+            return formatTime(milliseconds, TimeUnit.MONTH);
+        } else {
+            return formatTime(milliseconds, TimeUnit.YEAR);
+        }
+    }
+
+    /**
+     * Legacy methods for backward compatibility
+     */
+    public static String getFormatLongDays(long temps) {
+        return formatTime(temps, TimeUnit.DAY);
+    }
+
+    public static String getFormatLongHours(long temps) {
+        return formatTime(temps, TimeUnit.HOUR);
+    }
+
+    public static String getFormatLongMinutes(long temps) {
+        return formatTime(temps, TimeUnit.MINUTE);
+    }
+
+    public static String getFormatLongSecondes(long temps) {
+        return formatTime(temps, TimeUnit.SECOND);
+    }
+
+    public static String getStringTime(long milliseconds) {
+        return formatTimeAuto(milliseconds);
+    }
+
+    /**
+     * Get list of units from maxUnit down to smallest unit
+     */
+    private static List<TimeUnit> getUnitsFromMaxUnit(TimeUnit maxUnit) {
+        List<TimeUnit> result = new ArrayList<>();
+        boolean found = false;
+
+        for (TimeUnit unit : TimeUnit.values()) {
+            if (unit == maxUnit) {
+                found = true;
+            }
+            if (found) {
+                result.add(unit);
+            }
+        }
+
+        return result;
+    }
+
+    public static String format(String message) {
+        for (TimeUnit unit : TimeUnit.values()) {
+            message = message.replace(" 00 " + unit.singularFormat.msg(), "");
+            message = message.replace(" 00 " + unit.pluralFormat.msg(), "");
+        }
+        message = message.replaceAll("\\s+", " ").trim();
+
+        return message;
+    }
+
+    public static long parseTime(String timeString) {
+        return parseTime(timeString, TimeUnit.SECOND);
+    }
+
+    public static long parseTime(String timeString, TimeUnit defaultUnit) {
+        if (timeString == null || timeString.trim().isEmpty()) {
+            return 0L;
+        }
+
+        timeString = timeString.toLowerCase().trim();
+
+        if (isNumeric(timeString)) {
+            long value = Long.parseLong(timeString);
+            return value * defaultUnit.getMilliseconds();
+        }
+
+        long totalMilliseconds = 0L;
+
+        String regex = "(\\d+)\\s*([a-zA-Z]+)";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher matcher = pattern.matcher(timeString);
+
+        while (matcher.find()) {
+            try {
+                long value = Long.parseLong(matcher.group(1));
+                String unit = matcher.group(2).toLowerCase();
+
+                TimeUnit timeUnit = parseUnit(unit);
+                if (timeUnit != null) {
+                    totalMilliseconds += value * timeUnit.getMilliseconds();
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return totalMilliseconds;
+    }
+
+    /**
+     * Parse time string and return result in seconds instead of milliseconds
+     */
+    public static long parseTimeToSeconds(String timeString) {
+        return parseTime(timeString) / 1000L;
+    }
+
+    /**
+     * Parse time string and return result in seconds instead of milliseconds
+     */
+    public static long parseTimeToSeconds(String timeString, TimeUnit defaultUnit) {
+        return parseTime(timeString, defaultUnit) / 1000L;
+    }
+
+    private static TimeUnit parseUnit(String unit) {
+        return switch (unit) {
+            case "y", "year", "years", "année", "années", "an", "ans" -> TimeUnit.YEAR;
+            case "mo", "month", "months", "mois" -> TimeUnit.MONTH;
+            case "w", "week", "weeks", "semaine", "semaines" -> TimeUnit.WEEK;
+            case "d", "day", "days", "jour", "jours" -> TimeUnit.DAY;
+            case "h", "hour", "hours", "heure", "heures" -> TimeUnit.HOUR;
+            case "m", "min", "minute", "minutes" -> TimeUnit.MINUTE;
+            case "s", "sec", "second", "seconds", "seconde", "secondes" -> TimeUnit.SECOND;
+            case "ms", "millisecond", "milliseconds", "milliseconde", "millisecondes" -> TimeUnit.MILLISECOND;
+            default -> null;
+        };
+    }
+
+    private static boolean isNumeric(String str) {
+        try {
+            Long.parseLong(str.trim());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static class Parser {
+        private final String timeString;
+        private TimeUnit defaultUnit = TimeUnit.SECOND;
+
+        public Parser(String timeString) {
+            this.timeString = timeString;
+        }
+
+        public Parser defaultUnit(TimeUnit defaultUnit) {
+            this.defaultUnit = defaultUnit;
+            return this;
+        }
+
+        public long parse() {
+            return parseTime(timeString, defaultUnit);
+        }
+    }
+
+    public static class Builder {
+        private final long milliseconds;
+        private TimeUnit maxUnit = TimeUnit.DAY;
+        private boolean autoSelect = false;
+        private boolean hideZeroValues = true;
+
+        public Builder(long milliseconds) {
+            this.milliseconds = milliseconds;
+        }
+
+        public static Builder fromSeconds(long seconds) {
+            return new Builder(seconds * 1000L);
+        }
+
+        public Builder maxUnit(TimeUnit maxUnit) {
+            this.maxUnit = maxUnit;
+            return this;
+        }
+
+        public Builder autoSelectUnit() {
+            this.autoSelect = true;
+            return this;
+        }
+
+        public Builder showZeroValues() {
+            this.hideZeroValues = false;
+            return this;
+        }
+
+        public String build() {
+            if (autoSelect) {
+                return formatTimeAuto(milliseconds);
+            } else {
+                String result = formatTime(milliseconds, maxUnit);
+                return hideZeroValues ? format(result) : result;
+            }
+        }
+    }
 }

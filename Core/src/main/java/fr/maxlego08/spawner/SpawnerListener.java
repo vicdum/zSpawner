@@ -617,9 +617,9 @@ public class SpawnerListener extends ListenerAdapter {
                     this.plugin.getManager().openPlayerLocationSpawner(player, spawner, 1);
                 }
                 else if (lastUser.equals(player.getUniqueId())) {
-                    message(player, Message.SPAWNER_LOCATION_RENTED_BY_YOU.getMessage(),"%time%", TimerBuilder.format(String.valueOf((startTime + duration)- currentTime)));
+                    message(this.plugin,player, Message.SPAWNER_LOCATION_RENTED_BY_YOU.getMessage(),"%time%", TimerBuilder.formatTimeAuto((startTime + duration)- currentTime));
                 } else {
-                    message(player, Message.SPAWNER_LOCATION_ALREADY_RENTED.getMessage());
+                    message(this.plugin,player, Message.SPAWNER_LOCATION_ALREADY_RENTED.getMessage());
                 }
             }
         }
