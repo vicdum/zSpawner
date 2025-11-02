@@ -1,12 +1,13 @@
 package fr.maxlego08.spawner.migrations;
 
+import fr.maxlego08.sarah.SchemaBuilder;
 import fr.maxlego08.sarah.database.Migration;
 import fr.maxlego08.spawner.storage.Tables;
 
 public class OptionMigration extends Migration {
     @Override
     public void up() {
-        createOrAlter(Tables.OPTIONS, table -> {
+        this.createOrAlter(Tables.OPTIONS, table -> {
             table.uuid("spawner_id").primary();
             table.decimal("distance");
             table.decimal("experience_multiplier");
@@ -22,5 +23,9 @@ public class OptionMigration extends Migration {
             table.bool("drop_loots").defaultValue(false);
             table.integer("remaining").defaultValue(0);
         });
+        SchemaBuilder.alter(this, Tables.OPTIONS, table -> table.bool("location_enabled").defaultValue(false));
+        SchemaBuilder.alter(this, Tables.OPTIONS, table -> table.bigInt("min_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, Tables.OPTIONS, table -> table.bigInt("max_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, Tables.OPTIONS, table -> table.decimal("location_price").defaultValue(0));
     }
 }

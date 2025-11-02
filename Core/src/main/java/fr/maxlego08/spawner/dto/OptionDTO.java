@@ -16,6 +16,10 @@ public record OptionDTO(
         int max_spawn,
         int mob_per_minute,
         boolean drop_loots,
+        boolean location_enabled,
+        long min_location_time,
+        long max_location_time,
+        double location_price,
         int remaining
 ) {
 }

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,8 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     private final SpawnerPlugin plugin;
     private final FoliaCompatibilityManager foliaManager;
     private RequestHelper requestHelper;
-    private List<Spawner> spawners = new ArrayList<>();
+    private final List<Spawner> spawners = new CopyOnWriteArrayList<>();
+    private final Object spawnerLock = new Object();
 
     public DatabaseStorage(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
         this.plugin = plugin;
@@ -55,65 +57,87 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public Optional<Spawner> getSpawner(Location location) {
-        return this.spawners.stream().filter(spawner -> spawner.isPlace() && spawner.getCuboid().contains(location)).findFirst();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.isPlace() && spawner.getCuboid().contains(location)).findFirst();
+        }
     }
 
     @Override
     public Optional<Spawner> getSpawner(UUID uniqueId) {
-        return this.spawners.stream().filter(e -> e.getSpawnerId().equals(uniqueId)).findFirst();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(e -> e.getSpawnerId().equals(uniqueId)).findFirst();
+        }
     }
 
     @Override
     public Optional<Spawner> getSpawner(SpawnerType spawnerType, Location... locations) {
-        return this.spawners.stream().filter(spawner -> {
-            if (spawner.getType() != spawnerType || !spawner.isPlace()) return false;
-            for (Location location : locations) {
-                if (spawner.getCuboid().contains(location)) {
-                    return true;
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> {
+                if (spawner.getType() != spawnerType || !spawner.isPlace()) return false;
+                for (Location location : locations) {
+                    if (spawner.getCuboid().contains(location)) {
+                        return true;
+                    }
                 }
-            }
-            return false;
-        }).findFirst();
+                return false;
+            }).findFirst();
+        }
     }
 
     @Override
     public Optional<Spawner> getSpawnerByEntity(LivingEntity entity) {
-        return this.spawners.stream().filter(spawner -> spawner.getLivingEntity() != null && spawner.getLivingEntity() == entity).findFirst();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.getLivingEntity() != null && spawner.getLivingEntity() == entity).findFirst();
+        }
     }
 
     @Override
     public Optional<Spawner> getSpawnerByDeadEntity(Entity entity) {
-        return this.spawners.stream().filter(spawner -> spawner.getDeadEntities().contains(entity)).findFirst();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.getDeadEntities().contains(entity)).findFirst();
+        }
     }
 
     @Override
     public List<Spawner> getSpawners(int x, int z) {
-        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).collect(Collectors.toList());
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).collect(Collectors.toList());
+        }
     }
 
     @Override
     public List<Spawner> getSpawners(OfflinePlayer offlinePlayer) {
-        return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId())).collect(Collectors.toList());
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId())).collect(Collectors.toList());
+        }
     }
 
     @Override
     public List<Spawner> getSpawners(OfflinePlayer offlinePlayer, SpawnerType spawnerType) {
-        return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId()) && spawnerType == spawner.getType()).collect(Collectors.toList());
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.getOwner().equals(offlinePlayer.getUniqueId()) && spawnerType == spawner.getType()).collect(Collectors.toList());
+        }
     }
 
     @Override
     public long countSpawners(int x, int z) {
-        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).count();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z)).count();
+        }
     }
 
     @Override
     public long countSpawners(int x, int z, EntityType entityType) {
-        return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z) && entityType == spawner.getEntityType()).count();
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.sameChunk(x, z) && entityType == spawner.getEntityType()).count();
+        }
     }
 
     @Override
     public void addSpawner(Spawner spawner) {
-        this.spawners.add(spawner);
+        synchronized (this.spawnerLock) {
+            this.spawners.add(spawner);
+        }
         this.foliaManager.runAsync(()->this.plugin.getStorage().addSpawner(spawner));
     }
 
@@ -124,7 +148,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void removeSpawner(Spawner spawner) {
-        this.spawners.remove(spawner);
+        synchronized (this.spawnerLock) {
+            this.spawners.remove(spawner);
+        }
         this.foliaManager.runAsync(() -> this.deleteSpawner(spawner));
     }
 
@@ -132,7 +158,6 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     public void load() {
         this.foliaManager.runAsync(() -> {
 
-            this.spawners.clear();
 
             FileConfiguration configuration = plugin.getConfig();
             DatabaseType databaseType = DatabaseType.valueOf(configuration.getString("storage", "SQLITE"));
@@ -149,10 +174,17 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
             ElapsedTime elapsedTime = new ElapsedTime("Select spawners");
             elapsedTime.start();
-            this.spawners = this.getAllSpawners();
+            synchronized (this.spawnerLock) {
+                this.spawners.clear();
+                this.spawners.addAll(this.getAllSpawners());
+            }
             elapsedTime.end();
 
-            this.foliaManager.runNextTick(() -> this.spawners.forEach(Spawner::load));
+            this.foliaManager.runNextTick(() -> {
+                synchronized (this.spawnerLock) {
+                    this.spawners.forEach(Spawner::load);
+                }
+            });
         });
     }
 
@@ -178,18 +210,23 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public void save() {
-        this.spawners.forEach(Spawner::disable);
+        synchronized (this.spawnerLock) {
+            this.spawners.forEach(Spawner::disable);
+        }
         this.update(false);
     }
 
     @Override
     public void purge(World world, boolean destroyBlock) {
-        List<Spawner> spawnersToRemove = this.spawners.stream()
-                .filter(spawner -> {
-                    Location location = spawner.getLocation();
-                    return location != null && location.getWorld() != null && location.getWorld().equals(world);
-                })
-                .collect(Collectors.toList());
+        List<Spawner> spawnersToRemove;
+        synchronized (this.spawnerLock) {
+            spawnersToRemove = this.spawners.stream()
+                    .filter(spawner -> {
+                        Location location = spawner.getLocation();
+                        return location != null && location.getWorld() != null && location.getWorld().equals(world);
+                    })
+                    .toList();
+        }
 
         spawnersToRemove.forEach(spawner -> {
             spawner.disable();
@@ -208,29 +245,31 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             List<Schema> schemas = new ArrayList<>();
             List<Schema> schemasOptions = new ArrayList<>();
 
-            this.spawners.forEach(spawner -> {
-                if (spawner.needUpdate()) {
-                    spawner.update();
-                    schemas.add(SchemaBuilder.upsert(Tables.SPAWNERS, toSchema(spawner)));
-                }
-                SpawnerOption spawnerOption = spawner.getOption();
-                if (spawnerOption.needUpdate()) {
-                    spawnerOption.update();
-                    schemasOptions.add(SchemaBuilder.upsert(Tables.OPTIONS, toSchema(spawner.getSpawnerId(), spawnerOption)));
-                }
-
-                for (SpawnerItem spawnerItem : spawner.getItems()) {
-                    if (spawnerItem.needUpdate()) {
-                        spawnerItem.update();
-                        schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
-                            table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
-                            table.uuid("spawner_id", spawner.getSpawnerId()).primary();
-                            table.string("item_stack", Base64ItemStack.encode(spawnerItem.getItemStack()));
-                            table.bigInt("amount", spawnerItem.getAmount());
-                        }));
+            synchronized (this.spawnerLock) {
+                this.spawners.forEach(spawner -> {
+                    if (spawner.needUpdate()) {
+                        spawner.update();
+                        schemas.add(SchemaBuilder.upsert(Tables.SPAWNERS, toSchema(spawner)));
                     }
-                }
-            });
+                    SpawnerOption spawnerOption = spawner.getOption();
+                    if (spawnerOption.needUpdate()) {
+                        spawnerOption.update();
+                        schemasOptions.add(SchemaBuilder.upsert(Tables.OPTIONS, toSchema(spawner.getSpawnerId(), spawnerOption)));
+                    }
+
+                    for (SpawnerItem spawnerItem : spawner.getItems()) {
+                        if (spawnerItem.needUpdate()) {
+                            spawnerItem.update();
+                            schemasItems.add(SchemaBuilder.upsert(Tables.ITEMS, table -> {
+                                table.uuid("unique_id", spawnerItem.getUniqueId()).primary();
+                                table.uuid("spawner_id", spawner.getSpawnerId()).primary();
+                                table.string("item_stack", Base64ItemStack.encode(spawnerItem.getItemStack()));
+                                table.bigInt("amount", spawnerItem.getAmount());
+                            }));
+                        }
+                    }
+                });
+            }
 
             if (!schemas.isEmpty()) this.requestHelper.upsertMultiple(schemas);
             if (!schemasItems.isEmpty()) this.requestHelper.upsertMultiple(schemasItems);
@@ -238,12 +277,14 @@ public class DatabaseStorage extends ZUtils implements IStorage {
         };
 
         if (async) this.foliaManager.runAsync(runnable);
-        else this.foliaManager.runNextTick(runnable);
+        else runnable.run();
     }
 
     @Override
     public List<Spawner> getSpawners(SpawnerType spawnerType) {
-        return this.spawners.stream().filter(spawner -> spawner.getType() == spawnerType).collect(Collectors.toList());
+        synchronized (this.spawnerLock) {
+            return this.spawners.stream().filter(spawner -> spawner.getType() == spawnerType).collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -258,7 +299,9 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
     @Override
     public List<Spawner> getSpawners() {
-        return spawners;
+        synchronized (this.spawnerLock) {
+            return new ArrayList<>(spawners);
+        }
     }
 
     public void deleteSpawner(Spawner spawner) {
@@ -279,6 +322,13 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.bigInt("placed_at", spawner.getPlacedAt());
             table.string("entity_type", spawner.getEntityType().name());
             table.string("block_face", spawner.getBlockFace().name());
+            if (spawner.getLastLocationUser() != null) {
+                table.uuid("last_location_user", spawner.getLastLocationUser());
+            } else {
+                table.string("last_location_user", null);
+            }
+            table.bigInt("last_location_time", spawner.getLastLocationTime());
+            table.bigInt("last_location_start_time", spawner.getLastLocationStartTime());
             table.bigInt("amount", spawner.getAmount());
         };
     }
@@ -290,7 +340,7 @@ public class DatabaseStorage extends ZUtils implements IStorage {
 
         return spawners.stream().map(spawnerDTO -> {
 
-            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.owner(), spawnerDTO.type(), spawnerDTO.entity_type(), spawnerDTO.placed_at(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.block_face());
+            Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.owner(), spawnerDTO.type(), spawnerDTO.entity_type(), spawnerDTO.placed_at(), spawnerDTO.location() != null ? changeStringLocationToLocation(spawnerDTO.location()) : null, spawnerDTO.amount(), spawnerDTO.block_face(), spawnerDTO.last_location_user(), spawnerDTO.last_location_time());
 
             spawner.setItems(items.stream().filter(itemDTO -> itemDTO.spawner_id().equals(spawnerDTO.spawner_id())).map(itemDTO -> new ZSpawnerItem(itemDTO.unique_id(), itemDTO.item_stack(), itemDTO.amount())).collect(Collectors.toList()));
 
@@ -323,7 +373,12 @@ public class DatabaseStorage extends ZUtils implements IStorage {
             table.bigInt("min_spawn", option.getMinSpawn());
             table.bigInt("max_spawn", option.getMaxSpawn());
             table.bigInt("mob_per_minute", option.getMobPerMinute());
+            table.bool("drop_loots",option.dropLoots());
             table.bigInt("remaining", option.getRemainingEntity());
+            table.bool("location_enabled", option.isLocationEnabled());
+            table.bigInt("min_location_time", option.getMinLocationTime());
+            table.bigInt("max_location_time", option.getMaxLocationTime());
+            table.decimal("location_price", option.getLocationPrice());
         };
     }
 
@@ -334,6 +389,6 @@ public class DatabaseStorage extends ZUtils implements IStorage {
     }
 
     private SpawnerOption toOption(OptionDTO optionDTO) {
-        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.remaining());
+        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.location_enabled(), optionDTO.remaining(), optionDTO.min_location_time(), optionDTO.max_location_time(), optionDTO.location_price());
     }
 }

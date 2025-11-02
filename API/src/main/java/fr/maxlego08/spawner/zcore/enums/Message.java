@@ -53,6 +53,7 @@ public enum Message {
 
     SPAWNER_UNPLACED("&cᴜɴᴘʟᴀᴄᴇᴅ"),
     SPAWNER_LOCATION("&f%world%&7, &f%x%&7, &f %y%&7, &f %z%"),
+    SPAWNER_LOCATION_ALREADY_RENTED("&cThis spawner is currently rented by another player."),
     SPAWNER_PLACE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ᴘʟᴀᴄᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
     SPAWNER_REMOVE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
 

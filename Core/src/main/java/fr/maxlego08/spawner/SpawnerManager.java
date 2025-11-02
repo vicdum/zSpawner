@@ -15,13 +15,10 @@ import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.ShowButton;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
-import fr.maxlego08.spawner.buttons.virtual.InfoButton;
-import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
-import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
-import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.buttons.virtual.*;
 import fr.maxlego08.spawner.drop.CustomVirtualDrop;
 import fr.maxlego08.spawner.drop.VirtualDrop;
-import fr.maxlego08.spawner.loader.ToggleDropLoader;
+import fr.maxlego08.spawner.loader.*;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.enums.Message;
@@ -137,6 +134,12 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("max-spawn", String.valueOf(spawnerOption.getMaxSpawn()));
         placeholders.register("mob-per-minute", String.valueOf(spawnerOption.getMobPerMinute()));
         placeholders.register("remaining-entities", format(spawnerOption.getRemainingEntity()));
+        placeholders.register("location-enabled", spawnerOption.isLocationEnabled() ? Message.YES.msg() : Message.NO.msg());
+        placeholders.register("min-location-time", String.valueOf(spawnerOption.getMinLocationTime()));
+        placeholders.register("max-location-time", String.valueOf(spawnerOption.getMaxLocationTime()));
+        placeholders.register("location-price", String.valueOf(spawnerOption.getLocationPrice()));
+        placeholders.register("entity_type", name(spawner.getEntityType().name()));
+        placeholders.register("spawner_owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
@@ -153,9 +156,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.spawnerTypeKey, PersistentDataType.STRING, spawnerType.name());
         persistentDataContainer.set(this.spawnerEntityKey, PersistentDataType.STRING, entityType.name());
-        if (spawner != null) {
-            persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawner.getSpawnerId().toString());
-        }
+        persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawner.getSpawnerId().toString());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -239,7 +240,15 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
         buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
+        buttonManager.register(new NoneLoader(this.plugin, LocationTimeDisplayButton.class, "zspawner_location_time_display"));
+        buttonManager.register(new NoneLoader(this.plugin, LocationPriceDisplayButton.class, "zspawner_location_price_display"));
         buttonManager.register(new ToggleDropLoader(this.plugin));
+        buttonManager.register(new ToggleLocationLoader(this.plugin));
+        buttonManager.register(new PlayerPurchaseLocationButtonLoader(this.plugin));
+        buttonManager.registerAction(new MinLocationTimeActionLoader(this.plugin));
+        buttonManager.registerAction(new MaxLocationTimeActionLoader(this.plugin));
+        buttonManager.registerAction(new LocationPriceActionLoader(this.plugin));
+        buttonManager.registerAction(new PlayerLocationPriceActionLoader(this.plugin));
     }
 
     public void loadInventories() {
@@ -248,6 +257,8 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         try {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/gui/spawners.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/virtual.yml");
+            inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/manage-location.yml");
+            inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/player-location.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/show.yml");
         } catch (InventoryException exception) {
             exception.printStackTrace();
@@ -266,11 +277,28 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         inventoryManager.getInventory(this.plugin, "virtual").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
     }
 
+    public void openManageLocationSpawner(Player player, Spawner spawner, int page) {
+        PlayerSpawner playerSpawner = this.playerSpawners.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
+        playerSpawner.setVirtualSpawner(spawner);
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.getInventory(this.plugin, "manage-location").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
+    }
+
+
+    public void openPlayerLocationSpawner(Player player, Spawner spawner, int page) {
+        PlayerSpawner playerSpawner = this.playerSpawners.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
+        playerSpawner.setVirtualSpawner(spawner);
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        inventoryManager.getInventory(this.plugin, "player-location").ifPresent(inventory -> inventoryManager.openInventory(player, inventory, page));
+    }
+
     @Override
     public void run() {
         IStorage storage = this.plugin.getStorage();
         storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(Spawner::isChunkLoaded).forEach(spawner -> {
             Location location = spawner.getLocation();
+            if (location == null || location.getWorld() == null) return;
+
             double distance = spawner.getDistance();
             int playerCount = location.getWorld().getNearbyEntities(location, distance, distance, distance, entity -> entity instanceof Player).size();
             if (playerCount > 0) spawner.tick();

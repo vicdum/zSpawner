@@ -6,11 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Config {
@@ -36,6 +32,10 @@ public class Config {
     public static SpawnerType naturelSpawnerInto = SpawnerType.CLASSIC;
     public static boolean breakUpVirtualSpawner;
     public static boolean givePlayerExperience;
+
+    public static boolean enableSpawnerLocation = true;
+    public static double minLocationPrice = 1000;
+    public static double maxLocationPrice = 10000;
 
     /**
      * static Singleton instance.
@@ -113,5 +113,9 @@ public class Config {
         whitelistMaterialSilkSpawner = configuration.getStringList("silkSpawner.whitelistMaterial").stream().map(Material::valueOf).collect(Collectors.toList());
         blacklistMaterials = configuration.getStringList("blacklist-materials").stream().map(Material::valueOf).collect(Collectors.toList());
         naturelSpawnerInto = SpawnerType.valueOf(configuration.getString("silkSpawner.naturelSpawnerInto", "CLASSIC").toUpperCase());
+
+        enableSpawnerLocation = configuration.getBoolean("spawner-location.enable", true);
+        minLocationPrice = configuration.getDouble("spawner-location.minPrice", 1000);
+        maxLocationPrice = configuration.getDouble("spawner-location.maxPrice", 10000);
     }
 }

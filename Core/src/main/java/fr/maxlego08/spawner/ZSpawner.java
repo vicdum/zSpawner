@@ -4,35 +4,21 @@ import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.utils.Cuboid;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.zcore.logger.Logger;
-import fr.maxlego08.spawner.api.utils.Cuboid;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.ZombieVillager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ZSpawner extends ZUtils implements Spawner {
@@ -55,8 +41,11 @@ public class ZSpawner extends ZUtils implements Spawner {
     private Cuboid cuboid;
     private List<SpawnerItem> items = new ArrayList<>();
     private long lastEntityKill;
+    private UUID lastLocationUser;
+    private long lastLocationTime;
+    private long lastLocationStartTime;
 
-    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace) {
+    public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace, UUID lastLocationUser, long lastLocationTime) {
         this.plugin = plugin;
         this.uniqueId = uniqueId;
         this.ownerId = ownerId;
@@ -66,11 +55,13 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.location = location;
         this.amount = amount;
         this.blockFace = blockFace;
+        this.lastLocationUser = lastLocationUser;
+        this.lastLocationTime = lastLocationTime;
         this.spawnerOption = this.plugin.getManager().getDefaultOption().cloneOption();
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
-        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace);
+        this(plugin, spawnerId, ownerId, spawnerType, entityType, 0, null, 0, blockFace, null, 0);
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -250,6 +241,39 @@ public class ZSpawner extends ZUtils implements Spawner {
         return location;
     }
 
+    @Override
+    public @Nullable UUID getLastLocationUser() {
+        return this.lastLocationUser;
+    }
+
+    @Override
+    public void setLastLocationUser(@Nullable UUID uuid) {
+        this.lastLocationUser = uuid;
+        this.needUpdate = true;
+    }
+
+    @Override
+    public long getLastLocationTime() {
+        return this.lastLocationTime;
+    }
+
+    @Override
+    public void setLastLocationTime(long time) {
+        this.lastLocationTime = time;
+        this.needUpdate = true;
+    }
+
+    @Override
+    public long getLastLocationStartTime() {
+        return this.lastLocationStartTime;
+    }
+
+    @Override
+    public void setLastLocationStartTime(long time) {
+        this.lastLocationStartTime = time;
+        this.needUpdate = true;
+    }
+
     private void spawnEntity() {
 
         if (this.livingEntity != null) {
@@ -288,6 +312,7 @@ public class ZSpawner extends ZUtils implements Spawner {
                 currentLiving.setVisualFire(false);
                 currentLiving.setSwimming(false);
                 currentLiving.setSilent(true);
+                currentLiving.setCanPickupItems(false);
                 if (currentLiving.isInsideVehicle()) {
                     var vehicle = currentLiving.getVehicle();
                     if (vehicle != null) {
@@ -430,7 +455,9 @@ public class ZSpawner extends ZUtils implements Spawner {
 
     @Override
     public boolean isChunkLoaded() {
+        if (this.location == null) return false;
         World world = this.location.getWorld();
+        if (world == null) return false;
         return world.isChunkLoaded(this.location.getChunk());
     }
 

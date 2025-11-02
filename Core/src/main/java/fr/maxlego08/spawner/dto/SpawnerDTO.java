@@ -6,5 +6,5 @@ import org.bukkit.entity.EntityType;
 
 import java.util.UUID;
 
-public record SpawnerDTO(UUID owner, UUID spawner_id, String location, SpawnerType type, long placed_at, EntityType entity_type, int amount, BlockFace block_face) {
+public record SpawnerDTO(UUID owner, UUID spawner_id, String location, SpawnerType type, long placed_at, EntityType entity_type, int amount,UUID last_location_user, long last_location_time,long last_location_start_time, BlockFace block_face) {
 }

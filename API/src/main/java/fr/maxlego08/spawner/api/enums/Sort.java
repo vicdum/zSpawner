@@ -37,15 +37,10 @@ public enum Sort {
     }
 
     public Sort next() {
-        switch (this) {
-            case PLACE:
-                return Sort.PLACE_NO;
-            case PLACE_NO:
-                return Sort.PLACE;
-            default:
-                break;
-        }
-        return Sort.PLACE;
+        return switch (this) {
+            case PLACE -> Sort.PLACE_NO;
+            default -> Sort.PLACE;
+        };
     }
 
 }

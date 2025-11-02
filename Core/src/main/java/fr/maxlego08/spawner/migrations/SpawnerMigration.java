@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.migrations;
 
+import fr.maxlego08.sarah.SchemaBuilder;
 import fr.maxlego08.sarah.database.Migration;
 import fr.maxlego08.spawner.storage.Tables;
 
@@ -7,7 +8,7 @@ public class SpawnerMigration extends Migration {
 
     @Override
     public void up() {
-        createOrAlter(Tables.SPAWNERS, table -> {
+        this.createOrAlter(Tables.SPAWNERS, table -> {
             table.uuid("owner").primary();
             table.uuid("spawner_id").unique().primary();
             table.string("location", 255);
@@ -17,5 +18,8 @@ public class SpawnerMigration extends Migration {
             table.string("block_face", 255);
             table.integer("amount");
         });
+        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.uuid("last_location_user").nullable());
+        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.bigInt("last_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.bigInt("last_location_start_time").defaultValue(0));
     }
 }

@@ -54,6 +54,11 @@ database-configuration:
   debug: true
   database: zspawner
 
+spawner-location:
+  enable: true
+  minPrice: 1000
+  maxPrice: 10000
+
 items:
   CLASSIC: # Classic spawner
     material: SPAWNER
@@ -337,6 +342,12 @@ virtual:
     minSpawn: 1 # Minimum spawn entity
     maxSpawn: 2 # Maximum spawn entity
     remaining: 1000000 # Remaining entities
+    locationEnabled: false # Enable location for the virtual spawner (Requires spawner-location to be enabled)
+    location:
+      enabled: false
+      minTime: 10 # 10 minutes
+      maxTime: 120 # 2 hours
+      price: 5000 # Price to use the spawner /minute
 
 # Define custom drops for virtual spawners.
 # Each entry allows configuring a list of drops for a specific entity type.

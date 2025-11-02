@@ -11,11 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class YamlUtils extends ZUtils {
@@ -140,8 +136,12 @@ public abstract class YamlUtils extends ZUtils {
         int maxSpawn = configuration.getInt(path + "maxSpawn", 3);
         boolean dropLoots = configuration.getBoolean(path + "dropLoots", false);
         int remaining = configuration.getInt(path + "remaining", 1000000);
+        boolean locationEnabled = configuration.getBoolean(path + "location.enabled", false);
+        long minLocationTime = configuration.getLong(path + "location.minTime", 10);
+        long maxLocationTime = configuration.getLong(path + "location.maxTime", 120);
+        double locationPrice = configuration.getDouble(path + "location.price", 5000);
 
-        return new ZSpawnerOption(distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots, remaining);
+        return new ZSpawnerOption(distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots,locationEnabled, remaining, minLocationTime, maxLocationTime, locationPrice);
     }
 
 

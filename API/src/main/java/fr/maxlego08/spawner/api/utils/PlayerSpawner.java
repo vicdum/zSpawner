@@ -11,6 +11,7 @@ public class PlayerSpawner {
     private Spawner placingSpawner;
     private Spawner virtualSpawner;
     private OfflinePlayer targetPlayer;
+    private int locationTime;
 
     public Sort getTypeShort() {
         return typeShort;
@@ -56,6 +57,7 @@ public class PlayerSpawner {
 
     public void setVirtualSpawner(Spawner virtualSpawner) {
         this.virtualSpawner = virtualSpawner;
+        this.locationTime = (int) virtualSpawner.getOption().getMinLocationTime();
     }
 
     public OfflinePlayer getTargetPlayer() {
@@ -65,4 +67,14 @@ public class PlayerSpawner {
     public void setTargetPlayer(OfflinePlayer targetPlayer) {
         this.targetPlayer = targetPlayer;
     }
+
+    public int getLocationTime() {
+        return locationTime;
+    }
+
+    public void setLocationTime(int locationTime) {
+        this.locationTime = locationTime;
+    }
+
+
 }

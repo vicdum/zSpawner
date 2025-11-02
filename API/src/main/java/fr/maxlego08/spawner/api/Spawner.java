@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,5 +84,17 @@ public interface Spawner extends Updatable {
     String getSpawnerKey();
 
     Location getSpawnedEntityLocation();
+
+    @Nullable UUID getLastLocationUser();
+
+    void setLastLocationUser(@Nullable UUID uuid);
+
+    long getLastLocationTime();
+
+    void setLastLocationTime(long time);
+
+    long getLastLocationStartTime();
+
+    void setLastLocationStartTime(long time);
 
 }

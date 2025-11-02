@@ -40,10 +40,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class SpawnerListener extends ListenerAdapter {
 
@@ -352,6 +349,22 @@ public class SpawnerListener extends ListenerAdapter {
                     event.setCancelled(true);
                     return;
                 }
+
+                if (spawner.getOption().isLocationEnabled() && spawner.getLastLocationUser() != null) {
+                    boolean isLocationActive = spawner.getLastLocationStartTime() + spawner.getLastLocationTime() > System.currentTimeMillis();
+
+                    if (isLocationActive) {
+                        if (damager instanceof Player damagerPlayer) {
+                            if (!damagerPlayer.getUniqueId().equals(spawner.getLastLocationUser())) {
+                                event.setCancelled(true);
+                                return;
+                            }
+                        } else {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
             }
 
             if (entity.getHealth() - finalDamage <= 0) {
@@ -413,15 +426,29 @@ public class SpawnerListener extends ListenerAdapter {
 
             spawner.getDeadEntities().remove(entity);
 
+            Player killer = event.getEntity().getKiller();
+
+            boolean isLocationActive = false;
+            if (spawner.getOption().isLocationEnabled() && spawner.getLastLocationUser() != null) {
+                isLocationActive = spawner.getLastLocationStartTime() + spawner.getLastLocationTime() > System.currentTimeMillis();
+
+                if (isLocationActive) {
+                    if (killer == null || !killer.getUniqueId().equals(spawner.getLastLocationUser())) {
+                        event.getDrops().clear();
+                        event.setDroppedExp(0);
+                        return;
+                    }
+                }
+            }
+
             if (spawner.getType() == SpawnerType.VIRTUAL) {
-                List<ItemStack> customDrops = this.plugin.getManager().generateCustomVirtualDrops(spawner.getEntityType(), event.getEntity().getKiller());
+                List<ItemStack> customDrops = this.plugin.getManager().generateCustomVirtualDrops(spawner.getEntityType(), killer);
                 if (!customDrops.isEmpty()) {
                     event.getDrops().clear();
                     event.getDrops().addAll(customDrops);
                 }
 
                 if (Config.givePlayerExperience) {
-                    Player killer = event.getEntity().getKiller();
                     if (killer != null) {
                         int droppedExp = MendingUtil.repairAllMainHandAndArmor(killer, event.getDroppedExp());
                         if (droppedExp > 0) {
@@ -457,7 +484,19 @@ public class SpawnerListener extends ListenerAdapter {
                 }
             }*/
 
-            if (!spawner.getOption().dropLoots()) {
+            if (isLocationActive) {
+                event.getDrops().clear();
+
+                for (ItemStack itemStack : itemStacks) {
+                    Map<Integer, ItemStack> leftover = killer.getInventory().addItem(itemStack);
+
+                    if (!leftover.isEmpty()) {
+                        for (ItemStack item : leftover.values()) {
+                            killer.getWorld().dropItemNaturally(killer.getLocation(), item);
+                        }
+                    }
+                }
+            } else if (!spawner.getOption().dropLoots()) {
                 if (!itemStacks.isEmpty()) {
                     spawner.addItems(itemStacks);
                 }
@@ -527,7 +566,8 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
 
-        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+        Action action = event.getAction();
+        if (action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.LEFT_CLICK_BLOCK)) {
 
             Block block = event.getClickedBlock();
             if (block == null) return;
@@ -537,15 +577,48 @@ public class SpawnerListener extends ListenerAdapter {
             IStorage storage = this.plugin.getStorage();
             storage.getSpawner(block.getLocation()).ifPresent(spawner -> {
 
-                if (spawner.getType() == SpawnerType.VIRTUAL && event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                if (spawner.getType() == SpawnerType.VIRTUAL && action.equals(Action.RIGHT_CLICK_BLOCK)) {
                     if (plugin.getUpgradeManager().applyUpgradeItem(spawner, player, event.getItem())) {
                         event.setCancelled(true);
                         return;
                     }
                 }
+                if (action == Action.RIGHT_CLICK_BLOCK) {
+                    this.openLocationSpawner(spawner, player, event);
+                } else {
+                    this.openVirtualSpawner(spawner, player, event);
+                }
 
-                this.openVirtualSpawner(spawner, player, event);
             });
+        }
+    }
+    private void openLocationSpawner(Spawner spawner, Player player, Cancellable event) {
+        if (spawner.getType() == SpawnerType.VIRTUAL) {
+
+            event.setCancelled(true);
+            boolean playerHasAccess = hasAccess(player, spawner);
+
+            if (playerHasAccess) {
+                this.plugin.getManager().openManageLocationSpawner(player, spawner, 1);
+            } else if (spawner.getOption().isLocationEnabled()) {
+
+                UUID lastUser = spawner.getLastLocationUser();
+                long startTime = spawner.getLastLocationStartTime();
+                long duration = spawner.getLastLocationTime();
+                long currentTime = System.currentTimeMillis();
+
+                boolean isLocationActive = lastUser != null && startTime + duration > currentTime;
+
+                if (!isLocationActive) {
+                    spawner.setLastLocationUser(null);
+                    spawner.setLastLocationStartTime(0);
+                    spawner.setLastLocationTime(0);
+                    this.plugin.getManager().openPlayerLocationSpawner(player, spawner, 1);
+                }
+                else {
+                    message(player, Message.SPAWNER_LOCATION_ALREADY_RENTED.getMessage());
+                }
+            }
         }
     }
 
@@ -554,16 +627,19 @@ public class SpawnerListener extends ListenerAdapter {
 
             event.setCancelled(true);
 
-            boolean hasAccess = spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS);
-
-            if (!hasAccess) {
-                hasAccess = this.plugin.hasTeamAccess(spawner.getOwner(), player.getUniqueId());
-            }
-
-            if (hasAccess) {
+            if (hasAccess(player,spawner)){
                 this.plugin.getManager().openVirtualSpawner(player, spawner, 1);
             }
         }
+    }
+
+    private boolean hasAccess(Player player, Spawner spawner) {
+        boolean hasAccess = spawner.getOwner().equals(player.getUniqueId()) || hasPermission(player, Permission.ZSPAWNER_BYPASS);
+
+        if (!hasAccess) {
+            hasAccess = this.plugin.hasTeamAccess(spawner.getOwner(), player.getUniqueId());
+        }
+        return hasAccess;
     }
 
     private boolean hasSpawnerLimit(Cancellable event, Player player, EntityType entityType, Chunk chunk) {

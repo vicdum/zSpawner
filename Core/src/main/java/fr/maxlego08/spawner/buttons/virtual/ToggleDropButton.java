@@ -1,61 +1,21 @@
 package fr.maxlego08.spawner.buttons.virtual;
 
-import fr.maxlego08.menu.api.engine.InventoryEngine;
-import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
-import fr.maxlego08.spawner.api.utils.PlayerSpawner;
-import fr.maxlego08.spawner.zcore.enums.Permission;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
-public class ToggleDropButton extends AbstractSpawnerButton {
-    
-    private final String textEnable;
-    private final String textDisable;
+public class ToggleDropButton extends AbstractToggleButton {
 
-    public ToggleDropButton(SpawnerPlugin plugin, String textEnable, String textDisable) {
-        super(plugin);
-        this.textEnable = textEnable;
-        this.textDisable = textDisable;
+    public ToggleDropButton(SpawnerPlugin plugin, String enableText, String disableText) {
+        super(plugin, enableText, disableText);
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, InventoryEngine inventory, int slot, Placeholders placeholders) {
-        super.onClick(player, event, inventory, slot, placeholders);
-
-        PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
-        Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
-        if (spawner == null) return;
-
-        if (!spawner.getOwner().equals(player.getUniqueId()) && !player.hasPermission(Permission.ZSPAWNER_BYPASS.getPermission())) {
-            return;
-        }
-
-        var option = spawner.getOption();
-        option.setDropLoots(!option.dropLoots());
-
-        inventory.getSpigotInventory().setItem(slot, getCustomItemStack(player));
+    protected void toggleOption(Spawner spawner) {
+        spawner.getOption().setDropLoots(!spawner.getOption().dropLoots());
     }
 
     @Override
-    public ItemStack getCustomItemStack(Player player) {
-
-        PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().get(player.getUniqueId());
-        Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner() == null ? null : playerSpawner.getVirtualSpawner();
-        if (spawner == null) return super.getCustomItemStack(player);
-
-        var option = spawner.getOption();
-
-        var placeholders = new Placeholders();
-        placeholders.register("state", option.dropLoots() ? this.textDisable : this.textEnable);
-
-        return getItemStack().build(player, false, placeholders);
-    }
-
-    @Override
-    public boolean isPermanent() {
-        return true;
+    protected boolean getCurrentState(Spawner spawner) {
+        return spawner.getOption().dropLoots();
     }
 }

@@ -52,10 +52,31 @@ public interface SpawnerOption extends Updatable {
 
     int getRemainingEntity();
 
+    boolean isLocationEnabled();
+
+    void setLocationEnabled(boolean locationEnabled);
+
     void setRemainingEntity(int remainingEntity);
 
     void removeRemainingEntity(int addedEntities);
 
     SpawnerOption cloneOption();
 
+    long getMinLocationTime();
+
+    void setMinLocationTime(long minLocationTime);
+
+    void addMinLocationTime(long timeToAdd);
+
+    long getMaxLocationTime();
+
+    void setMaxLocationTime(long maxLocationTime);
+
+    void addMaxLocationTime(long timeToAdd);
+
+    double getLocationPrice();
+
+    void setLocationPrice(double locationPrice);
+
+    void addLocationPrice(double priceToAdd);
 }
