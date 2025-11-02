@@ -11,7 +11,8 @@ public enum Permission {
 	ZSPAWNER_REMOVE,
     ZSPAWNER_OPTION,
     ZSPAWNER_BYPASS,
-	ZSPAWNER_SHOW;
+	ZSPAWNER_SHOW,
+	ZSPAWNER_LOCATION_ADMIN;
     private final String permission;
 
 	private Permission() {

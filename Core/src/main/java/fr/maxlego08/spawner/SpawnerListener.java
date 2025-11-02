@@ -12,6 +12,7 @@ import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.MendingUtil;
+import fr.maxlego08.spawner.zcore.utils.builder.TimerBuilder;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -615,7 +616,9 @@ public class SpawnerListener extends ListenerAdapter {
                     spawner.setLastLocationTime(0);
                     this.plugin.getManager().openPlayerLocationSpawner(player, spawner, 1);
                 }
-                else {
+                else if (lastUser.equals(player.getUniqueId())) {
+                    message(player, Message.SPAWNER_LOCATION_RENTED_BY_YOU.getMessage(),"%time%", TimerBuilder.format(String.valueOf((startTime + duration)- currentTime)));
+                } else {
                     message(player, Message.SPAWNER_LOCATION_ALREADY_RENTED.getMessage());
                 }
             }

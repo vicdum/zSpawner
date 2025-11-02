@@ -20,7 +20,7 @@ public class CommandSpawnerRemove extends VCommand {
         this.addSubCommand("remove");
         this.setDescription(Message.DESCRIPTION_REMOVE);
         this.addRequireArg("player");
-        this.addRequireArg("spawner", (sender, args) -> getSpawners(args, 1, plugin, SpawnerType.GUI));
+        this.addRequireArg("spawner", (sender, args) -> getSpawners(args, 2, plugin, SpawnerType.GUI));
         this.addOptionalArg("silent", (a, b) -> Arrays.asList("true", "false"));
     }
 
@@ -32,7 +32,7 @@ public class CommandSpawnerRemove extends VCommand {
         boolean silent = this.argAsBoolean(2, false);
 
         Optional<Spawner> optional = plugin.getStorage().getSpawners(offlinePlayer).stream().filter(e -> e.getSpawnerKey().equals(spawnerKey)).findFirst();
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);
             return CommandType.DEFAULT;
         }

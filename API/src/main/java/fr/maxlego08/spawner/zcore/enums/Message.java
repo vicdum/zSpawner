@@ -50,6 +50,12 @@ public enum Message {
     DESCRIPTION_REMOVE("Remove gui spawner"),
     DESCRIPTION_HELP("Help commands"),
     DESCRIPTION_SHOW("Show spawners"),
+    DESCRIPTION_LOCATION("Manage spawner location"),
+    DESCRIPTION_LOCATION_SET("Set location rental for a spawner"),
+    DESCRIPTION_LOCATION_ADD("Add time to location rental"),
+    DESCRIPTION_LOCATION_REMOVE("Remove time from location rental"),
+    DESCRIPTION_LOCATION_INFO("Show location rental information"),
+    DESCRIPTION_LOCATION_CLEAR("Clear location rental"),
 
     SPAWNER_UNPLACED("&cᴜɴᴘʟᴀᴄᴇᴅ"),
     SPAWNER_LOCATION("&f%world%&7, &f%x%&7, &f %y%&7, &f %z%"),
@@ -96,8 +102,24 @@ public enum Message {
     SELL_ERROR("&cUnable to sell content."),
     YES("&aYes"),
     NO("&cNo"),
-    PLACE_ERROR_EXIST("&cThe spawner already exists, you can’t place it."),
+    PLACE_ERROR_EXIST("&cThe spawner already exists, you can't place it."),
     PLACE_ERROR_SPAWNER("&cYou cannot place a spawner here."),
+
+    COMMAND_LOCATION_INVALID_TIME("§cInvalid time value. Must be greater than 0."),
+    COMMAND_LOCATION_NOT_ENABLED("§cLocation system is not enabled for this spawner."),
+    COMMAND_LOCATION_NO_RENTER("§cThis spawner has no active rental."),
+    COMMAND_LOCATION_EXPIRED("§cThe rental for this spawner has expired."),
+    COMMAND_LOCATION_SET_SUCCESS("§aLocation rental set! §e%renter% §acan now use §6%spawnerKey% §afor §f%minutes% minutes§a."),
+    COMMAND_LOCATION_TIME_MODIFIED("§aTime §f%action% §afor spawner §6%spawnerKey%§a: §f%minutes% minutes§a."),
+    COMMAND_LOCATION_CLEARED("§aRental cleared for spawner §6%spawnerKey% §aowned by §e%owner%§a."),
+    COMMAND_LOCATION_INFO_HEADER("§e§l=== Location Info: %spawnerKey% ==="),
+    COMMAND_LOCATION_INFO_ENABLED("§7Location System: §f%enabled%"),
+    COMMAND_LOCATION_INFO_RENTER("§7Current Renter: §e%renter%"),
+    COMMAND_LOCATION_INFO_STATUS("§7Status: %status%"),
+    COMMAND_LOCATION_INFO_REMAINING("§7Time Remaining: §f%time%"),
+    COMMAND_LOCATION_INFO_NO_RENTER("§7No active rental"),
+    COMMAND_LOCATION_INFO_CONFIG("§7Config: §bMin: §f%min% §bMax: §f%max% §6Price: §f$%price%/min"),
+    SPAWNER_LOCATION_RENTED_BY_YOU("&aYou have rented this spawner. You have %time% remaining."),
     ;
 
     private List<String> messages;
