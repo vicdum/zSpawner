@@ -411,7 +411,8 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             var spawnerItem = iterator.next();
             if (action.deposit(player, spawnerItem.getItemStack(), spawnerItem.getAmount())) {
                 iterator.remove();
-                this.plugin.getStorage().deleteSpawnerItem(spawner, spawnerItem);
+//                this.plugin.getStorage().deleteSpawnerItem(spawner, spawnerItem);
+                this.plugin.getStorageManager().deleteItem(spawnerItem, spawner.getSpawnerId());
                 isSuccess = true;
             }
         }

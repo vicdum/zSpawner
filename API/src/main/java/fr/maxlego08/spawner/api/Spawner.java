@@ -29,6 +29,10 @@ public interface Spawner extends Updatable {
 
     void setOption(SpawnerOption spawnerOption);
 
+    void addLocationHistory(SpawnerLocationHistory spawnerLocationHistory);
+
+    List<SpawnerLocationHistory> getLocationHistory();
+
     EntityType getEntityType();
 
     boolean isPlace();

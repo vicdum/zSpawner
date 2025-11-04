@@ -1,12 +1,10 @@
 package fr.maxlego08.spawner;
 
-import fr.maxlego08.spawner.api.Spawner;
-import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.api.SpawnerOption;
-import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.utils.Cuboid;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.*;
@@ -24,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ZSpawner extends ZUtils implements Spawner {
 
     private final SpawnerPlugin plugin;
+    private final StorageManager storageManager;
     private final UUID uniqueId;
     private final UUID ownerId;
     private final SpawnerType spawnerType;
@@ -44,6 +43,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     private UUID lastLocationUser;
     private long lastLocationTime;
     private long lastLocationStartTime;
+    private List<SpawnerLocationHistory> locationHistories = new ArrayList<>();
 
     public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace, UUID lastLocationUser, long lastLocationTime) {
         this.plugin = plugin;
@@ -58,6 +58,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.lastLocationUser = lastLocationUser;
         this.lastLocationTime = lastLocationTime;
         this.spawnerOption = this.plugin.getManager().getDefaultOption().cloneOption();
+        this.storageManager = plugin.getStorageManager();
     }
 
     public ZSpawner(SpawnerPlugin plugin, UUID spawnerId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, BlockFace blockFace) {
@@ -101,6 +102,17 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setOption(SpawnerOption spawnerOption) {
         this.spawnerOption = spawnerOption;
+    }
+
+    @Override
+    public void addLocationHistory(SpawnerLocationHistory spawnerLocationHistory) {
+        this.locationHistories.add(spawnerLocationHistory);
+        this.updateDB();
+    }
+
+    @Override
+    public List<SpawnerLocationHistory> getLocationHistory() {
+        return this.locationHistories;
     }
 
     @Override
@@ -164,7 +176,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             spawner.update(true);
         }
 
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
@@ -175,7 +187,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setAmount(int amount) {
         this.amount = amount;
-        this.needUpdate = true;
+        this.updateDB();
 
         if (amount <= 1) disable();
         else this.spawnHologram();
@@ -249,7 +261,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationUser(@Nullable UUID uuid) {
         this.lastLocationUser = uuid;
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
@@ -260,7 +272,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationTime(long time) {
         this.lastLocationTime = time;
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
@@ -271,7 +283,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationStartTime(long time) {
         this.lastLocationStartTime = time;
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     private void spawnEntity() {
@@ -394,7 +406,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
 
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
@@ -421,7 +433,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void entityDeath() {
 
         this.amount -= 1;
-        this.needUpdate = true;
+        this.updateDB();
         this.updateEntity();
 
         if (this.livingEntity != null && this.livingEntity.isValid() && ((this.livingEntity.getLocation().getBlockX() != this.location.getBlockX() || this.livingEntity.getLocation().getBlockZ() != this.location.getBlockZ()))) {
@@ -441,12 +453,12 @@ public class ZSpawner extends ZUtils implements Spawner {
                 SpawnerItem spawnerItem = optional.get();
                 spawnerItem.addAmount(itemStack.getAmount());
             } else {
-                SpawnerItem spawnerItem = new ZSpawnerItem(itemStack, itemStack.getAmount());
+                SpawnerItem spawnerItem = new ZSpawnerItem(itemStack, itemStack.getAmount(), this.storageManager, this.uniqueId);
                 this.items.add(spawnerItem);
             }
         });
 
-        this.needUpdate = true;
+        this.updateDB();
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             this.plugin.getInventoryManager().updateInventory(onlinePlayer, plugin);
@@ -494,7 +506,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             spawnerOption.removeRemainingEntity(addedEntities);
 
             if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
-            this.needUpdate = true;
+            this.updateDB();
             this.updateEntity();
         }
     }
@@ -529,7 +541,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void removeItem(SpawnerItem spawnerItem) {
         this.items.remove(spawnerItem);
-        this.plugin.getStorage().deleteSpawnerItem(this, spawnerItem);
+        this.plugin.getStorageManager().deleteItem(spawnerItem, this.uniqueId);
     }
 
     @Override
@@ -579,5 +591,9 @@ public class ZSpawner extends ZUtils implements Spawner {
 
         this.entityDeath();
         this.killEntity(count - 1);
+    }
+
+    public void updateDB(){
+        this.storageManager.upsertSpawner(this);
     }
 }

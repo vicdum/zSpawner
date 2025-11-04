@@ -19,6 +19,9 @@ import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
 import fr.maxlego08.spawner.storage.StorageManager;
+import fr.maxlego08.spawner.storage.storages.StorageManagerImp;
+import fr.maxlego08.spawner.storage.storages.ZServerDataManager;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
@@ -40,6 +43,9 @@ import java.util.UUID;
 public class SpawnerPlugin extends ZPlugin {
     private final FoliaCompatibilityManager foliaManager = new FoliaCompatibilityManager(this);
 
+    private final fr.maxlego08.spawner.storage.storages.interfaces.StorageManager storageManager = new StorageManagerImp(this, this.foliaManager);
+    private final ServerDataManager serverDataManager = new ZServerDataManager(this);
+
     private final SpawnerManager manager = new SpawnerManager(this, this.foliaManager);
     private final StackableManager stackableManager = new StackableManager(this);
     private final SpawnerPlaceholders spawnerPlaceholders = new SpawnerPlaceholders(this);
@@ -60,6 +66,8 @@ public class SpawnerPlugin extends ZPlugin {
         placeholder.setPrefix("zspawner");
 
         this.preEnable();
+
+        this.storageManager.loadDatabase();
 
         this.spawnerKey = new NamespacedKey(this, "zspawner");
 
@@ -85,6 +93,7 @@ public class SpawnerPlugin extends ZPlugin {
         this.manager.loadButtons();
         this.upgradeManager.loadItems();
         this.loadFiles();
+        this.serverDataManager.loadServerData();
 
         this.spawnerPlaceholders.register();
 
@@ -164,6 +173,14 @@ public class SpawnerPlugin extends ZPlugin {
 
     public NamespacedKey getSpawnerKey() {
         return spawnerKey;
+    }
+
+    public fr.maxlego08.spawner.storage.storages.interfaces.StorageManager getStorageManager() {
+        return storageManager;
+    }
+
+    public ServerDataManager getServerDataManager() {
+        return serverDataManager;
     }
 
     public FoliaCompatibilityManager getFoliaManager() {return this.foliaManager;}

@@ -4,7 +4,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public interface SpawnerItem extends Updatable{
+public interface SpawnerItem {
 
     ItemStack getItemStack();
 
@@ -20,4 +20,5 @@ public interface SpawnerItem extends Updatable{
 
     UUID getUniqueId();
 
+    UUID getSpawnerUUID();
 }

@@ -1,6 +1,7 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -8,23 +9,28 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 public class ZSpawnerItem extends ZUtils implements SpawnerItem {
+    private final StorageManager storageManager;
+    private final UUID spawnerUUID;
 
-    private UUID uuid;
+    private final UUID uuid;
     private final ItemStack itemStack;
     private long amount;
-    private boolean needUpdate = false;
 
-    public ZSpawnerItem(ItemStack itemStack, long amount) {
+    public ZSpawnerItem(ItemStack itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
         this.uuid = UUID.randomUUID();
         this.itemStack = itemStack;
         this.amount = amount;
-        this.needUpdate = true;
+        this.storageManager = storageManager;
+        this.spawnerUUID = spawnerUUID;
+        this.updateDB();
     }
 
-    public ZSpawnerItem(UUID uuid, String itemStack, long amount) {
+    public ZSpawnerItem(UUID uuid, String itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
         this.uuid = uuid;
         this.itemStack = Base64ItemStack.decode(itemStack);
         this.amount = amount;
+        this.storageManager = storageManager;
+        this.spawnerUUID = spawnerUUID;
     }
 
     @Override
@@ -40,24 +46,19 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     @Override
     public void setAmount(long amount) {
         this.amount = amount;
-        this.needUpdate = true;
-    }
-
-    @Override
-    public boolean needUpdate() {
-        return needUpdate;
+        this.updateDB();
     }
 
     @Override
     public void addAmount(long amount) {
         this.amount += amount;
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
     public void removeAmount(long amount) {
         this.amount -= amount;
-        this.needUpdate = true;
+        this.updateDB();
     }
 
     @Override
@@ -66,12 +67,16 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     }
 
     @Override
-    public void update() {
-        this.needUpdate = false;
+    public UUID getUniqueId() {
+        return this.uuid;
     }
 
     @Override
-    public UUID getUniqueId() {
-        return this.uuid;
+    public UUID getSpawnerUUID() {
+        return this.spawnerUUID;
+    }
+
+    public void updateDB() {
+        this.storageManager.upsertItem(this, spawnerUUID);
     }
 }

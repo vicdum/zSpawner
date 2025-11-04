@@ -9,8 +9,6 @@ import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.concurrent.TimeUnit;
-
 public class StorageManager implements SpawnerStorage {
 
     private final DatabaseType storageType;
@@ -20,11 +18,11 @@ public class StorageManager implements SpawnerStorage {
 
         FileConfiguration configuration = plugin.getConfig();
         this.storageType = DatabaseType.valueOf(configuration.getString("storage", "SQLITE"));
-        long updateInterval = configuration.getLong("updateInterval", 12000);
+//        long updateInterval = configuration.getLong("updateInterval", 12000);
 
         this.storage = new DatabaseStorage(plugin, foliaManager);
 
-        foliaManager.runTimerAsync(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
+//        foliaManager.runTimerAsync(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -49,7 +47,7 @@ public class StorageManager implements SpawnerStorage {
 
     @Override
     public void load(Persist persist) {
-        this.storage.load();
+//        this.storage.load();
     }
 
     public void saveTask() {
