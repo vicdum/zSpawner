@@ -76,7 +76,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
             this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
             return;
         }
-        fr.maxlego08.spawner.zcore.logger.Logger.info("§aThe database connection has been established successfully.", fr.maxlego08.spawner.zcore.logger.Logger.LogType.SUCCESS);
+        fr.maxlego08.spawner.zcore.logger.Logger.info("The database connection has been established successfully.", fr.maxlego08.spawner.zcore.logger.Logger.LogType.SUCCESS);
 
         MigrationManager.setDatabaseConfiguration(databaseConnection.getDatabaseConfiguration());
         MigrationManager.execute(databaseConnection, logger);
