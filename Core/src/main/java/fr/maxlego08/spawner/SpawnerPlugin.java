@@ -5,9 +5,8 @@ import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.utils.MetaUpdater;
 import fr.maxlego08.spawner.api.PlayerGive;
 import fr.maxlego08.spawner.api.ShopAction;
+import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
-import fr.maxlego08.spawner.api.storage.IStorage;
-import fr.maxlego08.spawner.api.storage.SpawnerStorage;
 import fr.maxlego08.spawner.api.team.TeamManager;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.give.DefaultGive;
@@ -18,10 +17,10 @@ import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
-import fr.maxlego08.spawner.storage.StorageManager;
 import fr.maxlego08.spawner.storage.storages.StorageManagerImp;
 import fr.maxlego08.spawner.storage.storages.ZServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
@@ -29,10 +28,7 @@ import fr.maxlego08.spawner.zcore.utils.plugins.Metrics;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
 import org.bukkit.NamespacedKey;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * System to create your plugins very simply Projet:
@@ -46,11 +42,10 @@ public class SpawnerPlugin extends ZPlugin {
     private final fr.maxlego08.spawner.storage.storages.interfaces.StorageManager storageManager = new StorageManagerImp(this, this.foliaManager);
     private final ServerDataManager serverDataManager = new ZServerDataManager(this);
 
-    private final SpawnerManager manager = new SpawnerManager(this, this.foliaManager);
+    private final SpawnerManager manager = new SpawnerManager(this, this.foliaManager, this.serverDataManager);
     private final StackableManager stackableManager = new StackableManager(this);
     private final SpawnerPlaceholders spawnerPlaceholders = new SpawnerPlaceholders(this);
     private final UpgradeManager upgradeManager = new ZUpgradeManager(this);
-    private SpawnerStorage spawnerStorage;
     private InventoryManager inventoryManager;
     private ButtonManager buttonManager;
     private ShopAction shopAction;
@@ -83,10 +78,9 @@ public class SpawnerPlugin extends ZPlugin {
         this.addSave(new MessageLoader(this));
         this.addSave(this.stackableManager);
 
-        this.spawnerStorage = new StorageManager(this, this.foliaManager);
-        this.addSave(this.spawnerStorage);
+        ServerProfile serverProfile = this.serverDataManager.getOrCreate();
 
-        this.addListener(new SpawnerListener(this, this.foliaManager));
+        this.addListener(new SpawnerListener(this, this.foliaManager, serverProfile));
         this.addListener(new SpawnerListenerPaper(this));
 
         Config.getInstance().load(this);
@@ -125,6 +119,11 @@ public class SpawnerPlugin extends ZPlugin {
         this.preDisable();
 
         this.saveFiles();
+        Collection<Spawner> spawners = this.serverDataManager.getOrCreate().getSpawners();
+        for (Spawner spawner : spawners) {
+            spawner.disable();
+        }
+        this.storageManager.saveAllNow();
 
         this.postDisable();
     }
@@ -137,14 +136,6 @@ public class SpawnerPlugin extends ZPlugin {
 
     public SpawnerManager getManager() {
         return manager;
-    }
-
-    public SpawnerStorage getSpawnerStorage() {
-        return this.spawnerStorage;
-    }
-
-    public IStorage getStorage() {
-        return this.spawnerStorage.getStorage();
     }
 
     public StackableManager getStackableManager() {

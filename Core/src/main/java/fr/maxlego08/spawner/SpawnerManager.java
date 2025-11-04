@@ -9,7 +9,6 @@ import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.api.utils.TypedMapAccessor;
 import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.enums.Sort;
-import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.ShowButton;
@@ -21,6 +20,8 @@ import fr.maxlego08.spawner.drop.VirtualDrop;
 import fr.maxlego08.spawner.loader.*;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
@@ -49,6 +50,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     private final SpawnerPlugin plugin;
     private final FoliaCompatibilityManager foliaManager;
+    private final ServerProfile serverProfile;
     private final NamespacedKey spawnerEntityKey;
     private final NamespacedKey spawnerTypeKey;
     private final NamespacedKey spawnerUuidKey;
@@ -59,10 +61,11 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     private List<Material> blacklistMaterials = new ArrayList<>();
     private SpawnerOption defaultSpawnerOption;
 
-    public SpawnerManager(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
+    public SpawnerManager(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager, ServerDataManager serverDataManager) {
         super(plugin);
         this.plugin = plugin;
         this.foliaManager = foliaManager;
+        this.serverProfile = serverDataManager.getOrCreate();
         this.spawnerTypeKey = new NamespacedKey(plugin, "type");
         this.spawnerEntityKey = new NamespacedKey(plugin, "entity");
         this.spawnerUuidKey = new NamespacedKey(plugin, "level");
@@ -70,7 +73,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     public void addSpawner(CommandSender sender, Player target, EntityType entityType, boolean silent) {
         Spawner spawner = new ZSpawner(this.plugin, target.getUniqueId(), SpawnerType.GUI, entityType, BlockFace.NORTH);
-        this.plugin.getStorage().addSpawner(spawner);
+        this.plugin.getServerDataManager().getOrCreate().addSpawner(spawner);
 
         message(this.plugin, sender, Message.ADD_SENDER, "%target%", target.getName(), "%entity%", name(entityType.name()));
         if (!silent) {
@@ -294,21 +297,22 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     @Override
     public void run() {
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(Spawner::isChunkLoaded).forEach(spawner -> {
+        Collection<Spawner> spawners = this.serverProfile.getSpawners(SpawnerType.VIRTUAL);
+        for (Spawner spawner : spawners) {
+            if (!spawner.isChunkLoaded()) continue;
             Location location = spawner.getLocation();
-            if (location == null || location.getWorld() == null) return;
+            if (location == null || location.getWorld() == null) continue;
 
             double distance = spawner.getDistance();
             int playerCount = location.getWorld().getNearbyEntities(location, distance, distance, distance, entity -> entity instanceof Player).size();
             if (playerCount > 0) spawner.tick();
             if (spawner.getOption().enableAutoKill()) spawner.autoKill();
-        });
+        }
     }
 
     public void removeSpawner(CommandSender sender, Player target, Spawner spawner, boolean silent) {
         spawner.breakBlock();
-        this.plugin.getStorage().removeSpawner(spawner);
+        this.serverProfile.deleteSpawner(spawner);
         message(this.plugin, sender, Message.REMOVE_SENDER, "%target%", target.getName(), "%spawnerKey%", spawner.getSpawnerKey());
         if (!silent) {
             message(this.plugin, target, Message.REMOVE_PLAYER);
@@ -353,7 +357,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         ItemStack itemStack = getSpawnerItemStack(player, spawner.getType(), spawner.getEntityType(), spawner);
         this.plugin.getPlayerGive().give(player, itemStack);
 
-        this.foliaManager.runAsync(()->this.plugin.getStorage().removeSpawner(spawner));
+        this.foliaManager.runAsync(() -> this.serverProfile.deleteSpawner(spawner));
         message(this.plugin, player, Message.VIRTUAL_REMOVE_SUCCESS);
     }
 
@@ -381,7 +385,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     public void removeSpawnerGui(Spawner spawner, Player player, OfflinePlayer target, int page) {
 
         spawner.breakBlock();
-        this.plugin.getStorage().removeSpawner(spawner);
+        this.serverProfile.deleteSpawner(spawner);
         message(this.plugin, player, Message.REMOVE_SENDER, "%target%", target.getName(), "%spawnerKey%", spawner.getSpawnerKey());
 
         InventoryManager inventoryManager = this.plugin.getInventoryManager();

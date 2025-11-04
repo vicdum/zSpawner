@@ -2,12 +2,12 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
-import fr.maxlego08.spawner.api.storage.IStorage;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.listener.ListenerAdapter;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -47,19 +47,16 @@ public class SpawnerListener extends ListenerAdapter {
 
     private final SpawnerPlugin plugin;
     private final FoliaCompatibilityManager foliaManager;
+    private final ServerProfile serverProfile;
 
-    public SpawnerListener(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager) {
+    public SpawnerListener(SpawnerPlugin plugin, FoliaCompatibilityManager foliaManager, ServerProfile serverProfile) {
         this.plugin = plugin;
         this.foliaManager = foliaManager;
+        this.serverProfile = serverProfile;
     }
 
     private boolean checkBlockPlaceVirtualSpawner(BlockPlaceEvent event, Block block) {
-        Optional<Spawner> optional = this.plugin.getStorage().getSpawner(SpawnerType.VIRTUAL,
-                block.getLocation(),
-                block.getLocation().add(0, 1, 0),
-                block.getLocation().add(0, 2, 0),
-                block.getLocation().add(0, 3, 0)
-        );
+        Optional<Spawner> optional = this.serverProfile.getSpawner(SpawnerType.VIRTUAL, block.getLocation());
         if (optional.isPresent()) {
             event.setCancelled(true);
             return true;
@@ -69,7 +66,7 @@ public class SpawnerListener extends ListenerAdapter {
             if (!(entity instanceof LivingEntity livingEntity)) continue;
             if (!livingEntity.getPersistentDataContainer().has(this.plugin.getSpawnerKey(), PersistentDataType.STRING))
                 continue;
-            if (this.plugin.getStorage().getSpawnerByEntity(livingEntity).isEmpty()) continue;
+            if (this.serverProfile.getSpawnerByEntity(livingEntity).isEmpty()) continue;
             event.setCancelled(true);
             return true;
         }
@@ -95,9 +92,7 @@ public class SpawnerListener extends ListenerAdapter {
             return;
         }
 
-        IStorage storage = this.plugin.getStorage();
-
-        if (storage.getSpawner(spawnerResult.spawnerId()).isPresent()) {
+        if (this.serverProfile.getSpawner(spawnerResult.spawnerId()).isPresent()) {
             message(this.plugin, player, Message.PLACE_ERROR_EXIST);
             event.setCancelled(true);
             return;
@@ -108,7 +103,7 @@ public class SpawnerListener extends ListenerAdapter {
         if (stackableManager.isEnable() && spawnerType == SpawnerType.CLASSIC) {
 
             Block blockAgainst = event.getBlockAgainst();
-            Optional<Spawner> optional = storage.getSpawner(blockAgainst.getLocation());
+            Optional<Spawner> optional = this.serverProfile.getSpawner(blockAgainst.getLocation());
 
             if (optional.isPresent()) {
                 Spawner spawner = optional.get();
@@ -144,9 +139,10 @@ public class SpawnerListener extends ListenerAdapter {
         Spawner spawner = new ZSpawner(plugin, spawnerResult.spawnerId(), player.getUniqueId(), spawnerType, entityType, blockFace);
         spawner.place(block.getLocation());
 
-        storage.addSpawner(spawner);
+        serverProfile.addSpawner(spawner);
 
-        this.foliaManager.runAsync(() -> this.plugin.getStorage().getOption(spawnerResult.spawnerId()).ifPresent(spawner::setOption));
+        this.foliaManager.runAsync(() -> this.plugin.getStorageManager().getOption(spawner.getSpawnerId()).ifPresent(spawner::setOption));
+
     }
 
     @Override
@@ -163,10 +159,9 @@ public class SpawnerListener extends ListenerAdapter {
 
         if (block.getType() == Material.SPAWNER || block.getType() == Config.virtualMaterial) {
 
-            IStorage storage = this.plugin.getStorage();
             StackableManager stackableManager = this.plugin.getStackableManager();
 
-            Optional<Spawner> optional = storage.getSpawner(block.getLocation());
+            Optional<Spawner> optional = this.serverProfile.getSpawner(block.getLocation());
             if (optional.isPresent()) {
                 Spawner spawner = optional.get();
 
@@ -179,7 +174,7 @@ public class SpawnerListener extends ListenerAdapter {
 
                 if (Config.enableSilkSpawner) {
                     if (cantSilkSpawner(player)) {
-                        storage.removeSpawner(spawner.getLocation());
+                        this.serverProfile.deleteSpawner(spawner.getLocation());
                         event.setCancelled(false);
                         return;
                     }
@@ -194,7 +189,7 @@ public class SpawnerListener extends ListenerAdapter {
 
                 spawner.disable();
                 block.setType(Material.AIR);
-                storage.removeSpawner(spawner.getLocation());
+                this.serverProfile.deleteSpawner(spawner.getLocation());
 
                 return;
             }
@@ -271,11 +266,9 @@ public class SpawnerListener extends ListenerAdapter {
 
         if (!Config.checkSpawnerExplosion()) return;
 
-        IStorage storage = this.plugin.getStorage();
-
         blocks.removeIf(block -> {
 
-            Optional<Spawner> optional = storage.getSpawner(block.getLocation());
+            Optional<Spawner> optional = this.serverProfile.getSpawner(block.getLocation());
             if (optional.isPresent()) {
                 Spawner spawner = optional.get();
                 if (spawner.getType() == SpawnerType.VIRTUAL || Config.spawnerExplosion.get(spawner.getType())) {
@@ -285,7 +278,7 @@ public class SpawnerListener extends ListenerAdapter {
                 if (Config.spawnerDrop.getOrDefault(spawner.getType(), false)) {
 
                     spawner.breakBlock();
-                    storage.removeSpawner(spawner);
+                    this.serverProfile.deleteSpawner(spawner);
 
                     block.getWorld().dropItemNaturally(block.getLocation(), this.plugin.getManager().getSpawnerItemStack(null, spawner.getType(), spawner.getEntityType(), spawner));
                     return false;
@@ -309,17 +302,15 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onPower(CreeperPowerEvent event, CreeperPowerEvent.PowerCause cause, Creeper entity, LightningStrike lightning) {
 
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawnerByEntity(entity).ifPresent(spawner -> event.setCancelled(true));
+        this.serverProfile.getSpawnerByEntity(entity).ifPresent(spawner -> event.setCancelled(true));
     }
 
     @Override
     protected void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event, Player player, Entity rightClicked) {
 
-        IStorage storage = this.plugin.getStorage();
-        if (rightClicked instanceof LivingEntity) {
+        if (rightClicked instanceof LivingEntity livingEntity) {
             if (!Objects.equals(event.getHand(), EquipmentSlot.HAND)) return;
-            storage.getSpawnerByEntity((LivingEntity) rightClicked).ifPresent(spawner -> {
+            this.serverProfile.getSpawnerByEntity(livingEntity).ifPresent(spawner -> {
                 event.setCancelled(true);
                 this.openVirtualSpawner(spawner, player, event);
             });
@@ -334,8 +325,7 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     protected void onEntityDamage(EntityDamageEvent event, LivingEntity entity, EntityDamageEvent.DamageCause cause, double finalDamage) {
 
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawnerByEntity(entity).ifPresent(spawner -> {
+        this.serverProfile.getSpawnerByEntity(entity).ifPresent(spawner -> {
 
             if (spawner.getAmount() <= 0 || cause == EntityDamageEvent.DamageCause.SUFFOCATION || cause == EntityDamageEvent.DamageCause.LAVA || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.DRYOUT || cause == EntityDamageEvent.DamageCause.POISON || cause == EntityDamageEvent.DamageCause.MAGIC || cause == EntityDamageEvent.DamageCause.DROWNING || cause == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
                 event.setCancelled(true);
@@ -421,9 +411,7 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onEntityDeath(EntityDeathEvent event, Entity entity) {
-
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawnerByDeadEntity(entity).ifPresent(spawner -> {
+        this.serverProfile.getSpawnerByDeadEntity(entity).ifPresent(spawner -> {
 
             spawner.getDeadEntities().remove(entity);
 
@@ -509,21 +497,17 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onCombust(EntityCombustEvent event, Entity entity) {
-
-        IStorage storage = this.plugin.getStorage();
-        if (entity instanceof LivingEntity) {
-            storage.getSpawnerByEntity((LivingEntity) entity).ifPresent(spawner -> event.setCancelled(true));
+        if (entity instanceof LivingEntity livingEntity) {
+            this.serverProfile.getSpawnerByEntity(livingEntity).ifPresent(spawner -> event.setCancelled(true));
         }
     }
 
     @Override
     public void onPistonExtend(BlockPistonExtendEvent event, Block block, List<Block> blocks) {
-
-        IStorage storage = this.plugin.getStorage();
         Block finalBlock = null;
         for (Block b : blocks) {
 
-            Optional<Spawner> optional = storage.getSpawner(b.getLocation());
+            Optional<Spawner> optional = this.serverProfile.getSpawner(b.getLocation());
             if (optional.isPresent()) {
                 event.setCancelled(true);
                 return;
@@ -538,7 +522,7 @@ public class SpawnerListener extends ListenerAdapter {
         if (finalBlock != null) {
 
             finalBlock = finalBlock.getRelative(blockFace);
-            Optional<Spawner> optional = storage.getSpawner(finalBlock.getLocation());
+            Optional<Spawner> optional = this.serverProfile.getSpawner(finalBlock.getLocation());
             if (optional.isPresent()) {
                 event.setCancelled(true);
                 return;
@@ -548,20 +532,28 @@ public class SpawnerListener extends ListenerAdapter {
 
         block = block.getRelative(blockFace);
 
-        Optional<Spawner> optional = storage.getSpawner(block.getLocation());
+        Optional<Spawner> optional = this.serverProfile.getSpawner(block.getLocation());
         if (optional.isPresent()) event.setCancelled(true);
     }
 
     @Override
     protected void onChunkLoad(ChunkLoadEvent event, Chunk chunk, World world) {
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(spawner -> spawner.sameChunk(chunk.getX(), chunk.getZ())).forEach(Spawner::load);
+        Collection<Spawner> spawners = this.serverProfile.getSpawners(SpawnerType.VIRTUAL);
+        for (Spawner spawner : spawners) {
+            if (spawner.sameChunk(chunk.getX(), chunk.getZ())) {
+                spawner.load();
+            }
+        }
     }
 
     @Override
     protected void onChunkUnLoad(ChunkUnloadEvent event, Chunk chunk, World world) {
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawners(SpawnerType.VIRTUAL).stream().filter(spawner -> spawner.sameChunk(chunk.getX(), chunk.getZ())).forEach(Spawner::disable);
+        Collection<Spawner> spawners = this.serverProfile.getSpawners(SpawnerType.VIRTUAL);
+        for (Spawner spawner : spawners) {
+            if (spawner.sameChunk(chunk.getX(), chunk.getZ())) {
+                spawner.disable();
+            }
+        }
     }
 
     @Override
@@ -575,9 +567,7 @@ public class SpawnerListener extends ListenerAdapter {
 
             if (!Objects.equals(event.getHand(), EquipmentSlot.HAND)) return;
 
-            IStorage storage = this.plugin.getStorage();
-            storage.getSpawner(block.getLocation()).ifPresent(spawner -> {
-
+            this.serverProfile.getSpawner(block.getLocation()).ifPresent(spawner -> {
                 if (spawner.getType() == SpawnerType.VIRTUAL && action.equals(Action.RIGHT_CLICK_BLOCK)) {
                     if (plugin.getUpgradeManager().applyUpgradeItem(spawner, player, event.getItem())) {
                         event.setCancelled(true);
@@ -647,12 +637,10 @@ public class SpawnerListener extends ListenerAdapter {
 
     private boolean hasSpawnerLimit(Cancellable event, Player player, EntityType entityType, Chunk chunk) {
 
-        IStorage storage = this.plugin.getStorage();
-
         if (Config.entityLimits.containsKey(entityType)) {
 
             int entityLimit = Config.entityLimits.get(entityType);
-            long amount = storage.countSpawners(chunk.getX(), chunk.getZ(), entityType);
+            long amount = this.serverProfile.getSpawnersInChunkCount(chunk.getX(), chunk.getZ(), entityType);
             if (amount >= entityLimit) {
                 event.setCancelled(true);
                 message(this.plugin, player, Message.LIMIT_ENTITY, "%amount%", entityLimit, "%type%", name(entityType.name()));
@@ -661,7 +649,7 @@ public class SpawnerListener extends ListenerAdapter {
         } else {
 
             int entityLimit = Config.globalLimit;
-            long amount = storage.countSpawners(chunk.getX(), chunk.getZ());
+            long amount = this.serverProfile.getSpawnersInChunkCount(chunk.getX(), chunk.getZ());
             if (amount >= entityLimit) {
                 event.setCancelled(true);
                 message(this.plugin, player, Message.LIMIT_GLOBAL, "%amount%", entityLimit);
@@ -679,8 +667,7 @@ public class SpawnerListener extends ListenerAdapter {
 
     @Override
     protected void onSlimeSplit(SlimeSplitEvent event, Slime entity) {
-        IStorage storage = this.plugin.getStorage();
-        storage.getSpawner(entity.getLocation()).ifPresent(spawner -> {
+        this.serverProfile.getSpawner(entity.getLocation()).ifPresent(spawner -> {
             event.setCancelled(true);
             entity.setSize(1);
         });
@@ -689,9 +676,8 @@ public class SpawnerListener extends ListenerAdapter {
     @Override
     public void onEntityDrop(EntityDropItemEvent event, Entity entity, Item itemDrop) {
 
-        IStorage storage = this.plugin.getStorage();
         if (entity instanceof LivingEntity living) {
-            storage.getSpawnerByEntity(living).ifPresent(spawner -> event.setCancelled(true));
+            this.serverProfile.getSpawnerByEntity(living).ifPresent(spawner -> event.setCancelled(true));
         }
     }
 }

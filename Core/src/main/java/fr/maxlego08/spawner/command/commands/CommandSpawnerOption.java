@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -57,7 +58,14 @@ public class CommandSpawnerOption extends VCommand {
         SpawnerOptionSetter spawnerOptionSetter = SpawnerOptionSetter.valueOf(this.argAsString(2).toUpperCase());
         String value = this.argAsString(3);
 
-        Optional<Spawner> optional = plugin.getStorage().getSpawners(offlinePlayer).stream().filter(e -> e.getSpawnerKey().equals(spawnerKey)).findFirst();
+        Collection<Spawner> spawners = plugin.getServerDataManager().getOrCreate().getSpawners(offlinePlayer.getUniqueId());
+        Optional<Spawner> optional = Optional.empty();
+        for (Spawner spawner : spawners) {
+            if (spawner.getSpawnerKey().equals(spawnerKey)) {
+                optional = Optional.of(spawner);
+                break;
+            }
+        }
         if (optional.isEmpty()) {
             message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);
             return CommandType.DEFAULT;

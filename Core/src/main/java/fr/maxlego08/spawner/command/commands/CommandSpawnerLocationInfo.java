@@ -10,7 +10,7 @@ import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +31,7 @@ public class CommandSpawnerLocationInfo extends VCommand {
         OfflinePlayer owner = this.argAsOfflinePlayer(0);
         String spawnerKey = this.argAsString(1);
 
-        List<Spawner> spawners = plugin.getStorage().getSpawners(owner);
+        Collection<Spawner> spawners = plugin.getServerDataManager().getOrCreate().getSpawners(owner.getUniqueId());
         Optional<Spawner> optional = Optional.empty();
         for (Spawner spawner : spawners) {
             if (spawner.getSpawnerKey().equals(spawnerKey)) {

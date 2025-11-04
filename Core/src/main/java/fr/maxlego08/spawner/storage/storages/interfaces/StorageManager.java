@@ -8,6 +8,7 @@ import fr.maxlego08.spawner.dto.OptionDTO;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface StorageManager {
@@ -27,9 +28,13 @@ public interface StorageManager {
 
     void upsertItem(SpawnerItem spawnerItem, UUID spawnerId);
 
+    Optional<SpawnerOption> getOption(UUID spawnerId);
+
     void deleteSpawner(Spawner spawner);
 
     void deleteOption(SpawnerOption spawnerOption, UUID spawnerId);
 
     void deleteItem(SpawnerItem spawnerItem, UUID spawnerId);
+
+    void saveAllNow();
 }

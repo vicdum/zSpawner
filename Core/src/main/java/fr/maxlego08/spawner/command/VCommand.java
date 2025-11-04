@@ -597,17 +597,12 @@ public abstract class VCommand extends Arguments {
         if (ownerName.isEmpty()) return Collections.emptyList();
 
         OfflinePlayer owner = Bukkit.getOfflinePlayer(ownerName);
-
-        List<Spawner> spawners = plugin.getStorage().getSpawners(owner);
-        if (spawners == null || spawners.isEmpty()) return Collections.emptyList();
-
+        
         List<String> result = new ArrayList<>();
-        for (Spawner spawner : spawners) {
+        for (Spawner spawner : plugin.getServerDataManager().getOrCreate().getSpawners(owner.getUniqueId(),type)){
             if (spawner == null) continue;
-            if (type == null || spawner.getType() == type) {
-                String key = spawner.getSpawnerKey();
-                if (key != null) result.add(key);
-            }
+            String key = spawner.getSpawnerKey();
+            if (key != null) result.add(key);
         }
         return result;
     }

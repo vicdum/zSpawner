@@ -3,12 +3,12 @@ package fr.maxlego08.spawner.buttons.gui;
 import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.menu.api.button.PaginateButton;
 import fr.maxlego08.menu.api.engine.InventoryEngine;
-import fr.maxlego08.menu.api.engine.Pagination;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,29 +16,25 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SpawnersButton extends PaginateButton {
 
     private final SpawnerPlugin plugin;
+    private final ServerProfile serverProfile;
 
     public SpawnersButton(Plugin plugin) {
         this.plugin = (SpawnerPlugin) plugin;
+        this.serverProfile = this.plugin.getServerDataManager().getOrCreate();
     }
 
     @Override
     public void onRender(Player player, InventoryEngine inventory) {
         Sort sort = this.plugin.getManager().getPlayerSort(player);
-        List<Spawner> spawners = this.plugin.getStorage().getSpawners(player, SpawnerType.GUI).stream().sorted(sort.getComparator()).collect(Collectors.toList());
-        Pagination<Spawner> pagination = new Pagination<>();
-        List<Spawner> paginatedSpawners = pagination.paginate(spawners, this.slots.size(), inventory.getPage());
-
-        for (int index = 0; index != Math.min(this.slots.size(), paginatedSpawners.size()); index++) {
-
-            int slot = this.slots.get(index);
-            Spawner spawner = paginatedSpawners.get(index);
-
+        List<Spawner> spawners = new ArrayList<>(this.serverProfile.getSpawners(player.getUniqueId(),SpawnerType.GUI));
+        spawners.sort(sort.getComparator());
+        this.paginate(spawners,inventory, (slot, spawner)->{
             MenuItemStack menuItemStack = this.getItemStack();
 
             Placeholders placeholders = new Placeholders();
@@ -54,7 +50,7 @@ public class SpawnersButton extends PaginateButton {
 
             ItemStack itemStack = menuItemStack.build(player, false, placeholders);
             inventory.addItem(slot, itemStack).setClick(event -> onClick(spawner, player, event, inventory.getPage()));
-        }
+        });
     }
 
     private void onClick(Spawner spawner, Player player, InventoryClickEvent event, int page) {
@@ -69,6 +65,6 @@ public class SpawnersButton extends PaginateButton {
 
     @Override
     public int getPaginationSize(Player player) {
-        return this.plugin.getStorage().getSpawners(player).size();
+        return this.serverProfile.getSpawners(player.getUniqueId(),SpawnerType.GUI).size();
     }
 }

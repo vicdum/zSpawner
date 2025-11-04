@@ -10,7 +10,7 @@ import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 import org.bukkit.OfflinePlayer;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public class CommandSpawnerLocationAdd extends VCommand {
@@ -39,7 +39,7 @@ public class CommandSpawnerLocationAdd extends VCommand {
             return CommandType.DEFAULT;
         }
 
-        List<Spawner> spawners = plugin.getStorage().getSpawners(owner);
+        Collection<Spawner> spawners = plugin.getServerDataManager().getOrCreate().getSpawners(owner.getUniqueId());
         Optional<Spawner> optional = Optional.empty();
         for (Spawner spawner : spawners) {
             if (spawner.getSpawnerKey().equals(spawnerKey)) {
@@ -47,6 +47,7 @@ public class CommandSpawnerLocationAdd extends VCommand {
                 break;
             }
         }
+
 
         if (optional.isEmpty()) {
             message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);

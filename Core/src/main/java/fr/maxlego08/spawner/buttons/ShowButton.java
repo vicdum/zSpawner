@@ -8,6 +8,7 @@ import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,14 +18,17 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShowButton extends PaginateButton {
 
     private final SpawnerPlugin plugin;
+    private final ServerProfile serverProfile;
 
     public ShowButton(Plugin plugin) {
         this.plugin = (SpawnerPlugin) plugin;
+        this.serverProfile = this.plugin.getServerDataManager().getOrCreate();
     }
 
     @Override
@@ -83,6 +87,7 @@ public class ShowButton extends PaginateButton {
     private List<Spawner> getSpawners(Player player) {
         PlayerSpawner playerSpawner = this.plugin.getManager().getPlayerSpawners().computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSpawner());
         OfflinePlayer offlinePlayer = playerSpawner.getTargetPlayer();
-        return offlinePlayer == null ? this.plugin.getStorage().getSpawners() : this.plugin.getStorage().getSpawners(offlinePlayer);
+
+        return new ArrayList<>(offlinePlayer == null ? this.serverProfile.getSpawners() : this.serverProfile.getSpawners(offlinePlayer.getUniqueId()));
     }
 }

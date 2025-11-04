@@ -10,6 +10,7 @@ import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
 import org.bukkit.OfflinePlayer;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
 public class CommandSpawnerRemove extends VCommand {
@@ -31,7 +32,15 @@ public class CommandSpawnerRemove extends VCommand {
         String spawnerKey = this.argAsString(1);
         boolean silent = this.argAsBoolean(2, false);
 
-        Optional<Spawner> optional = plugin.getStorage().getSpawners(offlinePlayer).stream().filter(e -> e.getSpawnerKey().equals(spawnerKey)).findFirst();
+
+        Collection<Spawner> spawners = plugin.getServerDataManager().getOrCreate().getSpawners(offlinePlayer.getUniqueId());
+        Optional<Spawner> optional = Optional.empty();
+        for (Spawner spawner : spawners) {
+            if (spawner.getSpawnerKey().equals(spawnerKey)) {
+                optional = Optional.of(spawner);
+                break;
+            }
+        }
         if (optional.isEmpty()) {
             message(this.plugin, this.sender, Message.COMMAND_SPAWNER_NOT_FOUND, "%spawnerKey%", spawnerKey);
             return CommandType.DEFAULT;
