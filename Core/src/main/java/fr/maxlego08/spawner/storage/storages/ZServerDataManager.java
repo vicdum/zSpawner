@@ -6,8 +6,10 @@ import fr.maxlego08.spawner.ZSpawnerItem;
 import fr.maxlego08.spawner.ZSpawnerOption;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
+import fr.maxlego08.spawner.storage.ZSpawnerLocationHistory;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
@@ -52,6 +54,11 @@ public class ZServerDataManager extends ZUtils implements ServerDataManager {
         for (var item : items) {
             itemsBySpawnerId.computeIfAbsent(item.spawner_id(), k -> new ArrayList<>()).add(new ZSpawnerItem(item.unique_id(),item.item_stack(),item.amount(), storageManager, item.spawner_id()));
         }
+        var locationHistories = storageManager.loadLocationHistories();
+        Map<UUID, List<SpawnerLocationHistory>> locationHistoriesBySpawnerId = new HashMap<>();
+        for (var historyDTO : locationHistories) {
+            locationHistoriesBySpawnerId.computeIfAbsent(historyDTO.spawner_id(), k -> new ArrayList<>()).add(new ZSpawnerLocationHistory(storageManager,historyDTO.spawner_id(), historyDTO.timestamp(), historyDTO.duration(), historyDTO.player_id(), historyDTO.price()));
+        }
         ServerProfile serverProfile = this.getOrCreate();
         for (SpawnerDTO spawnerDTO : spawners) {
             Spawner spawner = new ZSpawner(this.plugin, spawnerDTO.spawner_id(), spawnerDTO.owner(), spawnerDTO.type(),spawnerDTO.entity_type(), spawnerDTO.placed_at(), changeStringLocationToLocation(spawnerDTO.location()),spawnerDTO.amount(),spawnerDTO.block_face(),spawnerDTO.last_location_user(),spawnerDTO.last_location_time());
@@ -62,6 +69,11 @@ public class ZServerDataManager extends ZUtils implements ServerDataManager {
             SpawnerOption spawnerOption = spawnerOptions.get(spawnerDTO.spawner_id());
             if (spawnerOption != null) {
                 spawner.setOption(spawnerOption);
+            }
+            var histories = locationHistoriesBySpawnerId.get(spawnerDTO.spawner_id());
+            if (histories != null) {
+                histories.sort(Comparator.comparingLong(SpawnerLocationHistory::getStartTime)); // Most recent at the end
+                spawner.setLocationHistory(histories);
             }
             serverProfile.loadSpawner(spawner);
         }

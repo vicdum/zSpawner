@@ -31,6 +31,8 @@ public interface Spawner {
 
     void addLocationHistory(SpawnerLocationHistory spawnerLocationHistory);
 
+    void setLocationHistory(List<SpawnerLocationHistory> spawnerLocationHistory);
+
     List<SpawnerLocationHistory> getLocationHistory();
 
     EntityType getEntityType();

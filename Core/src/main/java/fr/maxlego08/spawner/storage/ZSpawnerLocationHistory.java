@@ -1,21 +1,28 @@
 package fr.maxlego08.spawner.storage;
 
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
+import fr.maxlego08.spawner.storage.storages.Updatable;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 
 import java.util.UUID;
 
-public class ZSpawnerLocationHistory implements SpawnerLocationHistory {
+public class ZSpawnerLocationHistory extends Updatable implements SpawnerLocationHistory {
+    private final StorageManager storageManager;
+    private final UUID spawnerId;
+
     private final long startTime;
-    private final long duration;
+    private long duration;
     private final UUID rentalPlayer;
     private final double price;
-    private boolean needUpdate;
 
-    public ZSpawnerLocationHistory(long startTime, long duration, UUID rentalPlayer, double price) {
+    public ZSpawnerLocationHistory(StorageManager storageManager,UUID spawnerId,long startTime, long duration, UUID rentalPlayer, double price) {
+        this.storageManager = storageManager;
+        this.spawnerId = spawnerId;
         this.startTime = startTime;
         this.duration = duration;
         this.rentalPlayer = rentalPlayer;
         this.price = price;
+        this.save();
     }
 
 
@@ -27,6 +34,12 @@ public class ZSpawnerLocationHistory implements SpawnerLocationHistory {
     @Override
     public long getDuration() {
         return this.duration;
+    }
+
+    @Override
+    public void setDuration(long duration) {
+        this.duration = duration;
+        this.canUpdate();
     }
 
     @Override
@@ -44,13 +57,9 @@ public class ZSpawnerLocationHistory implements SpawnerLocationHistory {
         return this.price;
     }
 
-    @Override
-    public boolean needUpdate() {
-        return this.needUpdate;
-    }
 
     @Override
-    public void update() {
-        this.needUpdate = false;
+    public void save() {
+        this.storageManager.upsertLocationHistory(this, this.spawnerId);
     }
 }

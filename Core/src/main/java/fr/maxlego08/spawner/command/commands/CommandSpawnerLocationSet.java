@@ -4,6 +4,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.command.VCommand;
+import fr.maxlego08.spawner.storage.ZSpawnerLocationHistory;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
@@ -64,8 +65,14 @@ public class CommandSpawnerLocationSet extends VCommand {
         }
 
         spawner.setLastLocationUser(renter.getUniqueId());
-        spawner.setLastLocationStartTime(System.currentTimeMillis());
-        spawner.setLastLocationTime(minutes * 60000L); // Convert minutes to milliseconds
+        long startTime = System.currentTimeMillis();
+        spawner.setLastLocationStartTime(startTime);
+        long durationMs = minutes * 60000L; // Convert minutes to milliseconds
+        spawner.setLastLocationTime(durationMs);
+
+        ZSpawnerLocationHistory history = new ZSpawnerLocationHistory(this.plugin.getStorageManager(), spawner.getSpawnerId(), startTime, durationMs, renter.getUniqueId(), 0);
+        spawner.addLocationHistory(history);
+        history.save();
 
         message(this.plugin, this.sender, Message.COMMAND_LOCATION_SET_SUCCESS,
                 "%spawnerKey%", spawnerKey,
@@ -76,4 +83,3 @@ public class CommandSpawnerLocationSet extends VCommand {
         return CommandType.SUCCESS;
     }
 }
-

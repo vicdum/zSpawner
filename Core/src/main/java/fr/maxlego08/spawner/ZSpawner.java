@@ -44,8 +44,6 @@ public class ZSpawner extends Updatable implements Spawner {
     private long lastLocationStartTime;
     private List<SpawnerLocationHistory> locationHistories = new ArrayList<>();
 
-    private int numberOfUpdates = 0;
-
     public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace, UUID lastLocationUser, long lastLocationTime) {
         this.plugin = plugin;
         this.uniqueId = uniqueId;
@@ -109,6 +107,11 @@ public class ZSpawner extends Updatable implements Spawner {
     public void addLocationHistory(SpawnerLocationHistory spawnerLocationHistory) {
         this.locationHistories.add(spawnerLocationHistory);
         this.canUpdate();
+    }
+
+    @Override
+    public void setLocationHistory(List<SpawnerLocationHistory> spawnerLocationHistory) {
+        this.locationHistories = spawnerLocationHistory;
     }
 
     @Override

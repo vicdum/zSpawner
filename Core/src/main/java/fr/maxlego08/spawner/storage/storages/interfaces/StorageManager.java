@@ -2,10 +2,12 @@ package fr.maxlego08.spawner.storage.storages.interfaces;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.dto.ItemDTO;
 import fr.maxlego08.spawner.dto.OptionDTO;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
+import fr.maxlego08.spawner.dto.SpawnerLocationHistoryDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +24,15 @@ public interface StorageManager {
 
     List<ItemDTO> loadItems();
 
+    List<SpawnerLocationHistoryDTO> loadLocationHistories();
+
     void upsertSpawner(Spawner spawner);
 
     void upsertOption(SpawnerOption spawnerOption, UUID spawnerId);
 
     void upsertItem(SpawnerItem spawnerItem, UUID spawnerId);
+
+    void upsertLocationHistory(SpawnerLocationHistory spawnerLocationHistory, UUID spawnerId);
 
     Optional<SpawnerOption> getOption(UUID spawnerId);
 

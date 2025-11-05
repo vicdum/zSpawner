@@ -3,6 +3,7 @@ package fr.maxlego08.spawner.command.commands;
 import fr.maxlego08.spawner.SpawnerManager;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.command.VCommand;
 import fr.maxlego08.spawner.zcore.enums.Message;
@@ -77,7 +78,13 @@ public class CommandSpawnerLocationAdd extends VCommand {
         }
 
         long additionalTime = minutes * 60000L; // Convert minutes to milliseconds
-        spawner.setLastLocationTime(spawner.getLastLocationTime() + additionalTime);
+        long lastLocationTime = spawner.getLastLocationTime() + additionalTime;
+        spawner.setLastLocationTime(lastLocationTime);
+
+        SpawnerLocationHistory last = spawner.getLocationHistory().getLast();
+        if (last != null) {
+            last.setDuration(lastLocationTime);
+        }
 
         String action = minutes > 0 ? "added" : "removed";
         message(this.plugin, this.sender, Message.COMMAND_LOCATION_TIME_MODIFIED,

@@ -9,10 +9,12 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.ZSpawnerOption;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.dto.ItemDTO;
 import fr.maxlego08.spawner.dto.OptionDTO;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
+import fr.maxlego08.spawner.dto.SpawnerLocationHistoryDTO;
 import fr.maxlego08.spawner.migrations.ItemMigration;
 import fr.maxlego08.spawner.migrations.OptionMigration;
 import fr.maxlego08.spawner.migrations.SpawnerLocationHistoryMigration;
@@ -157,6 +159,23 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
             }
         }
         this.requestHelper.upsertMultiple(schemas);
+        schemas.clear();
+        Iterator<SpawnerLocationHistoryDTO> locationHistoryIterator = this.cache.get(SpawnerLocationHistoryDTO.class).iterator();
+        while (locationHistoryIterator.hasNext()) {
+            SpawnerLocationHistoryDTO locationHistoryDTO = locationHistoryIterator.next();
+            locationHistoryIterator.remove();
+            if (locationHistoryDTO != null){
+                if (locationHistoryDTO.spawner_id() == null) continue;
+                schemas.add(SchemaBuilder.upsert(Tables.SPAWNER_LOCATION_HISTORY, table->{
+                    table.uuid("spawner_id", locationHistoryDTO.spawner_id()).primary();
+                    table.bigInt("timestamp", locationHistoryDTO.timestamp()).primary();
+                    table.bigInt("duration", locationHistoryDTO.duration());
+                    table.uuid("player_id", locationHistoryDTO.player_id());
+                    table.decimal("price", locationHistoryDTO.price());
+                }));
+            }
+        }
+        this.requestHelper.upsertMultiple(schemas);
     }
 
     private void spawnerToSchema(List<Schema> schemasList, SpawnerDTO spawnerDTO) {
@@ -198,6 +217,11 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
     }
 
     @Override
+    public List<SpawnerLocationHistoryDTO> loadLocationHistories() {
+        return this.selectAll(Tables.SPAWNER_LOCATION_HISTORY, SpawnerLocationHistoryDTO.class);
+    }
+
+    @Override
     public void upsertSpawner(Spawner spawner) {
         if (!this.isEnable) return;
 
@@ -219,6 +243,14 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
 
         this.cache.get(ItemDTO.class).removeIf(itemDTO -> itemDTO.spawner_id().equals(spawnerId) && itemDTO.unique_id().equals(spawnerItem.getUniqueId()));
         this.cache.add(new ItemDTO(spawnerItem.getUniqueId(), spawnerId, Base64ItemStack.encode(spawnerItem.getItemStack()), spawnerItem.getAmount()));
+    }
+
+    @Override
+    public void upsertLocationHistory(SpawnerLocationHistory spawnerLocationHistory, UUID spawnerId) {
+        if (!this.isEnable) return;
+
+        this.cache.get(SpawnerLocationHistoryDTO.class).removeIf(locationHistoryDTO -> locationHistoryDTO.spawner_id().equals(spawnerId));
+        this.cache.add(new SpawnerLocationHistoryDTO(spawnerId, spawnerLocationHistory.getStartTime(), spawnerLocationHistory.getDuration(), spawnerLocationHistory.getRentalPlayer(), spawnerLocationHistory.getPrice()));
     }
 
     @Override

@@ -144,6 +144,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("location-price", String.valueOf(spawnerOption.getLocationPrice()));
         placeholders.register("entity_type", name(spawner.getEntityType().name()));
         placeholders.register("spawner_owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
+        placeholders.register("spawner_key", spawner.getSpawnerKey());
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
@@ -242,6 +243,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ItemsButton.class, "zspawner_items"));
         buttonManager.register(new NoneLoader(this.plugin, RemoveButton.class, "zspawner_remove"));
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
+        buttonManager.register(new NoneLoader(this.plugin, LocationHistoryButton.class, "zspawner_location_history"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
         buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
         buttonManager.register(new NoneLoader(this.plugin, LocationPriceDisplayButton.class, "zspawner_location_price_display"));
@@ -262,6 +264,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/virtual.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/manage-location.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/player-location.yml");
+            inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/location-history.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/show.yml");
         } catch (InventoryException exception) {
             Logger.showException("loading inventories",exception);

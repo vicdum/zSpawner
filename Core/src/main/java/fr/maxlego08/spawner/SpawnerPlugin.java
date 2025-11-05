@@ -3,10 +3,7 @@ package fr.maxlego08.spawner;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.utils.MetaUpdater;
-import fr.maxlego08.spawner.api.PlayerGive;
-import fr.maxlego08.spawner.api.ShopAction;
-import fr.maxlego08.spawner.api.Spawner;
-import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
 import fr.maxlego08.spawner.api.team.TeamManager;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
@@ -130,6 +127,9 @@ public class SpawnerPlugin extends ZPlugin {
                 spawnerItem.save();
             }
             spawner.getOption().save();
+            for (SpawnerLocationHistory spawnerLocationHistory : spawner.getLocationHistory()){
+                spawnerLocationHistory.save();
+            }
         }
         this.storageManager.saveAllNow();
 

@@ -9,6 +9,8 @@ import fr.maxlego08.menu.hooks.currencies.Currencies;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import fr.maxlego08.spawner.storage.ZSpawnerLocationHistory;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,12 +20,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerPurchaseSpawnerLocationButton extends Button {
+    private final StorageManager storageManager;
     private final SpawnerPlugin plugin;
     private final Currencies currencies;
     private final String economyName;
 
     public PlayerPurchaseSpawnerLocationButton(SpawnerPlugin plugin, Currencies currencies, String economyName) {
         this.plugin = plugin;
+        this.storageManager = plugin.getStorageManager();
         this.currencies = currencies;
         this.economyName = economyName;
     }
@@ -55,9 +59,12 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
                     action.preExecute(player, this, inventory,placeholders);
                 }
             }
-            spawner.setLastLocationStartTime(System.currentTimeMillis());
+            long startTime = System.currentTimeMillis();
+            spawner.setLastLocationStartTime(startTime);
             spawner.setLastLocationUser(playerUniqueId);
-            spawner.setLastLocationTime(locationTime * 60000L);
+            long locationTimeMs = locationTime * 60000L;
+            spawner.setLastLocationTime(locationTimeMs);
+            spawner.addLocationHistory(new ZSpawnerLocationHistory(this.storageManager, spawner.getSpawnerId(),startTime,locationTimeMs, playerUniqueId, locationPrice.doubleValue()));
             resetPlayerLocationTime(playerSpawner);
             player.closeInventory();
         } else {
