@@ -3,9 +3,9 @@ package fr.maxlego08.spawner.command;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
-import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.commands.Arguments;
 import fr.maxlego08.spawner.zcore.utils.commands.CollectionBiConsumer;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;
@@ -454,8 +454,7 @@ public abstract class VCommand extends Arguments {
 		try {
 			return perform(plugin);
 		} catch (Exception e) {
-			if (Config.enableDebug)
-				e.printStackTrace();
+            Logger.showException("executing the command " + this.getSyntax(), e);
 			return CommandType.SYNTAX_ERROR;
 		}
 	}

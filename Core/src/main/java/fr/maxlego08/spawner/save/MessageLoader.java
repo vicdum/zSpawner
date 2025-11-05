@@ -48,7 +48,7 @@ public class MessageLoader extends YamlUtils implements Savable {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.showException("cannot create messages.yml",e);
             }
         }
 
@@ -84,7 +84,7 @@ public class MessageLoader extends YamlUtils implements Savable {
         try {
             configuration.save(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.showException("cannot save messages.yml",e);
         }
 
     }

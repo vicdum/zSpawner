@@ -1,12 +1,12 @@
 package fr.maxlego08.spawner.zcore.utils.storage;
 
-import java.io.File;
-import java.lang.reflect.Type;
-
 import com.google.gson.Gson;
 import fr.maxlego08.spawner.zcore.enums.Folder;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import org.bukkit.plugin.Plugin;
+
+import java.io.File;
+import java.lang.reflect.Type;
 
 public class Persist  {
 
@@ -117,18 +117,12 @@ public class Persist  {
 	}
 
 	public boolean save(Object instance, File file) {
-
 		try {
-
 			boolean b = DiscUtils.writeCatch(file, this.gson.toJson(instance));
 			Logger.info(file.getAbsolutePath() + " successfully saved !", Logger.LogType.SUCCESS);
 			return b;
-
 		} catch (Exception e) {
-
 			Logger.info("cannot save file " + file.getAbsolutePath(), Logger.LogType.ERROR);
-			e.printStackTrace();
-
 			return false;
 		}
 	}
@@ -148,7 +142,6 @@ public class Persist  {
 		if (content == null) {
 			return null;
 		}
-
 		try {
             return this.gson.fromJson(content, clazz);
 		} catch (Exception ex) { // output the error message rather than full
@@ -156,17 +149,14 @@ public class Persist  {
 									// likely
 			Logger.info(ex.getMessage(), Logger.LogType.ERROR);
 		}
-
 		return null;
 	}
 
 	// LOAD BY TYPE
-	@SuppressWarnings("unchecked")
 	public <T> T load(Type typeOfT, String name) {
-		return (T) load(typeOfT, getFile(name));
+		return load(typeOfT, getFile(name));
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> T load(Type typeOfT, File file) {
 		String content = DiscUtils.readCatch(file);
 		if (content == null) {
@@ -174,13 +164,12 @@ public class Persist  {
 		}
 
 		try {
-			return (T) this.gson.fromJson(content, typeOfT);
+			return this.gson.fromJson(content, typeOfT);
 		} catch (Exception ex) { // output the error message rather than full
 									// stack trace; error parsing the file, most
 									// likely
 			Logger.info(ex.getMessage(), Logger.LogType.ERROR);
 		}
-
 		return null;
 	}
 

@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.zcore.logger;
 
+import fr.maxlego08.menu.api.configuration.Config;
 import org.bukkit.Bukkit;
 
 import java.io.PrintWriter;
@@ -28,7 +29,9 @@ public class Logger {
     }
 
     public static void showException(String errorName,Throwable throwable) {
-        getLogger().printException(errorName,throwable);
+        if (Config.enableDebug) {
+            getLogger().printException(errorName,throwable);
+        }
     }
 
     public String getPrefix() {

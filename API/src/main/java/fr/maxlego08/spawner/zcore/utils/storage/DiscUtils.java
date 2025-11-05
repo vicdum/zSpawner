@@ -1,15 +1,12 @@
 package fr.maxlego08.spawner.zcore.utils.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import fr.maxlego08.spawner.zcore.logger.Logger;
+
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 
 public class DiscUtils {
 
@@ -87,7 +84,7 @@ public class DiscUtils {
 			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+            Logger.showException("cannot download url",e);
 			return false;
 		}
 	}
@@ -117,21 +114,11 @@ public class DiscUtils {
 	// -------------------------------------------- //
 
 	public static byte[] utf8(String string) {
-		try {
-			return string.getBytes(UTF8);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+        return string.getBytes(StandardCharsets.UTF_8);
+    }
 
 	public static String utf8(byte[] bytes) {
-		try {
-			return new String(bytes, UTF8);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
 
 }
