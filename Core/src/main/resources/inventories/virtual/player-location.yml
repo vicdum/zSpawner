@@ -162,7 +162,7 @@ items:
 
   # ===== INFO DISPLAY =====
   current_time_display:
-    type: zspawner_location_time_display
+    type: zspawner_location_price_display
     slot: 22
     item:
       material: CLOCK

@@ -243,7 +243,6 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         buttonManager.register(new NoneLoader(this.plugin, ShowButton.class, "zspawner_show"));
         buttonManager.register(new NoneLoader(this.plugin, ShopButton.class, "zspawner_shop"));
         buttonManager.register(new NoneLoader(this.plugin, InfoButton.class, "zspawner_info"));
-        buttonManager.register(new NoneLoader(this.plugin, LocationTimeDisplayButton.class, "zspawner_location_time_display"));
         buttonManager.register(new NoneLoader(this.plugin, LocationPriceDisplayButton.class, "zspawner_location_price_display"));
         buttonManager.register(new ToggleDropLoader(this.plugin));
         buttonManager.register(new ToggleLocationLoader(this.plugin));
