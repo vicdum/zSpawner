@@ -2,6 +2,9 @@ package fr.maxlego08.spawner.zcore.logger;
 
 import org.bukkit.Bukkit;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class Logger {
 
     private final String prefix;
@@ -22,6 +25,10 @@ public class Logger {
 
     public static void info(String message) {
         getLogger().log(message, LogType.INFO);
+    }
+
+    public static void showException(String errorName,Throwable throwable) {
+        getLogger().printException(errorName,throwable);
     }
 
     public String getPrefix() {
@@ -65,6 +72,19 @@ public class Logger {
         for (String message : messages) {
             log(message, type);
         }
+    }
+
+    public void printException(String errorName, Throwable throwable) {
+        this.log("An error occurred while "+errorName+".",LogType.ERROR);
+        this.log("Exception error message: "+throwable.getMessage(),LogType.ERROR);
+        this.log("Please check the stack trace below for more details. If you don't understand the issue report it to the developer.",LogType.ERROR);
+        this.log("------------------- Stack Trace ------------------",LogType.ERROR);
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+            throwable.printStackTrace(pw);
+        }
+        log(sw.toString(), LogType.ERROR);
+        this.log("--------------------------------------------------",LogType.ERROR);
     }
 
     public String getColoredMessage(String message) {

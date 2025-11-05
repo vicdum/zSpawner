@@ -24,6 +24,7 @@ import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
@@ -203,7 +204,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
                     MenuItemStack menuItemStack = this.plugin.getInventoryManager().loadItemStack(configuration, "items." + type + ".", file);
                     this.spawnerTypeItemStacks.put(spawnerType, menuItemStack);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Logger.showException("invalid spawner type", exception);
                 }
             });
         }
@@ -263,7 +264,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/player-location.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/show.yml");
         } catch (InventoryException exception) {
-            exception.printStackTrace();
+            Logger.showException("loading inventories",exception);
         }
     }
 

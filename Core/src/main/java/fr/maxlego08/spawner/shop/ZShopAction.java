@@ -3,6 +3,7 @@ package fr.maxlego08.spawner.shop;
 import fr.maxlego08.shop.api.ShopManager;
 import fr.maxlego08.shop.api.buttons.ItemButton;
 import fr.maxlego08.spawner.api.ShopAction;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,7 +27,7 @@ public class ZShopAction extends ZUtils implements ShopAction {
             return shopManager.getItemButton(player, itemStack);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.showException("cannot get zshop instance",exception);
             return Optional.empty();
         }
     }
