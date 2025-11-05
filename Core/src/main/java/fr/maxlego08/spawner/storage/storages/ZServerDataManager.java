@@ -10,6 +10,7 @@ import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 
 import java.util.*;
@@ -39,16 +40,17 @@ public class ZServerDataManager extends ZUtils implements ServerDataManager {
 
     @Override
     public void loadServerData() {
-        var spawners = this.plugin.getStorageManager().loadSpawners();
-        var options = this.plugin.getStorageManager().loadOptions();
+        StorageManager storageManager = this.plugin.getStorageManager();
+        var spawners = storageManager.loadSpawners();
+        var options = storageManager.loadOptions();
         Map<UUID, SpawnerOption> spawnerOptions = new HashMap<>();
         for (var optionDTO : options) {
-            spawnerOptions.put(optionDTO.spawner_id(), new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.location_enabled(), optionDTO.remaining(), optionDTO.min_location_time(), optionDTO.max_location_time(), optionDTO.location_price()));
+            spawnerOptions.put(optionDTO.spawner_id(), new ZSpawnerOption(storageManager,optionDTO.spawner_id(),optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.location_enabled(), optionDTO.remaining(), optionDTO.min_location_time(), optionDTO.max_location_time(), optionDTO.location_price()));
         }
-        var items = this.plugin.getStorageManager().loadItems();
+        var items = storageManager.loadItems();
         Map<UUID, List<SpawnerItem>> itemsBySpawnerId = new HashMap<>();
         for (var item : items) {
-            itemsBySpawnerId.computeIfAbsent(item.spawner_id(), k -> new ArrayList<>()).add(new ZSpawnerItem(item.unique_id(),item.item_stack(),item.amount(), this.plugin.getStorageManager(), item.spawner_id()));
+            itemsBySpawnerId.computeIfAbsent(item.spawner_id(), k -> new ArrayList<>()).add(new ZSpawnerItem(item.unique_id(),item.item_stack(),item.amount(), storageManager, item.spawner_id()));
         }
         ServerProfile serverProfile = this.getOrCreate();
         for (SpawnerDTO spawnerDTO : spawners) {

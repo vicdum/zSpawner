@@ -1,6 +1,6 @@
 package fr.maxlego08.spawner.api;
 
-public interface SpawnerOption extends Updatable {
+public interface SpawnerOption {
 
     double getDistance();
 
@@ -79,4 +79,6 @@ public interface SpawnerOption extends Updatable {
     void setLocationPrice(double locationPrice);
 
     void addLocationPrice(double priceToAdd);
+
+    void save();
 }

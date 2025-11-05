@@ -2,8 +2,15 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.save.Config;
+import fr.maxlego08.spawner.storage.storages.Updatable;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 
-public class ZSpawnerOption implements SpawnerOption {
+import java.util.UUID;
+
+public class ZSpawnerOption extends Updatable implements SpawnerOption {
+    private final StorageManager storageManager;
+
+    private final UUID spawnerId;
 
     private double distance;
     private double experienceMultiplier;
@@ -24,7 +31,9 @@ public class ZSpawnerOption implements SpawnerOption {
     private long maxLocationTime;
     private double locationPrice;
 
-    public ZSpawnerOption(double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute, boolean dropLoots,boolean locationEnabled, int remainingEntity, long minLocationTime, long maxLocationTime, double locationPrice) {
+    public ZSpawnerOption(StorageManager storageManager,UUID spawnerId,double distance, double experienceMultiplier, double lootMultiplier, boolean autoKill, boolean autoSell, int maxEntity, int minDelay, int maxDelay, int minSpawn, int maxSpawn, int mobPerMinute, boolean dropLoots,boolean locationEnabled, int remainingEntity, long minLocationTime, long maxLocationTime, double locationPrice) {
+        this.storageManager = storageManager;
+        this.spawnerId = spawnerId;
         this.distance = distance;
         this.experienceMultiplier = experienceMultiplier;
         this.lootMultiplier = lootMultiplier;
@@ -52,7 +61,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setDistance(double distance) {
         this.distance = distance;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -63,7 +72,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setExperienceMultiplier(double experienceMultiplier) {
         this.experienceMultiplier = experienceMultiplier;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -74,7 +83,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setLootMultiplier(double lootMultiplier) {
         this.lootMultiplier = lootMultiplier;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -95,7 +104,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMaxEntity(int maxEntity) {
         this.maxEntity = maxEntity;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -106,7 +115,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMinDelay(int minDelay) {
         this.minDelay = minDelay;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -117,7 +126,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMaxDelay(int maxDelay) {
         this.maxDelay = maxDelay;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -128,7 +137,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMinSpawn(int minSpawn) {
         this.minSpawn = minSpawn;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -139,7 +148,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMaxSpawn(int maxSpawn) {
         this.maxSpawn = maxSpawn;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -150,19 +159,19 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMobPerMinute(int mobPerMinute) {
         this.mobPerMinute = mobPerMinute;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void setAutoKill(boolean autoKill) {
         this.autoKill = autoKill;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void setAutoSell(boolean autoSell) {
         this.autoSell = autoSell;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -173,17 +182,7 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setDropLoots(boolean dropLoots) {
         this.dropLoots = dropLoots;
-        this.needUpdate = true;
-    }
-
-    @Override
-    public boolean needUpdate() {
-        return this.needUpdate;
-    }
-
-    @Override
-    public void update() {
-        this.needUpdate = false;
+        this.canUpdate();
     }
 
     @Override
@@ -199,19 +198,19 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setLocationEnabled(boolean locationEnabled) {
         this.locationEnabled = locationEnabled;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void setRemainingEntity(int remainingEntity) {
         this.remainingEntity = remainingEntity;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void removeRemainingEntity(int addedEntities) {
         this.remainingEntity -= addedEntities;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
@@ -228,7 +227,6 @@ public class ZSpawnerOption implements SpawnerOption {
                 ", minSpawn=" + minSpawn +
                 ", maxSpawn=" + maxSpawn +
                 ", mobPerMinute=" + mobPerMinute +
-                ", needUpdate=" + needUpdate +
                 ", dropLoots=" + dropLoots +
                 ", locationEnabled=" + locationEnabled +
                 ", remainingEntity=" + remainingEntity +
@@ -240,7 +238,7 @@ public class ZSpawnerOption implements SpawnerOption {
 
     @Override
     public ZSpawnerOption cloneOption() {
-        return new ZSpawnerOption(this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots, this.locationEnabled, this.remainingEntity, this.minLocationTime, this.maxLocationTime, this.locationPrice);
+        return new ZSpawnerOption(this.storageManager,this.spawnerId,this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots, this.locationEnabled, this.remainingEntity, this.minLocationTime, this.maxLocationTime, this.locationPrice);
     }
 
     @Override
@@ -251,13 +249,13 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMinLocationTime(long minLocationTime) {
         this.minLocationTime = minLocationTime;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void addMinLocationTime(long timeToAdd) {
         this.minLocationTime += timeToAdd;
-        this.needUpdate = true;
+        this.canUpdate();
         if (this.minLocationTime < 0) this.minLocationTime = 0;
     }
 
@@ -269,13 +267,13 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setMaxLocationTime(long maxLocationTime) {
         this.maxLocationTime = maxLocationTime;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void addMaxLocationTime(long timeToAdd) {
         this.maxLocationTime += timeToAdd;
-        this.needUpdate = true;
+        this.canUpdate();
         if (this.maxLocationTime < 0) this.maxLocationTime = 0;
     }
 
@@ -287,13 +285,19 @@ public class ZSpawnerOption implements SpawnerOption {
     @Override
     public void setLocationPrice(double locationPrice) {
         this.locationPrice = locationPrice;
-        this.needUpdate = true;
+        this.canUpdate();
     }
 
     @Override
     public void addLocationPrice(double priceToAdd) {
         this.locationPrice += priceToAdd;
-        this.needUpdate = true;
+        this.canUpdate();
         if (this.locationPrice < 0) this.locationPrice = 0;
+    }
+
+    @Override
+    public void save() {
+        if (this.spawnerId == null) return;
+        this.storageManager.upsertOption(this,this.spawnerId);
     }
 }

@@ -224,11 +224,11 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
     @Override
     public Optional<SpawnerOption> getOption(UUID spawnerId) {
         var options = this.requestHelper.select(Tables.OPTIONS, OptionDTO.class, table -> table.where("spawner_id", spawnerId));
-        return options.isEmpty() ? Optional.empty() : Optional.of(toOption(options.getFirst()));
+        return options.isEmpty() ? Optional.empty() : Optional.of(toOption(options.getFirst(),spawnerId));
     }
 
-    private SpawnerOption toOption(OptionDTO optionDTO) {
-        return new ZSpawnerOption(optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.location_enabled(), optionDTO.remaining(), optionDTO.min_location_time(), optionDTO.max_location_time(), optionDTO.location_price());
+    private SpawnerOption toOption(OptionDTO optionDTO, UUID spawnerId) {
+        return new ZSpawnerOption(this,spawnerId,optionDTO.distance(), optionDTO.experience_multiplier(), optionDTO.loot_multiplier(), optionDTO.auto_kill(), optionDTO.auto_sell(), optionDTO.max_entity(), optionDTO.min_delay(), optionDTO.max_delay(), optionDTO.min_spawn(), optionDTO.max_spawn(), optionDTO.mob_per_minute(), optionDTO.drop_loots(), optionDTO.location_enabled(), optionDTO.remaining(), optionDTO.min_location_time(), optionDTO.max_location_time(), optionDTO.location_price());
     }
 
     @Override

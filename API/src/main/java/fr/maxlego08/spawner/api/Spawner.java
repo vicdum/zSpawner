@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface Spawner extends Updatable {
+public interface Spawner {
 
     UUID getOwner();
 
@@ -101,4 +101,5 @@ public interface Spawner extends Updatable {
 
     void setLastLocationStartTime(long time);
 
+    void save();
 }

@@ -4,9 +4,9 @@ import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.utils.Cuboid;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
+import fr.maxlego08.spawner.storage.storages.Updatable;
 import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.zcore.logger.Logger;
-import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ZSpawner extends ZUtils implements Spawner {
+public class ZSpawner extends Updatable implements Spawner {
 
     private final SpawnerPlugin plugin;
     private final StorageManager storageManager;
@@ -32,7 +32,6 @@ public class ZSpawner extends ZUtils implements Spawner {
     private SpawnerOption spawnerOption;
     private long placedAt;
     private Location location;
-    private boolean needUpdate;
     private int amount = 0;
     private ArmorStand stackArmorstand;
     private LivingEntity livingEntity;
@@ -44,6 +43,8 @@ public class ZSpawner extends ZUtils implements Spawner {
     private long lastLocationTime;
     private long lastLocationStartTime;
     private List<SpawnerLocationHistory> locationHistories = new ArrayList<>();
+
+    private int numberOfUpdates = 0;
 
     public ZSpawner(SpawnerPlugin plugin, UUID uniqueId, UUID ownerId, SpawnerType spawnerType, EntityType entityType, long placedAt, Location location, int amount, BlockFace blockFace, UUID lastLocationUser, long lastLocationTime) {
         this.plugin = plugin;
@@ -107,7 +108,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void addLocationHistory(SpawnerLocationHistory spawnerLocationHistory) {
         this.locationHistories.add(spawnerLocationHistory);
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -126,21 +127,11 @@ public class ZSpawner extends ZUtils implements Spawner {
     }
 
     @Override
-    public boolean needUpdate() {
-        return this.needUpdate;
-    }
-
-    @Override
     public boolean sameChunk(int x, int z) {
         if (!this.isPlace()) return false;
         int chunkX = this.location.getBlockX() >> 4;
         int chunkZ = this.location.getBlockZ() >> 4;
         return x == chunkX && z == chunkZ;
-    }
-
-    @Override
-    public void update() {
-        this.needUpdate = false;
     }
 
     @Override
@@ -176,7 +167,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             spawner.update(true);
         }
 
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -187,7 +178,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setAmount(int amount) {
         this.amount = amount;
-        this.updateDB();
+        this.canUpdate();
 
         if (amount <= 1) disable();
         else this.spawnHologram();
@@ -261,7 +252,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationUser(@Nullable UUID uuid) {
         this.lastLocationUser = uuid;
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -272,7 +263,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationTime(long time) {
         this.lastLocationTime = time;
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -283,7 +274,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     @Override
     public void setLastLocationStartTime(long time) {
         this.lastLocationStartTime = time;
-        this.updateDB();
+        this.canUpdate();
     }
 
     private void spawnEntity() {
@@ -406,7 +397,7 @@ public class ZSpawner extends ZUtils implements Spawner {
         if (this.stackArmorstand != null) stackArmorstand.remove();
         if (this.livingEntity != null) livingEntity.remove();
 
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -433,7 +424,7 @@ public class ZSpawner extends ZUtils implements Spawner {
     public void entityDeath() {
 
         this.amount -= 1;
-        this.updateDB();
+        this.canUpdate();
         this.updateEntity();
 
         if (this.livingEntity != null && this.livingEntity.isValid() && ((this.livingEntity.getLocation().getBlockX() != this.location.getBlockX() || this.livingEntity.getLocation().getBlockZ() != this.location.getBlockZ()))) {
@@ -458,7 +449,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             }
         });
 
-        this.updateDB();
+        this.canUpdate();
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             this.plugin.getInventoryManager().updateInventory(onlinePlayer, plugin);
@@ -506,7 +497,7 @@ public class ZSpawner extends ZUtils implements Spawner {
             spawnerOption.removeRemainingEntity(addedEntities);
 
             if (this.amount > spawnerOption.getMaxEntity()) this.amount = spawnerOption.getMaxEntity();
-            this.updateDB();
+            this.canUpdate();
             this.updateEntity();
         }
     }
@@ -593,7 +584,8 @@ public class ZSpawner extends ZUtils implements Spawner {
         this.killEntity(count - 1);
     }
 
-    public void updateDB(){
+    @Override
+    public void save() {
         this.storageManager.upsertSpawner(this);
     }
 }

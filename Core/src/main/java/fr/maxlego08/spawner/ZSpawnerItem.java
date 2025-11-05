@@ -1,14 +1,14 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.storage.storages.Updatable;
 import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
-import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class ZSpawnerItem extends ZUtils implements SpawnerItem {
+public class ZSpawnerItem extends Updatable implements SpawnerItem {
     private final StorageManager storageManager;
     private final UUID spawnerUUID;
 
@@ -16,13 +16,15 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     private final ItemStack itemStack;
     private long amount;
 
+    private int numberOfUpdates = 0;
+
     public ZSpawnerItem(ItemStack itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
         this.uuid = UUID.randomUUID();
         this.itemStack = itemStack;
         this.amount = amount;
         this.storageManager = storageManager;
         this.spawnerUUID = spawnerUUID;
-        this.updateDB();
+        this.canUpdate();
     }
 
     public ZSpawnerItem(UUID uuid, String itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
@@ -46,19 +48,19 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
     @Override
     public void setAmount(long amount) {
         this.amount = amount;
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
     public void addAmount(long amount) {
         this.amount += amount;
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
     public void removeAmount(long amount) {
         this.amount -= amount;
-        this.updateDB();
+        this.canUpdate();
     }
 
     @Override
@@ -76,7 +78,8 @@ public class ZSpawnerItem extends ZUtils implements SpawnerItem {
         return this.spawnerUUID;
     }
 
-    public void updateDB() {
+    @Override
+    public void save() {
         this.storageManager.upsertItem(this, spawnerUUID);
     }
 }

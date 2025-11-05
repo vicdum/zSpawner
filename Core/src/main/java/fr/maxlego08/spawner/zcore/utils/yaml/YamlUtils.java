@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.zcore.utils.yaml;
 
+import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.ZSpawnerOption;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -8,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 
 public abstract class YamlUtils extends ZUtils {
 
-    protected transient final JavaPlugin plugin;
+    protected transient final SpawnerPlugin plugin;
 
     /**
      * @param plugin
      */
-    public YamlUtils(JavaPlugin plugin) {
+    public YamlUtils(SpawnerPlugin plugin) {
         super();
         this.plugin = plugin;
     }
@@ -141,7 +141,7 @@ public abstract class YamlUtils extends ZUtils {
         long maxLocationTime = configuration.getLong(path + "location.maxTime", 120);
         double locationPrice = configuration.getDouble(path + "location.price", 5000);
 
-        return new ZSpawnerOption(distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots,locationEnabled, remaining, minLocationTime, maxLocationTime, locationPrice);
+        return new ZSpawnerOption(this.plugin.getStorageManager(),null,distance, experienceMultiplier, lootMultiplier, autoKill, autoSell, maxEntity, minDelay, maxDelay, minSpawn, maxSpawn, mobPerMinute, dropLoots,locationEnabled, remaining, minLocationTime, maxLocationTime, locationPrice);
     }
 
 

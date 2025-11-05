@@ -6,6 +6,7 @@ import fr.maxlego08.menu.api.utils.MetaUpdater;
 import fr.maxlego08.spawner.api.PlayerGive;
 import fr.maxlego08.spawner.api.ShopAction;
 import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
 import fr.maxlego08.spawner.api.team.TeamManager;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
@@ -23,6 +24,7 @@ import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
+import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.plugins.Metrics;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
@@ -119,11 +121,19 @@ public class SpawnerPlugin extends ZPlugin {
         this.preDisable();
 
         this.saveFiles();
+        Logger.info("Saving spawners...");
         Collection<Spawner> spawners = this.serverDataManager.getOrCreate().getSpawners();
         for (Spawner spawner : spawners) {
             spawner.disable();
+            spawner.save();
+            for (SpawnerItem spawnerItem : spawner.getItems()) {
+                spawnerItem.save();
+            }
+            spawner.getOption().save();
         }
         this.storageManager.saveAllNow();
+
+        Logger.info("Spawners saved.", Logger.LogType.SUCCESS);
 
         this.postDisable();
     }

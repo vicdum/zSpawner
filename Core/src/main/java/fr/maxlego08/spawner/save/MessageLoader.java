@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.save;
 
+import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.MessageType;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -7,7 +8,6 @@ import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class MessageLoader extends YamlUtils implements Savable {
      *
      * @param plugin The JavaPlugin instance associated with this loader.
      */
-    public MessageLoader(JavaPlugin plugin) {
+    public MessageLoader(SpawnerPlugin plugin) {
         super(plugin);
     }
 

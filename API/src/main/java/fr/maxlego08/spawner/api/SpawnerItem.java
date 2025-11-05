@@ -21,4 +21,6 @@ public interface SpawnerItem {
     UUID getUniqueId();
 
     UUID getSpawnerUUID();
+
+    void save();
 }
