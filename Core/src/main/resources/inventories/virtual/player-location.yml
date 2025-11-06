@@ -157,7 +157,7 @@ items:
               - ""
               - "&c&l✘ Rental Failed!"
               - "&7You don't have enough money to rent this spawner."
-              - "&7Required: &6%location_price_total%$"
+              - "&7Required: &6%location_price%$"
               - ""
 
   # ===== INFO DISPLAY =====

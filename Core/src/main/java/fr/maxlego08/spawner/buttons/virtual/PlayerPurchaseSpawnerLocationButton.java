@@ -48,10 +48,10 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
         BigDecimal locationPrice = BigDecimal.valueOf(locationTime * spawner.getOption().getLocationPrice());
 
         BigDecimal balance = this.currencies.getBalance(player, this.economyName == null ? "default" : this.economyName);
+        placeholders.register("location_price", locationPrice.toString());
+        placeholders.register("location_time", String.valueOf(locationTime));
         if (balance.compareTo(locationPrice) >= 0) {
             currencies.withdraw(player, locationPrice, this.economyName == null ? "default" : this.economyName, "Location of"+spawner.getSpawnerId()+" for "+locationTime+" seconds");
-            placeholders.register("location_price", locationPrice.toString());
-            placeholders.register("location_time", String.valueOf(locationTime));
             Requirement first = this.getClickRequirements().getFirst();
             if (first != null){
                 List<Action> successActions = first.getSuccessActions();
