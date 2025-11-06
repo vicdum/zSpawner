@@ -39,6 +39,10 @@ items:
         - "&7Owner: &e%spawner_owner%"
         - "&7Spawner: &e%spawner_key%"
         - ""
+        - "&8▸ &7Total Rentals: &e%total_rentals%"
+        - "&8▸ &7Total Revenue: &a$%total_revenue%"
+        - "&8▸ &7Avg. Price: &d$%average_rental_price%"
+        - ""
         - "&8&oScroll to see all entries"
 
   header_right:

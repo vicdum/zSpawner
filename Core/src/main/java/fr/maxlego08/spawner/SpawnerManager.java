@@ -145,6 +145,15 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("entity_type", name(spawner.getEntityType().name()));
         placeholders.register("spawner_owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
         placeholders.register("spawner_key", spawner.getSpawnerKey());
+        int nbRentals =0;
+        double rentalAmount = 0;
+        for (SpawnerLocationHistory spawnerLocationHistory : spawner.getLocationHistory()) {
+            rentalAmount += spawnerLocationHistory.getPrice();
+            nbRentals++;
+        }
+        placeholders.register("location_total_rentals", String.valueOf(nbRentals));
+        placeholders.register("location_total_earned", format(rentalAmount));
+        placeholders.register("location_average_earned", format(nbRentals == 0 ? 0 : rentalAmount / nbRentals));
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
