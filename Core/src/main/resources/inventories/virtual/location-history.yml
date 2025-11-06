@@ -37,13 +37,11 @@ items:
         - "&7for this spawner."
         - ""
         - "&7Owner: &e%spawner_owner%"
-        - "&7Spawner: &e%spawner_key%"
         - ""
-        - "&8▸ &7Total Rentals: &e%total_rentals%"
-        - "&8▸ &7Total Revenue: &a$%total_revenue%"
-        - "&8▸ &7Avg. Price: &d$%average_rental_price%"
+        - "&8▸ &7Total Rentals: &e%location_total_rentals%"
+        - "&8▸ &7Total Revenue: &a$%location_total_earned%"
+        - "&8▸ &7Avg. Price: &d$%location_average_earned%"
         - ""
-        - "&8&oScroll to see all entries"
 
   header_right:
     slot: 7
@@ -70,7 +68,6 @@ items:
         - ""
         - "&7Status: %location_status%"
         - ""
-        - "&8&o[Rental Record]"
     else:
       item:
         material: BARRIER
@@ -82,6 +79,22 @@ items:
           - ""
           - "&8&oRentals will appear here"
 
+  # BACK BUTTON
+  back_button:
+    slot: 45
+    item:
+      material: RED_WOOL
+      name: "&c&l⬅ Back to Manage Location"
+      lore:
+        - ""
+        - "&7Click to return to the"
+        - "&7manage location menu."
+        - ""
+    actions:
+      - type: inventory
+        inventory: manage-location
+        plugin: zspawner
+
   # ===== INFO PANEL =====
   stats_panel:
     type: zspawner_info
@@ -91,8 +104,8 @@ items:
       name: "&a&l📊 Statistics"
       lore:
         - ""
-        - "&7Total Rentals: &e%total_rentals%"
-        - "&7Total Revenue: &a$%total_revenue%"
+        - "&7Total Rentals: &e%location_total_rentals%"
+        - "&7Total Revenue: &a$%location_total_earned%"
         - ""
         - "&8&oAll-time rental statistics"
 

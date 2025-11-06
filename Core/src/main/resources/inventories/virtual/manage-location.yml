@@ -29,7 +29,7 @@ items:
         - "&7Configure rental settings"
         - "&7for this spawner."
         - ""
-        - "&8&o[!] Owner controls"
+        - "&c[!] Owner controls"
 
   # ===== MINIMUM TIME SECTION =====
   min_time_info:
@@ -260,3 +260,25 @@ items:
         - "&7  Cost per minute for players"
         - ""
         - "&e&oAdjust these to control rentals!"
+
+  # ===== VIEW HISTORY BUTTON =====
+  view_location_history:
+    type: zspawner_info
+    slot: 50
+    item:
+      material: WRITABLE_BOOK
+      name: "&e&l📜 View Rental History"
+      lore:
+        - ""
+        - "&7Click to view all past"
+        - "&7rental records for this spawner."
+        - ""
+        - "&8▸ &7Total Rentals: &e%location_total_rentals%"
+        - "&8▸ &7Total Revenue: &e%location_total_earned%&a$"
+        - ""
+        - "&e► Click to open"
+        - ""
+    actions:
+      - type: inventory
+        inventory: location-history
+        plugin: zspawner
