@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.api;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.UUID;
 
 public interface SpawnerLocationHistory {
@@ -11,7 +13,7 @@ public interface SpawnerLocationHistory {
 
     long getEndTime();
 
-    UUID getRentalPlayer();
+    @NotNull UUID getRentalPlayer();
 
     double getPrice();
 

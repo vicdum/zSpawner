@@ -5,6 +5,7 @@ import fr.maxlego08.spawner.api.SpawnerType;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,7 +72,7 @@ public class Config {
     }
 
 
-    public void load(SpawnerPlugin plugin) {
+    public void load(@NotNull SpawnerPlugin plugin) {
 
         FileConfiguration configuration = plugin.getConfig();
 

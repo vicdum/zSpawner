@@ -4,6 +4,7 @@ import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.storage.Updatable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -237,7 +238,7 @@ public class ZSpawnerOption extends Updatable implements SpawnerOption {
     }
 
     @Override
-    public ZSpawnerOption cloneOption() {
+    public @NotNull ZSpawnerOption cloneOption() {
         return new ZSpawnerOption(this.storageManager,this.spawnerId,this.distance, this.experienceMultiplier, this.lootMultiplier, this.autoKill, this.autoSell, this.maxEntity, this.minDelay, this.maxDelay, this.minSpawn, this.maxSpawn, this.mobPerMinute, this.dropLoots, this.locationEnabled, this.remainingEntity, this.minLocationTime, this.maxLocationTime, this.locationPrice);
     }
 

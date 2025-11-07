@@ -13,6 +13,7 @@ import fr.maxlego08.spawner.api.storage.ServerDataManager;
 import fr.maxlego08.spawner.api.storage.ServerProfile;
 import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class ZServerDataManager extends ZUtils implements ServerDataManager {
     }
 
     @Override
-    public ServerProfile getOrCreate() {
+    public @NotNull ServerProfile getOrCreate() {
         return this.profile == null ? this.profile = new ZServerProfile(this.plugin.getStorageManager()) : this.profile;
     }
 

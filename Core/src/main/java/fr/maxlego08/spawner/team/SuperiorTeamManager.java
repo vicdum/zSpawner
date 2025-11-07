@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.team.TeamManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class SuperiorTeamManager implements TeamManager {
     }
 
     @Override
-    public boolean canAccess(UUID ownerId, UUID playerId) {
+    public boolean canAccess(@Nullable UUID ownerId, @Nullable UUID playerId) {
         if (ownerId == null || playerId == null) {
             return false;
         }

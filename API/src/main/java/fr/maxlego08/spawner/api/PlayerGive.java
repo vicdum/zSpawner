@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.api;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public interface PlayerGive {
 
@@ -12,6 +13,6 @@ public interface PlayerGive {
      * @param player    the player to give the item to
      * @param itemStack the item to give
      */
-    void give(Player player, ItemStack itemStack);
+    void give(@NotNull Player player, @NotNull ItemStack itemStack);
 
 }

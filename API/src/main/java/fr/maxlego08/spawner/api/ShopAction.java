@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.api;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public interface ShopAction {
 
@@ -25,6 +26,6 @@ public interface ShopAction {
      * @param amount the amount to deposit
      * @return true if the deposit was successful, false if there was a problem
      */
-    boolean deposit(Player player, ItemStack itemStack, long amount);
+    boolean deposit(@NotNull Player player, @NotNull ItemStack itemStack, long amount);
 
 }

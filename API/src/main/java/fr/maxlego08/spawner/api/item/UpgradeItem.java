@@ -3,6 +3,8 @@ package fr.maxlego08.spawner.api.item;
 import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.enums.SpawnerOptionSetter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface UpgradeItem {
 
@@ -11,21 +13,21 @@ public interface UpgradeItem {
      *
      * @return The {@link SpawnerOptionSetter} associated to this item.
      */
-    SpawnerOptionSetter getOption();
+    @NotNull SpawnerOptionSetter getOption();
 
     /**
      * Returns the {@link MenuItemStack} associated to this item.
      *
      * @return The {@link MenuItemStack} associated to this item.
      */
-    MenuItemStack getItemStack();
+    @Nullable MenuItemStack getItemStack();
 
     /**
      * Returns the value associated with this item. This value is used to apply the option to the spawner.
      *
      * @return The value associated with this item.
      */
-    Object getValue();
+    @Nullable Object getValue();
 
     /**
      * Returns the maximum value of this item. This value is used to check if the current value of the option is
@@ -33,7 +35,7 @@ public interface UpgradeItem {
      *
      * @return The maximum value of this item.
      */
-    Object getMaxValue();
+    @Nullable Object getMaxValue();
 
     /**
      * Determines if this upgrade item can be applied to the specified spawner.
@@ -56,5 +58,5 @@ public interface UpgradeItem {
      *
      * @return The display name of this item.
      */
-    String getDisplayName();
+    @NotNull String getDisplayName();
 }

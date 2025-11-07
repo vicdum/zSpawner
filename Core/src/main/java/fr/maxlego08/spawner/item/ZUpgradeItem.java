@@ -4,6 +4,8 @@ import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.enums.SpawnerOptionSetter;
 import fr.maxlego08.spawner.api.item.UpgradeItem;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ZUpgradeItem implements UpgradeItem {
 
@@ -13,7 +15,7 @@ public class ZUpgradeItem implements UpgradeItem {
     private final Object maxValue;
     private final MenuItemStack itemStack;
 
-    public ZUpgradeItem(String displayName, SpawnerOptionSetter spawnerOptionSetter, Object value, Object maxValue, MenuItemStack itemStack) {
+    public ZUpgradeItem(@NotNull String displayName, @NotNull SpawnerOptionSetter spawnerOptionSetter, @Nullable Object value, @Nullable Object maxValue, @Nullable MenuItemStack itemStack) {
         this.displayName = displayName;
         this.spawnerOptionSetter = spawnerOptionSetter;
         this.value = value;
@@ -21,27 +23,23 @@ public class ZUpgradeItem implements UpgradeItem {
         this.itemStack = itemStack;
     }
 
-    public SpawnerOptionSetter getSpawnerOptionSetter() {
-        return spawnerOptionSetter;
-    }
-
     @Override
-    public Object getMaxValue() {
+    public @Nullable Object getMaxValue() {
         return maxValue;
     }
 
     @Override
-    public MenuItemStack getItemStack() {
+    public @Nullable MenuItemStack getItemStack() {
         return itemStack;
     }
 
     @Override
-    public SpawnerOptionSetter getOption() {
+    public @NotNull SpawnerOptionSetter getOption() {
         return this.spawnerOptionSetter;
     }
 
     @Override
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return this.value;
     }
 
@@ -57,7 +55,7 @@ public class ZUpgradeItem implements UpgradeItem {
     }
 
     @Override
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return displayName;
     }
 }

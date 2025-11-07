@@ -2,6 +2,7 @@ package fr.maxlego08.spawner.storage;
 
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.storage.StorageManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class ZSpawnerLocationHistory extends Updatable implements SpawnerLocatio
     private final UUID rentalPlayer;
     private final double price;
 
-    public ZSpawnerLocationHistory(StorageManager storageManager,UUID spawnerId,long startTime, long duration, UUID rentalPlayer, double price) {
+    public ZSpawnerLocationHistory(@NotNull StorageManager storageManager,UUID spawnerId,long startTime, long duration, @NotNull UUID rentalPlayer, double price) {
         this.storageManager = storageManager;
         this.spawnerId = spawnerId;
         this.startTime = startTime;
@@ -47,7 +48,7 @@ public class ZSpawnerLocationHistory extends Updatable implements SpawnerLocatio
     }
 
     @Override
-    public UUID getRentalPlayer() {
+    public @NotNull UUID getRentalPlayer() {
         return this.rentalPlayer;
     }
 

@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public interface Spawner {
 
-    UUID getOwner();
+    @NotNull UUID getOwner();
 
     UUID getSpawnerId();
 

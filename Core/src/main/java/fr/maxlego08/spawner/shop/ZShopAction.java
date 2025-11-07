@@ -8,6 +8,7 @@ import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -42,7 +43,7 @@ public class ZShopAction extends ZUtils implements ShopAction {
     }
 
     @Override
-    public boolean deposit(Player player, ItemStack itemStack, long amount) {
+    public boolean deposit(@NotNull Player player, @NotNull ItemStack itemStack, long amount) {
         var optional = getItemButton(player, itemStack, amount);
         if (optional.isEmpty()) return false;
 

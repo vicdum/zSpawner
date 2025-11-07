@@ -1,10 +1,11 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.storage.Updatable;
 import fr.maxlego08.spawner.api.storage.StorageManager;
+import fr.maxlego08.spawner.storage.Updatable;
 import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -16,9 +17,7 @@ public class ZSpawnerItem extends Updatable implements SpawnerItem {
     private final ItemStack itemStack;
     private long amount;
 
-    private int numberOfUpdates = 0;
-
-    public ZSpawnerItem(ItemStack itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
+    public ZSpawnerItem(@NotNull ItemStack itemStack, long amount, @NotNull StorageManager storageManager, @NotNull UUID spawnerUUID) {
         this.uuid = UUID.randomUUID();
         this.itemStack = itemStack;
         this.amount = amount;
@@ -27,7 +26,7 @@ public class ZSpawnerItem extends Updatable implements SpawnerItem {
         this.canUpdate();
     }
 
-    public ZSpawnerItem(UUID uuid, String itemStack, long amount, StorageManager storageManager, UUID spawnerUUID) {
+    public ZSpawnerItem(@NotNull UUID uuid, @NotNull String itemStack, long amount, @NotNull StorageManager storageManager, @NotNull UUID spawnerUUID) {
         this.uuid = uuid;
         this.itemStack = Base64ItemStack.decode(itemStack);
         this.amount = amount;
@@ -36,7 +35,7 @@ public class ZSpawnerItem extends Updatable implements SpawnerItem {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    public @NotNull ItemStack getItemStack() {
         return this.itemStack;
     }
 
@@ -69,12 +68,12 @@ public class ZSpawnerItem extends Updatable implements SpawnerItem {
     }
 
     @Override
-    public UUID getUniqueId() {
+    public @NotNull UUID getUniqueId() {
         return this.uuid;
     }
 
     @Override
-    public UUID getSpawnerUUID() {
+    public @NotNull UUID getSpawnerUUID() {
         return this.spawnerUUID;
     }
 

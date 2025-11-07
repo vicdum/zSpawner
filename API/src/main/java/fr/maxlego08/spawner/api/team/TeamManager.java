@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.api.team;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.UUID;
 
 /**
@@ -18,5 +20,5 @@ public interface TeamManager {
      * @return {@code true} if the player is part of the owner's team and should
      * be granted access, {@code false} otherwise
      */
-    boolean canAccess(UUID ownerId, UUID playerId);
+    boolean canAccess(@Nullable UUID ownerId, @Nullable UUID playerId);
 }

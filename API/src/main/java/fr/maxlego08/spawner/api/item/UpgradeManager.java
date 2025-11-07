@@ -4,7 +4,7 @@ import fr.maxlego08.spawner.api.Spawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public interface UpgradeManager {
      *
      * @return a map of all upgrade items
      */
-    Map<String, UpgradeItem> getUpgradeItems();
+    @NotNull Map<String, UpgradeItem> getUpgradeItems();
 
     /**
      * Returns an optional of an upgrade item

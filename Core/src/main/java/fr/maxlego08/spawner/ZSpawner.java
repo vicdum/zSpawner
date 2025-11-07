@@ -14,6 +14,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -69,7 +70,7 @@ public class ZSpawner extends Updatable implements Spawner {
     }
 
     @Override
-    public UUID getOwner() {
+    public @NotNull UUID getOwner() {
         return this.ownerId;
     }
 

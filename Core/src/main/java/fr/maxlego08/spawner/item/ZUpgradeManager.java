@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class ZUpgradeManager extends ZUtils implements UpgradeManager {
     }
 
     @Override
-    public Map<String, UpgradeItem> getUpgradeItems() {
+    public @NotNull Map<String, UpgradeItem> getUpgradeItems() {
         return this.upgrades;
     }
 

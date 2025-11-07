@@ -1,12 +1,13 @@
 package fr.maxlego08.spawner.api;
 
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
 public interface SpawnerItem {
 
-    ItemStack getItemStack();
+    @NotNull ItemStack getItemStack();
 
     long getAmount();
 
@@ -18,9 +19,9 @@ public interface SpawnerItem {
 
     boolean isSimilar(ItemStack itemStack);
 
-    UUID getUniqueId();
+    @NotNull UUID getUniqueId();
 
-    UUID getSpawnerUUID();
+    @NotNull UUID getSpawnerUUID();
 
     void save();
 }

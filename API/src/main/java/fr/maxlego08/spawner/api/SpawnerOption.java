@@ -1,5 +1,7 @@
 package fr.maxlego08.spawner.api;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface SpawnerOption {
 
     double getDistance();
@@ -60,7 +62,7 @@ public interface SpawnerOption {
 
     void removeRemainingEntity(int addedEntities);
 
-    SpawnerOption cloneOption();
+    @NotNull SpawnerOption cloneOption();
 
     long getMinLocationTime();
 
