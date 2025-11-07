@@ -1,7 +1,7 @@
 package fr.maxlego08.spawner.migrations;
 
 import fr.maxlego08.sarah.database.Migration;
-import fr.maxlego08.spawner.storage.Tables;
+import fr.maxlego08.spawner.zcore.enums.Tables;
 
 public class SpawnerLocationHistoryMigration extends Migration {
     @Override

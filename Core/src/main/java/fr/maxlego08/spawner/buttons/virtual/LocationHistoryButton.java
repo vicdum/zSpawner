@@ -8,6 +8,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
+import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -86,8 +87,8 @@ public class LocationHistoryButton extends PaginateButton {
 
             long currentTime = System.currentTimeMillis();
             boolean isActive = locationHistorie.getEndTime() > currentTime;
-            placeholders.register("location_status", isActive ? "&aActif" : "&cExpiré");
-            placeholders.register("location_status_raw", isActive ? "active" : "expired");
+            placeholders.register("location_status", isActive ? Message.SPAWNER_LOCATION_STATUS_ACTIVE.getMessage() : Message.SPAWNER_LOCATION_STATUS_EXPIRED.getMessage());
+            placeholders.register("location_status_raw", isActive ? Message.SPAWNER_LOCATION_STATUS_RAW_ACTIVE.getMessage() :  Message.SPAWNER_LOCATION_STATUS_RAW_EXPIRED.getMessage());
 
             // Price
             placeholders.register("location_price", String.format("%.2f", locationHistorie.getPrice()));

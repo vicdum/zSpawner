@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage;
+package fr.maxlego08.spawner.zcore.enums;
 
 public enum Tables {
     SPAWNERS("spawners"),

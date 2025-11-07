@@ -20,6 +20,7 @@ import fr.maxlego08.spawner.migrations.ItemMigration;
 import fr.maxlego08.spawner.migrations.OptionMigration;
 import fr.maxlego08.spawner.migrations.SpawnerLocationHistoryMigration;
 import fr.maxlego08.spawner.migrations.SpawnerMigration;
+import fr.maxlego08.spawner.zcore.enums.Tables;
 import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;

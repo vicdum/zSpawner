@@ -64,6 +64,10 @@ public enum Message {
     SPAWNER_LOCATION_ALREADY_RENTED("&cThis spawner is currently rented by another player."),
     SPAWNER_PLACE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ᴘʟᴀᴄᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
     SPAWNER_REMOVE(" #8c8c8c• #92bed8ᴄʟɪᴄᴋ #e6fff3ᴛᴏ ʀᴇᴍᴏᴠᴇ ᴛʜᴇ sᴘᴀᴡɴᴇʀ"),
+    SPAWNER_LOCATION_STATUS_ACTIVE("&aActive"),
+    SPAWNER_LOCATION_STATUS_EXPIRED("&cExpired"),
+    SPAWNER_LOCATION_STATUS_RAW_ACTIVE("active"),
+    SPAWNER_LOCATION_STATUS_RAW_EXPIRED("expired"),
 
     GIVE_SENDER("§aYou just gave a spawner §f%entity% §8(§7%type%§8) §ato the player §e%target%§a."),
     GIVE_PLAYER("§aYou just received a spawner at §f%entity%§a."),
