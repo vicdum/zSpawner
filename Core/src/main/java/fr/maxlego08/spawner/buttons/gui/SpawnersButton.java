@@ -8,7 +8,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
+import fr.maxlego08.spawner.api.storage.ServerProfile;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

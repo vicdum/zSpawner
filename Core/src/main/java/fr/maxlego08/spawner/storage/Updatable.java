@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage.storages;
+package fr.maxlego08.spawner.storage;
 
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 

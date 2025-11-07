@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.dto;
+package fr.maxlego08.spawner.api.dto;
 
 import java.util.UUID;
 

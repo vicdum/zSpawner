@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage.storages;
+package fr.maxlego08.spawner.storage;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -21,20 +21,20 @@ public class TypeSafeCache {
 
     @SuppressWarnings("unchecked")
     public @NotNull <T> List<T> get(Class<T> type) {
-        return (List<T>) cache.getOrDefault(type, new ArrayList<>());
+        return (List<T>) this.cache.getOrDefault(type, new ArrayList<>());
     }
 
     public void clear(Class<?> type) {
-        cache.put(type, new ArrayList<>());
+        this.cache.put(type, new ArrayList<>());
     }
 
     public void clearAll() {
-        cache.clear();
+        this.cache.clear();
     }
 
     public boolean remove(Object object) {
         Class<?> type = object.getClass();
-        List<Object> list = cache.get(type);
+        List<Object> list = this.cache.get(type);
         if (list != null) {
             return list.remove(object);
         }

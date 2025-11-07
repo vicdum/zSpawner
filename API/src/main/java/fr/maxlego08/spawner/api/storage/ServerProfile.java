@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage.storages.interfaces;
+package fr.maxlego08.spawner.api.storage;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;

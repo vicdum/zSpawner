@@ -1,9 +1,9 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerOption;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.save.Config;
-import fr.maxlego08.spawner.storage.storages.Updatable;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
+import fr.maxlego08.spawner.storage.Updatable;
 
 import java.util.UUID;
 

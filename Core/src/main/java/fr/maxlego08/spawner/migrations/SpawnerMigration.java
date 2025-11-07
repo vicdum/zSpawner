@@ -8,7 +8,8 @@ public class SpawnerMigration extends Migration {
 
     @Override
     public void up() {
-        this.createOrAlter(Tables.SPAWNERS, table -> {
+        String spawnersTableName = Tables.SPAWNERS.getTableName();
+        this.createOrAlter(spawnersTableName, table -> {
             table.uuid("owner").primary();
             table.uuid("spawner_id").unique().primary();
             table.string("location", 255);
@@ -18,8 +19,8 @@ public class SpawnerMigration extends Migration {
             table.string("block_face", 255);
             table.integer("amount");
         });
-        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.uuid("last_location_user").nullable());
-        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.bigInt("last_location_time").defaultValue(0));
-        SchemaBuilder.alter(this, Tables.SPAWNERS, table -> table.bigInt("last_location_start_time").defaultValue(0));
+        SchemaBuilder.alter(this, spawnersTableName, table -> table.uuid("last_location_user").nullable());
+        SchemaBuilder.alter(this, spawnersTableName, table -> table.bigInt("last_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, spawnersTableName, table -> table.bigInt("last_location_start_time").defaultValue(0));
     }
 }

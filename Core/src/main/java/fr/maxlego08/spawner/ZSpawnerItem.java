@@ -1,8 +1,8 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.storage.storages.Updatable;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
+import fr.maxlego08.spawner.storage.Updatable;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.inventory.ItemStack;
 

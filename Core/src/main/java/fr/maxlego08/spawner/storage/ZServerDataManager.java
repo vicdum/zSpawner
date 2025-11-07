@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage.storages;
+package fr.maxlego08.spawner.storage;
 
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.ZSpawner;
@@ -8,10 +8,10 @@ import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
-import fr.maxlego08.spawner.dto.SpawnerDTO;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
+import fr.maxlego08.spawner.api.dto.SpawnerDTO;
+import fr.maxlego08.spawner.api.storage.ServerDataManager;
+import fr.maxlego08.spawner.api.storage.ServerProfile;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 
 import java.util.*;

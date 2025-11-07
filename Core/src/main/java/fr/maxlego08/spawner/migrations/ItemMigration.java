@@ -6,7 +6,7 @@ import fr.maxlego08.spawner.storage.Tables;
 public class ItemMigration extends Migration {
     @Override
     public void up() {
-        this.create(Tables.ITEMS, table -> {
+        this.create(Tables.ITEMS.getTableName(), table -> {
             table.uuid("unique_id").primary();
             table.uuid("spawner_id").primary();
             table.text("item_stack");

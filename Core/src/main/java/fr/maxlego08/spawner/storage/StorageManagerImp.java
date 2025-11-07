@@ -1,4 +1,4 @@
-package fr.maxlego08.spawner.storage.storages;
+package fr.maxlego08.spawner.storage;
 
 import fr.maxlego08.sarah.*;
 import fr.maxlego08.sarah.database.DatabaseType;
@@ -11,16 +11,15 @@ import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
-import fr.maxlego08.spawner.dto.ItemDTO;
-import fr.maxlego08.spawner.dto.OptionDTO;
-import fr.maxlego08.spawner.dto.SpawnerDTO;
-import fr.maxlego08.spawner.dto.SpawnerLocationHistoryDTO;
+import fr.maxlego08.spawner.api.dto.ItemDTO;
+import fr.maxlego08.spawner.api.dto.OptionDTO;
+import fr.maxlego08.spawner.api.dto.SpawnerDTO;
+import fr.maxlego08.spawner.api.dto.SpawnerLocationHistoryDTO;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.migrations.ItemMigration;
 import fr.maxlego08.spawner.migrations.OptionMigration;
 import fr.maxlego08.spawner.migrations.SpawnerLocationHistoryMigration;
 import fr.maxlego08.spawner.migrations.SpawnerMigration;
-import fr.maxlego08.spawner.storage.Tables;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.zcore.utils.GlobalDatabaseConfiguration;
 import fr.maxlego08.spawner.zcore.utils.ZUtils;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
@@ -119,7 +118,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         for (OptionDTO optionDTO : optionDTOList) {
             if (optionDTO != null){
                 if (optionDTO.spawner_id() == null) continue;
-                schemas.add(SchemaBuilder.upsert(Tables.OPTIONS, table->{
+                schemas.add(SchemaBuilder.upsert(Tables.OPTIONS.getTableName(), table->{
                     table.uuid("spawner_id", optionDTO.spawner_id()).primary();
                     table.decimal("distance", optionDTO.distance());
                     table.decimal("experience_multiplier", optionDTO.experience_multiplier());
@@ -147,7 +146,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         for (ItemDTO itemDTO : itemDTOList) {
             if (itemDTO != null){
                 if (itemDTO.item_stack() == null || itemDTO.item_stack().isEmpty()) continue;
-                schemas.add(SchemaBuilder.upsert(Tables.ITEMS, table->{
+                schemas.add(SchemaBuilder.upsert(Tables.ITEMS.getTableName(), table->{
                     table.uuid("unique_id", itemDTO.unique_id()).primary();
                     table.uuid("spawner_id", itemDTO.spawner_id()).primary();
                     table.string("item_stack", itemDTO.item_stack());
@@ -161,7 +160,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         for (SpawnerLocationHistoryDTO locationHistoryDTO : locationHistoryDTOList) {
             if (locationHistoryDTO != null){
                 if (locationHistoryDTO.spawner_id() == null) continue;
-                schemas.add(SchemaBuilder.upsert(Tables.SPAWNER_LOCATION_HISTORY, table->{
+                schemas.add(SchemaBuilder.upsert(Tables.SPAWNER_LOCATION_HISTORY.getTableName(), table->{
                     table.uuid("spawner_id", locationHistoryDTO.spawner_id()).primary();
                     table.bigInt("timestamp", locationHistoryDTO.timestamp()).primary();
                     table.bigInt("duration", locationHistoryDTO.duration());
@@ -174,7 +173,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
     }
 
     private void spawnerToSchema(List<Schema> schemasList, SpawnerDTO spawnerDTO) {
-        schemasList.add(SchemaBuilder.upsert(Tables.SPAWNERS, table->{
+        schemasList.add(SchemaBuilder.upsert(Tables.SPAWNERS.getTableName(), table->{
             table.uuid("owner", spawnerDTO.owner()).primary();
             table.uuid("spawner_id", spawnerDTO.spawner_id()).primary();
             table.string("location", spawnerDTO.location());
@@ -203,22 +202,22 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
 
     @Override
     public List<SpawnerDTO> loadSpawners() {
-        return this.selectAll(Tables.SPAWNERS, SpawnerDTO.class);
+        return this.selectAll(Tables.SPAWNERS.getTableName(), SpawnerDTO.class);
     }
 
     @Override
     public List<OptionDTO> loadOptions() {
-        return this.selectAll(Tables.OPTIONS, OptionDTO.class);
+        return this.selectAll(Tables.OPTIONS.getTableName(), OptionDTO.class);
     }
 
     @Override
     public List<ItemDTO> loadItems() {
-        return this.selectAll(Tables.ITEMS, ItemDTO.class);
+        return this.selectAll(Tables.ITEMS.getTableName(), ItemDTO.class);
     }
 
     @Override
     public List<SpawnerLocationHistoryDTO> loadLocationHistories() {
-        return this.selectAll(Tables.SPAWNER_LOCATION_HISTORY, SpawnerLocationHistoryDTO.class);
+        return this.selectAll(Tables.SPAWNER_LOCATION_HISTORY.getTableName(), SpawnerLocationHistoryDTO.class);
     }
 
     @Override
@@ -255,7 +254,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
 
     @Override
     public Optional<SpawnerOption> getOption(UUID spawnerId) {
-        var options = this.requestHelper.select(Tables.OPTIONS, OptionDTO.class, table -> table.where("spawner_id", spawnerId));
+        var options = this.requestHelper.select(Tables.OPTIONS.getTableName(), OptionDTO.class, table -> table.where("spawner_id", spawnerId));
         return options.isEmpty() ? Optional.empty() : Optional.of(toOption(options.getFirst(),spawnerId));
     }
 
@@ -269,9 +268,9 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
 
         this.cache.get(SpawnerDTO.class).removeIf(spawnerDTO ->  spawnerDTO.spawner_id().equals(spawner.getSpawnerId()) && spawnerDTO.owner().equals(spawner.getOwner()));
         this.foliaManager.runAsync(()-> {
-            this.requestHelper.delete(Tables.SPAWNERS, table -> table.where("spawner_id", spawner.getSpawnerId()).where("owner", spawner.getOwner()));
-            this.requestHelper.delete(Tables.OPTIONS, table -> table.where("spawner_id", spawner.getSpawnerId()));
-            this.requestHelper.delete(Tables.ITEMS, table -> table.where("spawner_id", spawner.getSpawnerId()));
+            this.requestHelper.delete(Tables.SPAWNER_LOCATION_HISTORY.getTableName(), table -> table.where("spawner_id", spawner.getSpawnerId()).where("owner", spawner.getOwner()));
+            this.requestHelper.delete(Tables.OPTIONS.getTableName(), table -> table.where("spawner_id", spawner.getSpawnerId()));
+            this.requestHelper.delete(Tables.ITEMS.getTableName(), table -> table.where("spawner_id", spawner.getSpawnerId()));
         });
     }
 
@@ -280,7 +279,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         if (!this.isEnable) return;
 
         this.cache.get(OptionDTO.class).removeIf(optionDTO -> optionDTO.spawner_id().equals(spawnerId));
-        this.foliaManager.runAsync(()->this.requestHelper.delete(Tables.OPTIONS, table-> table.where("spawner_id", spawnerId)));
+        this.foliaManager.runAsync(()->this.requestHelper.delete(Tables.OPTIONS.getTableName(), table-> table.where("spawner_id", spawnerId)));
     }
 
     @Override
@@ -288,7 +287,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         if (!this.isEnable) return;
 
         this.cache.get(ItemDTO.class).removeIf(itemDTO -> itemDTO.spawner_id().equals(spawnerId) && itemDTO.unique_id().equals(spawnerItem.getUniqueId()));
-        this.foliaManager.runAsync(()->this.requestHelper.delete(Tables.ITEMS, table-> table.where("spawner_id", spawnerId).where("unique_id", spawnerItem.getUniqueId())));
+        this.foliaManager.runAsync(()->this.requestHelper.delete(Tables.ITEMS.getTableName(), table-> table.where("spawner_id", spawnerId).where("unique_id", spawnerItem.getUniqueId())));
     }
 
     @Override

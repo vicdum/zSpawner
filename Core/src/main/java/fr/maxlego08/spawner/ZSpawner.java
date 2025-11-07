@@ -1,11 +1,11 @@
 package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.*;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.api.utils.Cuboid;
 import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.stackable.StackableManager;
-import fr.maxlego08.spawner.storage.storages.Updatable;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
+import fr.maxlego08.spawner.storage.Updatable;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;

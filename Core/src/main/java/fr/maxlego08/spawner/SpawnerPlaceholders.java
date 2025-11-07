@@ -2,9 +2,9 @@ package fr.maxlego08.spawner;
 
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.storage.ServerProfile;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.placeholder.LocalPlaceholder;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 

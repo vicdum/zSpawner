@@ -4,7 +4,7 @@ import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.command.VCommand;
-import fr.maxlego08.spawner.storage.storages.ZSpawnerLocationHistory;
+import fr.maxlego08.spawner.storage.ZSpawnerLocationHistory;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.utils.commands.CommandType;

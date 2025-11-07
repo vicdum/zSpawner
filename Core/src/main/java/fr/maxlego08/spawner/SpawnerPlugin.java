@@ -5,6 +5,9 @@ import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.utils.MetaUpdater;
 import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.item.UpgradeManager;
+import fr.maxlego08.spawner.api.storage.ServerDataManager;
+import fr.maxlego08.spawner.api.storage.ServerProfile;
+import fr.maxlego08.spawner.api.storage.StorageManager;
 import fr.maxlego08.spawner.api.team.TeamManager;
 import fr.maxlego08.spawner.command.commands.CommandSpawner;
 import fr.maxlego08.spawner.give.DefaultGive;
@@ -15,11 +18,8 @@ import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.save.MessageLoader;
 import fr.maxlego08.spawner.shop.ZShopAction;
 import fr.maxlego08.spawner.stackable.StackableManager;
-import fr.maxlego08.spawner.storage.storages.StorageManagerImp;
-import fr.maxlego08.spawner.storage.storages.ZServerDataManager;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
-import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
-import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
+import fr.maxlego08.spawner.storage.StorageManagerImp;
+import fr.maxlego08.spawner.storage.ZServerDataManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -177,7 +177,7 @@ public class SpawnerPlugin extends ZPlugin {
         return spawnerKey;
     }
 
-    public fr.maxlego08.spawner.storage.storages.interfaces.StorageManager getStorageManager() {
+    public StorageManager getStorageManager() {
         return storageManager;
     }
 
