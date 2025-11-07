@@ -37,6 +37,8 @@ public class Config {
     public static double minLocationPrice = 1000;
     public static double maxLocationPrice = 10000;
 
+    public static long offlinePlayerCacheDuration = 300;
+
     /**
      * static Singleton instance.
      */
@@ -76,6 +78,7 @@ public class Config {
         enableDebug = configuration.getBoolean("enableDebug", false);
         enableDebugTime = configuration.getBoolean("enableDebugTime", false);
         ownerCanBreakSpawner = configuration.getBoolean("ownerCanBreakSpawner", true);
+        offlinePlayerCacheDuration = configuration.getLong("cache-offline-player", 300);
 
         enableLimit = configuration.getBoolean("chunkLimit.enable", false);
         globalLimit = configuration.getInt("chunkLimit.global", 5);

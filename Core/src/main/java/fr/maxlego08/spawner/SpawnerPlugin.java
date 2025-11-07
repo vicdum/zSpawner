@@ -23,6 +23,7 @@ import fr.maxlego08.spawner.storage.ZServerDataManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.logger.Logger;
+import fr.maxlego08.spawner.zcore.utils.OfflinePlayerCache;
 import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.plugins.Metrics;
 import fr.maxlego08.spawner.zcore.utils.plugins.Plugins;
@@ -109,6 +110,8 @@ public class SpawnerPlugin extends ZPlugin {
             getLogger().info("Use SuperiorSkyBlock2");
             this.registerTeamManager(new SuperiorTeamManager(this));
         }
+
+        this.foliaManager.runTimerAsync(OfflinePlayerCache::clearCache, Config.offlinePlayerCacheDuration, Config.offlinePlayerCacheDuration);
 
         this.postEnable();
     }

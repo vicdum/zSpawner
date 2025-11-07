@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import fr.maxlego08.spawner.zcore.enums.Message;
+import fr.maxlego08.spawner.zcore.utils.OfflinePlayerCache;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -52,7 +53,7 @@ public class LocationHistoryButton extends PaginateButton {
             Placeholders placeholders = new Placeholders();
 
             placeholders.register("location_user_uuid", String.valueOf(locationHistorie.getRentalPlayer()));
-            OfflinePlayer offlinePlayer = this.plugin.getServer().getOfflinePlayer(locationHistorie.getRentalPlayer());
+            OfflinePlayer offlinePlayer = OfflinePlayerCache.getOfflinePlayer(locationHistorie.getRentalPlayer());
             String playerName = offlinePlayer.getName() != null ? offlinePlayer.getName() : "Unknown";
             placeholders.register("location_user", playerName);
 
