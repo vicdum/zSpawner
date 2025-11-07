@@ -9,7 +9,6 @@ import fr.maxlego08.spawner.api.SpawnerItem;
 import fr.maxlego08.spawner.api.SpawnerLocationHistory;
 import fr.maxlego08.spawner.api.SpawnerOption;
 import fr.maxlego08.spawner.dto.SpawnerDTO;
-import fr.maxlego08.spawner.storage.ZSpawnerLocationHistory;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
 import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;

@@ -28,7 +28,10 @@ import fr.maxlego08.spawner.zcore.utils.nms.Base64ItemStack;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class StorageManagerImp extends ZUtils implements StorageManager {
@@ -97,27 +100,23 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
     private void storeData(){
         List<Schema> schemas = new ArrayList<>();
         List<Schema> schemasWithLocation = new ArrayList<>();
-        Iterator<SpawnerDTO> iterator = this.cache.get(SpawnerDTO.class).iterator();
-        while (iterator.hasNext()) {
-            SpawnerDTO spawnerDTO = iterator.next();
-            iterator.remove();
+        List<SpawnerDTO> spawnerDTOList = new ArrayList<>(this.cache.get(SpawnerDTO.class));
+        this.cache.clear(SpawnerDTO.class);
+        for (SpawnerDTO spawnerDTO : spawnerDTOList) {
             if (spawnerDTO != null){
                 if (spawnerDTO.owner() == null || spawnerDTO.spawner_id() == null) continue;
                 spawnerToSchema(spawnerDTO.last_location_user() != null ? schemasWithLocation : schemas, spawnerDTO);
             }
         }
         if (!schemas.isEmpty()) {
-            this.requestHelper.upsertMultiple(schemas);
-            schemas.clear();
+            upsertMultiple(schemas);
         }
         if (!schemasWithLocation.isEmpty()) {
-            this.requestHelper.upsertMultiple(schemasWithLocation);
-            schemasWithLocation.clear();
+            upsertMultiple(schemasWithLocation);
         }
-        Iterator<OptionDTO> optionIterator = this.cache.get(OptionDTO.class).iterator();
-        while (optionIterator.hasNext()) {
-            OptionDTO optionDTO = optionIterator.next();
-            optionIterator.remove();
+        List<OptionDTO> optionDTOList = new ArrayList<>(this.cache.get(OptionDTO.class));
+        this.cache.clear(OptionDTO.class);
+        for (OptionDTO optionDTO : optionDTOList) {
             if (optionDTO != null){
                 if (optionDTO.spawner_id() == null) continue;
                 schemas.add(SchemaBuilder.upsert(Tables.OPTIONS, table->{
@@ -142,12 +141,10 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
                 }));
             }
         }
-        this.requestHelper.upsertMultiple(schemas);
-        schemas.clear();
-        Iterator<ItemDTO> itemIterator = this.cache.get(ItemDTO.class).iterator();
-        while (itemIterator.hasNext()) {
-            ItemDTO itemDTO = itemIterator.next();
-            itemIterator.remove();
+        upsertMultiple(schemas);
+        List<ItemDTO> itemDTOList = new ArrayList<>(this.cache.get(ItemDTO.class));
+        this.cache.clear(ItemDTO.class);
+        for (ItemDTO itemDTO : itemDTOList) {
             if (itemDTO != null){
                 if (itemDTO.item_stack() == null || itemDTO.item_stack().isEmpty()) continue;
                 schemas.add(SchemaBuilder.upsert(Tables.ITEMS, table->{
@@ -158,12 +155,10 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
                 }));
             }
         }
-        this.requestHelper.upsertMultiple(schemas);
-        schemas.clear();
-        Iterator<SpawnerLocationHistoryDTO> locationHistoryIterator = this.cache.get(SpawnerLocationHistoryDTO.class).iterator();
-        while (locationHistoryIterator.hasNext()) {
-            SpawnerLocationHistoryDTO locationHistoryDTO = locationHistoryIterator.next();
-            locationHistoryIterator.remove();
+        upsertMultiple(schemas);
+        List<SpawnerLocationHistoryDTO> locationHistoryDTOList = new ArrayList<>(this.cache.get(SpawnerLocationHistoryDTO.class));
+        this.cache.clear(SpawnerLocationHistoryDTO.class);
+        for (SpawnerLocationHistoryDTO locationHistoryDTO : locationHistoryDTOList) {
             if (locationHistoryDTO != null){
                 if (locationHistoryDTO.spawner_id() == null) continue;
                 schemas.add(SchemaBuilder.upsert(Tables.SPAWNER_LOCATION_HISTORY, table->{
@@ -175,7 +170,7 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
                 }));
             }
         }
-        this.requestHelper.upsertMultiple(schemas);
+        upsertMultiple(schemas);
     }
 
     private void spawnerToSchema(List<Schema> schemasList, SpawnerDTO spawnerDTO) {
@@ -194,6 +189,11 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
             table.bigInt("last_location_start_time", spawnerDTO.last_location_start_time());
             table.bigInt("amount", spawnerDTO.amount());
         }));
+    }
+
+    private void upsertMultiple(List<Schema> schemas) {
+        this.requestHelper.upsertMultiple(schemas);
+        schemas.clear();
     }
 
     @Override

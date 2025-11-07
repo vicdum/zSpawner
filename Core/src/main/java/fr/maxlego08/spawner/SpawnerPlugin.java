@@ -19,6 +19,7 @@ import fr.maxlego08.spawner.storage.storages.StorageManagerImp;
 import fr.maxlego08.spawner.storage.storages.ZServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerDataManager;
 import fr.maxlego08.spawner.storage.storages.interfaces.ServerProfile;
+import fr.maxlego08.spawner.storage.storages.interfaces.StorageManager;
 import fr.maxlego08.spawner.team.SuperiorTeamManager;
 import fr.maxlego08.spawner.zcore.ZPlugin;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -38,7 +39,7 @@ import java.util.*;
 public class SpawnerPlugin extends ZPlugin {
     private final FoliaCompatibilityManager foliaManager = new FoliaCompatibilityManager(this);
 
-    private final fr.maxlego08.spawner.storage.storages.interfaces.StorageManager storageManager = new StorageManagerImp(this, this.foliaManager);
+    private final StorageManager storageManager = new StorageManagerImp(this, this.foliaManager);
     private final ServerDataManager serverDataManager = new ZServerDataManager(this);
 
     private final SpawnerManager manager = new SpawnerManager(this, this.foliaManager, this.serverDataManager);
