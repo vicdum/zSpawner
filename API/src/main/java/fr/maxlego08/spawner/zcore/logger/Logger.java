@@ -28,8 +28,8 @@ public class Logger {
         getLogger().log(message, LogType.INFO);
     }
 
-    public static void showException(String errorName,Throwable throwable) {
-        if (Config.enableDebug) {
+    public static void showException(boolean enableDebug, String errorName,Throwable throwable) {
+        if (enableDebug) {
             getLogger().printException(errorName,throwable);
         }
     }

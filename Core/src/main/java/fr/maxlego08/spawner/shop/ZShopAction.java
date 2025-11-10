@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.shop;
 
+import fr.maxlego08.menu.api.configuration.Config;
 import fr.maxlego08.shop.api.ShopManager;
 import fr.maxlego08.shop.api.buttons.ItemButton;
 import fr.maxlego08.spawner.api.ShopAction;
@@ -28,7 +29,7 @@ public class ZShopAction extends ZUtils implements ShopAction {
             return shopManager.getItemButton(player, itemStack);
 
         } catch (Exception exception) {
-            Logger.showException("cannot get zshop instance",exception);
+            Logger.showException(Config.enableDebug, "cannot get zshop instance",exception);
             return Optional.empty();
         }
     }

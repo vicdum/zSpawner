@@ -1,5 +1,6 @@
 package fr.maxlego08.spawner.zcore.utils.storage;
 
+import fr.maxlego08.menu.api.configuration.Config;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 
 import java.io.*;
@@ -84,7 +85,7 @@ public class DiscUtils {
 			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
 			return true;
 		} catch (Exception e) {
-            Logger.showException("cannot download url",e);
+            Logger.showException(Config.enableDebug, "cannot download url",e);
 			return false;
 		}
 	}

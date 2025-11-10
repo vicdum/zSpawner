@@ -1,13 +1,18 @@
 package fr.maxlego08.spawner.zcore.utils.nms;
 
 
+import fr.maxlego08.menu.api.configuration.Config;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Base64;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -26,7 +31,7 @@ public class Base64ItemStack {
             objectOutputStream.close();
             return Base64.encode(byteArrayOutputStream.toByteArray());
         } catch (IOException exception) {
-            Logger.showException("cannot encode item",exception);
+            Logger.showException(Config.enableDebug, "cannot encode item", exception);
             return null;
         }
     }
@@ -40,7 +45,7 @@ public class Base64ItemStack {
             objectInputStream.close();
             return item;
         } catch (IOException | ClassNotFoundException exception) {
-            Logger.showException("cannot decode item",exception);
+            Logger.showException(Config.enableDebug, "cannot decode item", exception);
             return null;
         }
     }

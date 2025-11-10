@@ -51,7 +51,7 @@ database-configuration:
   password: secret
   port: 3306
   host: 192.168.10.10
-  debug: true
+  debug: false
   database: zspawner
 
 spawner-location:

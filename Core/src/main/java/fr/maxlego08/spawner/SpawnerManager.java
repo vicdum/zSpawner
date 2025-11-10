@@ -3,11 +3,17 @@ package fr.maxlego08.spawner;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.MenuItemStack;
+import fr.maxlego08.menu.api.configuration.Config;
 import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.api.utils.TypedMapAccessor;
-import fr.maxlego08.spawner.api.*;
+import fr.maxlego08.spawner.api.ShopAction;
+import fr.maxlego08.spawner.api.Spawner;
+import fr.maxlego08.spawner.api.SpawnerItem;
+import fr.maxlego08.spawner.api.SpawnerLocationHistory;
+import fr.maxlego08.spawner.api.SpawnerOption;
+import fr.maxlego08.spawner.api.SpawnerType;
 import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.api.storage.ServerDataManager;
 import fr.maxlego08.spawner.api.storage.ServerProfile;
@@ -16,10 +22,21 @@ import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.ShowButton;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
-import fr.maxlego08.spawner.buttons.virtual.*;
+import fr.maxlego08.spawner.buttons.virtual.InfoButton;
+import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
+import fr.maxlego08.spawner.buttons.virtual.LocationHistoryButton;
+import fr.maxlego08.spawner.buttons.virtual.LocationPriceDisplayButton;
+import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
+import fr.maxlego08.spawner.buttons.virtual.ShopButton;
 import fr.maxlego08.spawner.drop.CustomVirtualDrop;
 import fr.maxlego08.spawner.drop.VirtualDrop;
-import fr.maxlego08.spawner.loader.*;
+import fr.maxlego08.spawner.loader.LocationPriceActionLoader;
+import fr.maxlego08.spawner.loader.MaxLocationTimeActionLoader;
+import fr.maxlego08.spawner.loader.MinLocationTimeActionLoader;
+import fr.maxlego08.spawner.loader.PlayerLocationPriceActionLoader;
+import fr.maxlego08.spawner.loader.PlayerPurchaseLocationButtonLoader;
+import fr.maxlego08.spawner.loader.ToggleDropLoader;
+import fr.maxlego08.spawner.loader.ToggleLocationLoader;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.enums.Message;
@@ -45,7 +62,14 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
@@ -145,7 +169,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("entity_type", name(spawner.getEntityType().name()));
         placeholders.register("spawner_owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
         placeholders.register("spawner_key", spawner.getSpawnerKey());
-        int nbRentals =0;
+        int nbRentals = 0;
         double rentalAmount = 0;
         for (SpawnerLocationHistory spawnerLocationHistory : spawner.getLocationHistory()) {
             rentalAmount += spawnerLocationHistory.getPrice();
@@ -193,9 +217,13 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public void giveSpawner(CommandSender sender, Player target, SpawnerType spawnerType, EntityType entityType, boolean silent) {
-        ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, null);
+
+        var fakeSpawner = new ZSpawner(this.plugin, target.getUniqueId(), spawnerType, entityType, BlockFace.NORTH);
+        ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, fakeSpawner);
+
         this.plugin.getPlayerGive().give(target, itemStack);
         message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
+        
         if (!silent) {
             message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
         }
@@ -214,7 +242,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
                     MenuItemStack menuItemStack = this.plugin.getInventoryManager().loadItemStack(configuration, "items." + type + ".", file);
                     this.spawnerTypeItemStacks.put(spawnerType, menuItemStack);
                 } catch (Exception exception) {
-                    Logger.showException("invalid spawner type", exception);
+                    Logger.showException(Config.enableDebug, "invalid spawner type", exception);
                 }
             });
         }
@@ -276,7 +304,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/location-history.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/show.yml");
         } catch (InventoryException exception) {
-            Logger.showException("loading inventories",exception);
+            Logger.showException(Config.enableDebug, "loading inventories", exception);
         }
     }
 

@@ -3,6 +3,7 @@ package fr.maxlego08.spawner.command;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.api.Spawner;
 import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.save.Config;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.Permission;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -454,7 +455,7 @@ public abstract class VCommand extends Arguments {
 		try {
 			return perform(plugin);
 		} catch (Exception e) {
-            Logger.showException("executing the command " + this.getSyntax(), e);
+            Logger.showException(Config.enableDebug, "Executing the command " + this.getSyntax(), e);
 			return CommandType.SYNTAX_ERROR;
 		}
 	}
