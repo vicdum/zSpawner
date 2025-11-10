@@ -36,11 +36,11 @@ items:
         - "&7View all past rental records"
         - "&7for this spawner."
         - ""
-        - "&7Owner: &e%spawner_owner%"
+        - "&7Owner: &e%spawner-owner%"
         - ""
-        - "&8▸ &7Total Rentals: &e%location_total_rentals%"
-        - "&8▸ &7Total Revenue: &a$%location_total_earned%"
-        - "&8▸ &7Avg. Price: &d$%location_average_earned%"
+        - "&8▸ &7Total Rentals: &e%location-total-rentals%"
+        - "&8▸ &7Total Revenue: &a$%location-total-earned%"
+        - "&8▸ &7Avg. Price: &d$%location-average-earned%"
         - ""
 
   header_right:
@@ -61,10 +61,10 @@ items:
       name: "&e&l👤 %location_user%"
       lore:
         - ""
-        - "&8▸ &7Start Date: &b%location_date%"
-        - "&8▸ &7End Date: &b%location_end_date%"
-        - "&8▸ &7Duration: &d%location_duration%"
-        - "&8▸ &7Price Paid: &a$%location_price%"
+        - "&8▸ &7Start Date: &b%location-date%"
+        - "&8▸ &7End Date: &b%location-end-date%"
+        - "&8▸ &7Duration: &d%location-duration%"
+        - "&8▸ &7Price Paid: &a$%location-price%"
         - ""
         - "&7Status: %location_status%"
         - ""
@@ -104,8 +104,8 @@ items:
       name: "&a&l📊 Statistics"
       lore:
         - ""
-        - "&7Total Rentals: &e%location_total_rentals%"
-        - "&7Total Revenue: &a$%location_total_earned%"
+        - "&7Total Rentals: &e%location-total-rentals%"
+        - "&7Total Revenue: &a$%location-total-earned%"
         - ""
         - "&8&oAll-time rental statistics"
 

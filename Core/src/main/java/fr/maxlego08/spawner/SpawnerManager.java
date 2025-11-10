@@ -147,7 +147,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     }
 
     public void registerPlaceholders(Placeholders placeholders, Spawner spawner) {
+
         SpawnerOption spawnerOption = spawner == null ? this.defaultSpawnerOption : spawner.getOption();
+
         placeholders.register("auto-kill", spawnerOption.enableAutoKill() ? Message.YES.msg() : Message.NO.msg());
         placeholders.register("auto-sell", spawnerOption.enableAutoSell() ? Message.YES.msg() : Message.NO.msg());
         placeholders.register("max-entity", format(spawnerOption.getMaxEntity()));
@@ -166,18 +168,21 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         placeholders.register("min-location-time", String.valueOf(spawnerOption.getMinLocationTime()));
         placeholders.register("max-location-time", String.valueOf(spawnerOption.getMaxLocationTime()));
         placeholders.register("location-price", String.valueOf(spawnerOption.getLocationPrice()));
-        placeholders.register("entity_type", name(spawner.getEntityType().name()));
-        placeholders.register("spawner_owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
-        placeholders.register("spawner_key", spawner.getSpawnerKey());
-        int nbRentals = 0;
-        double rentalAmount = 0;
-        for (SpawnerLocationHistory spawnerLocationHistory : spawner.getLocationHistory()) {
-            rentalAmount += spawnerLocationHistory.getPrice();
-            nbRentals++;
+
+        if (spawner != null) {
+            placeholders.register("entity-type", name(spawner.getEntityType().name()));
+            placeholders.register("spawner-owner", this.plugin.getServer().getOfflinePlayer(spawner.getOwner()).getName());
+            placeholders.register("spawner-key", spawner.getSpawnerKey());
+            int nbRentals = 0;
+            double rentalAmount = 0;
+            for (SpawnerLocationHistory spawnerLocationHistory : spawner.getLocationHistory()) {
+                rentalAmount += spawnerLocationHistory.getPrice();
+                nbRentals++;
+            }
+            placeholders.register("location-total-rentals", String.valueOf(nbRentals));
+            placeholders.register("location-total-earned", format(rentalAmount));
+            placeholders.register("location-average-earned", format(nbRentals == 0 ? 0 : rentalAmount / nbRentals));
         }
-        placeholders.register("location_total_rentals", String.valueOf(nbRentals));
-        placeholders.register("location_total_earned", format(rentalAmount));
-        placeholders.register("location_average_earned", format(nbRentals == 0 ? 0 : rentalAmount / nbRentals));
     }
 
     public ItemStack getSpawnerItemStack(Player player, SpawnerType spawnerType, EntityType entityType, Spawner spawner) {
@@ -194,7 +199,9 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.spawnerTypeKey, PersistentDataType.STRING, spawnerType.name());
         persistentDataContainer.set(this.spawnerEntityKey, PersistentDataType.STRING, entityType.name());
-        persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawner.getSpawnerId().toString());
+        if (spawner != null) {
+            persistentDataContainer.set(this.spawnerUuidKey, PersistentDataType.STRING, spawner.getSpawnerId().toString());
+        }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -218,12 +225,11 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
     public void giveSpawner(CommandSender sender, Player target, SpawnerType spawnerType, EntityType entityType, boolean silent) {
 
-        var fakeSpawner = new ZSpawner(this.plugin, target.getUniqueId(), spawnerType, entityType, BlockFace.NORTH);
-        ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, fakeSpawner);
+        ItemStack itemStack = getSpawnerItemStack(target, spawnerType, entityType, null);
 
         this.plugin.getPlayerGive().give(target, itemStack);
         message(this.plugin, sender, Message.GIVE_SENDER, "%target%", target.getName(), "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
-        
+
         if (!silent) {
             message(this.plugin, target, Message.GIVE_PLAYER, "%type%", name(spawnerType.name()), "%entity%", name(entityType.name()), "%translation%", entityType.translationKey());
         }

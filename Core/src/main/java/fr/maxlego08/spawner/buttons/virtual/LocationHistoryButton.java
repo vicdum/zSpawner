@@ -52,14 +52,14 @@ public class LocationHistoryButton extends PaginateButton {
         this.paginate(locationHistories, inventory, (slot, locationHistorie)->{
             Placeholders placeholders = new Placeholders();
 
-            placeholders.register("location_user_uuid", String.valueOf(locationHistorie.getRentalPlayer()));
+            placeholders.register("location_user-uuid", String.valueOf(locationHistorie.getRentalPlayer()));
             OfflinePlayer offlinePlayer = OfflinePlayerCache.getOfflinePlayer(locationHistorie.getRentalPlayer());
             String playerName = offlinePlayer.getName() != null ? offlinePlayer.getName() : "Unknown";
-            placeholders.register("location_user", playerName);
+            placeholders.register("location-user", playerName);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             String formattedDate = dateFormat.format(new Date(locationHistorie.getStartTime()));
-            placeholders.register("location_date", formattedDate);
+            placeholders.register("location-date", formattedDate);
 
             long durationMs = locationHistorie.getDuration();
             long durationMinutes = TimeUnit.MILLISECONDS.toMinutes(durationMs);
@@ -80,19 +80,19 @@ public class LocationHistoryButton extends PaginateButton {
                 formattedDuration = String.format("%d minutes", durationMinutes);
             }
 
-            placeholders.register("location_duration", formattedDuration);
-            placeholders.register("location_duration_minutes", String.valueOf(durationMinutes));
+            placeholders.register("location-duration", formattedDuration);
+            placeholders.register("location-duration-minutes", String.valueOf(durationMinutes));
 
             String formattedEndTime = dateFormat.format(new Date(locationHistorie.getEndTime()));
-            placeholders.register("location_end_date", formattedEndTime);
+            placeholders.register("location-end-date", formattedEndTime);
 
             long currentTime = System.currentTimeMillis();
             boolean isActive = locationHistorie.getEndTime() > currentTime;
-            placeholders.register("location_status", isActive ? Message.SPAWNER_LOCATION_STATUS_ACTIVE.getMessage() : Message.SPAWNER_LOCATION_STATUS_EXPIRED.getMessage());
-            placeholders.register("location_status_raw", isActive ? Message.SPAWNER_LOCATION_STATUS_RAW_ACTIVE.getMessage() :  Message.SPAWNER_LOCATION_STATUS_RAW_EXPIRED.getMessage());
+            placeholders.register("location-status", isActive ? Message.SPAWNER_LOCATION_STATUS_ACTIVE.getMessage() : Message.SPAWNER_LOCATION_STATUS_EXPIRED.getMessage());
+            placeholders.register("location-status-raw", isActive ? Message.SPAWNER_LOCATION_STATUS_RAW_ACTIVE.getMessage() :  Message.SPAWNER_LOCATION_STATUS_RAW_EXPIRED.getMessage());
 
             // Price
-            placeholders.register("location_price", String.format("%.2f", locationHistorie.getPrice()));
+            placeholders.register("location-price", String.format("%.2f", locationHistorie.getPrice()));
 
             ItemStack itemStack = this.getItemStack().build(player, false, placeholders);
             if (itemStack.getType() == Material.PLAYER_HEAD){

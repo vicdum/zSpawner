@@ -37,9 +37,9 @@ public class LocationPriceDisplayButton extends Button {
             double locationPricePerMinute = spawner.getOption().getLocationPrice();
             BigDecimal totalPrice = BigDecimal.valueOf(locationTime * locationPricePerMinute);
 
-            placeholders.register("location_time", String.valueOf(locationTime));
-            placeholders.register("location_price", String.valueOf(locationPricePerMinute));
-            placeholders.register("location_price_total", totalPrice.toString());
+            placeholders.register("location-time", String.valueOf(locationTime));
+            placeholders.register("location-price", String.valueOf(locationPricePerMinute));
+            placeholders.register("location-price-total", totalPrice.toString());
         }
 
         return getItemStack().build(player, false, placeholders);

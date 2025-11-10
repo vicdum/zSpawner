@@ -26,8 +26,8 @@ items:
       name: "&e&l⚡ Spawner Information"
       lore:
         - ""
-        - "&7Owner: &e%spawner_owner%"
-        - "&7Entity: &e%entity_type%"
+        - "&7Owner: &e%spawner-owner%"
+        - "&7Entity: &e%entity-type%"
         - ""
         - "&8&o[!] This spawner is available for rent"
 
@@ -128,14 +128,14 @@ items:
       lore:
         - ""
         - "&7Click to rent this spawner"
-        - "&7for &6%location_time% minutes&7."
+        - "&7for &6%location-time% minutes&7."
         - ""
-        - "&8▸ &7Price per minute: &6%location_price%$"
-        - "&8▸ &7Total price: &6%location_price_total%$"
+        - "&8▸ &7Price per minute: &6%location-price%$"
+        - "&8▸ &7Total price: &6%location-price-total%$"
         - ""
         - "&e&l⚠ Rental Limits:"
-        - "&7  • Minimum: &e%min_location_time% minutes"
-        - "&7  • Maximum: &e%max_location_time% minutes"
+        - "&7  • Minimum: &e%min-location-time% minutes"
+        - "&7  • Maximum: &e%max-location-time% minutes"
         - ""
         - "&a&l► Click to purchase!"
         - ""
@@ -148,7 +148,7 @@ items:
             messages:
               - ""
               - "&a&l✔ Rental Successful!"
-              - "&7You have rented this spawner for &6%location_time% minutes&7."
+              - "&7You have rented this spawner for &6%location-time% minutes&7."
               - "&7Only you can kill mobs and receive loot during this time."
               - ""
         deny:
@@ -157,7 +157,7 @@ items:
               - ""
               - "&c&l✘ Rental Failed!"
               - "&7You don't have enough money to rent this spawner."
-              - "&7Required: &6%location_price%$"
+              - "&7Required: &6%location-price%$"
               - ""
 
   # ===== INFO DISPLAY =====
@@ -169,7 +169,7 @@ items:
       name: "&e&l⏰ Selected Time"
       lore:
         - ""
-        - "&7Duration: &6%location_time% minutes"
+        - "&7Duration: &6%location-time% minutes"
         - ""
         - "&7Use the &a+ &7and &c- &7buttons"
         - "&7to adjust the rental time."
@@ -183,9 +183,9 @@ items:
       name: "&6&l💰 Price Information"
       lore:
         - ""
-        - "&7Price per minute: &6%location_price%$"
-        - "&7Selected time: &e%location_time% minutes"
+        - "&7Price per minute: &6%location-price%$"
+        - "&7Selected time: &e%location-time% minutes"
         - ""
-        - "&7Total cost: &6&l%location_price_total%$"
+        - "&7Total cost: &6&l%location-price-total%$"
         - ""
         - "&8&oAdjust time to see price changes"

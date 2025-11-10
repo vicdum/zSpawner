@@ -48,8 +48,8 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
         BigDecimal locationPrice = BigDecimal.valueOf(locationTime * spawner.getOption().getLocationPrice());
 
         BigDecimal balance = this.currencies.getBalance(player, this.economyName == null ? "default" : this.economyName);
-        placeholders.register("location_price", locationPrice.toString());
-        placeholders.register("location_time", String.valueOf(locationTime));
+        placeholders.register("location-price", locationPrice.toString());
+        placeholders.register("location-time", String.valueOf(locationTime));
         if (balance.compareTo(locationPrice) >= 0) {
             currencies.withdraw(player, locationPrice, this.economyName == null ? "default" : this.economyName, "Location of"+spawner.getSpawnerId()+" for "+locationTime+" seconds");
             Requirement first = this.getClickRequirements().getFirst();
@@ -99,11 +99,11 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
 
     private Placeholders getPlaceholders(PlayerSpawner playerSpawner, Spawner spawner) {
         Placeholders placeholders = new Placeholders();
-        placeholders.register("location_time", String.valueOf(playerSpawner.getLocationTime()));
-        placeholders.register("location_price", String.valueOf(spawner.getOption().getLocationPrice()));
-        placeholders.register("min_location_time", String.valueOf(spawner.getOption().getMinLocationTime()));
-        placeholders.register("max_location_time", String.valueOf(spawner.getOption().getMaxLocationTime()));
-        placeholders.register("location_price_total", String.valueOf(playerSpawner.getLocationTime() * spawner.getOption().getLocationPrice()));
+        placeholders.register("location-time", String.valueOf(playerSpawner.getLocationTime()));
+        placeholders.register("location-price", String.valueOf(spawner.getOption().getLocationPrice()));
+        placeholders.register("min-location-time", String.valueOf(spawner.getOption().getMinLocationTime()));
+        placeholders.register("max-location-time", String.valueOf(spawner.getOption().getMaxLocationTime()));
+        placeholders.register("location-price-total", String.valueOf(playerSpawner.getLocationTime() * spawner.getOption().getLocationPrice()));
         return placeholders;
     }
 }
