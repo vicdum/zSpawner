@@ -46,6 +46,7 @@ import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -56,6 +57,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -344,14 +346,36 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
     @Override
     public void run() {
         Collection<Spawner> spawners = this.serverProfile.getSpawners(SpawnerType.VIRTUAL);
+        if (spawners.isEmpty()) {
+            return;
+        }
+
+        Map<World, List<Location>> playerLocationsByWorld = new HashMap<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Location location = player.getLocation();
+            World world = location.getWorld();
+            if (world == null) continue;
+            playerLocationsByWorld.computeIfAbsent(world, ignored -> new ArrayList<>()).add(location);
+        }
+
         for (Spawner spawner : spawners) {
             if (!spawner.isChunkLoaded()) continue;
             Location location = spawner.getLocation();
-            if (location == null || location.getWorld() == null) continue;
+            World world = location == null ? null : location.getWorld();
+            if (world == null) continue;
 
-            double distance = spawner.getDistance();
-            int playerCount = location.getWorld().getNearbyEntities(location, distance, distance, distance, entity -> entity instanceof Player).size();
-            if (playerCount > 0) spawner.tick();
+            List<Location> playerLocations = playerLocationsByWorld.get(world);
+            if (playerLocations != null && !playerLocations.isEmpty()) {
+                double maxDistanceSquared = spawner.getDistance() * spawner.getDistance();
+                for (Location playerLocation : playerLocations) {
+                    if (playerLocation.distanceSquared(location) <= maxDistanceSquared) {
+                        spawner.tick();
+                        break;
+                    }
+                }
+            }
+
             if (spawner.getOption().enableAutoKill()) spawner.autoKill();
         }
     }
