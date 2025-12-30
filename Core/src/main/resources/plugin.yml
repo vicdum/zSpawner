@@ -1,0 +1,16 @@
+name: zSpawner
+author: Maxlego08
+main: fr.maxlego08.spawner.SpawnerPlugin
+website: https://groupez.dev
+description: Spawner plugin
+version: 4.2.0
+api-version: 1.13
+folia-supported: true
+depend:
+  - zMenu
+softdepend:
+  - zShop
+  - zEssentials
+  - SuperiorSkyblock2
+libraries:
+  - org.mariadb.jdbc:mariadb-java-client:3.5.6

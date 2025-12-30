@@ -1,0 +1,32 @@
+package fr.maxlego08.spawner.migrations;
+
+import fr.maxlego08.sarah.SchemaBuilder;
+import fr.maxlego08.sarah.database.Migration;
+import fr.maxlego08.spawner.zcore.enums.Tables;
+
+public class OptionMigration extends Migration {
+    @Override
+    public void up() {
+        String optionsTableName = Tables.OPTIONS.getTableName();
+        this.createOrAlter(optionsTableName, table -> {
+            table.uuid("spawner_id").primary();
+            table.decimal("distance");
+            table.decimal("experience_multiplier");
+            table.decimal("loot_multiplier");
+            table.bool("auto_kill");
+            table.bool("auto_sell");
+            table.integer("max_entity");
+            table.integer("min_delay");
+            table.integer("max_delay");
+            table.integer("min_spawn");
+            table.integer("max_spawn");
+            table.integer("mob_per_minute");
+            table.bool("drop_loots").defaultValue(false);
+            table.integer("remaining").defaultValue(0);
+        });
+        SchemaBuilder.alter(this, optionsTableName, table -> table.bool("location_enabled").defaultValue(false));
+        SchemaBuilder.alter(this, optionsTableName, table -> table.bigInt("min_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, optionsTableName, table -> table.bigInt("max_location_time").defaultValue(0));
+        SchemaBuilder.alter(this, optionsTableName, table -> table.decimal("location_price").defaultValue(0));
+    }
+}

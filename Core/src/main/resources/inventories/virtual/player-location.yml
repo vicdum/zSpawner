@@ -1,0 +1,191 @@
+name: "&8⛏ &6Spawner Location Rental &8⛏"
+size: 54
+items:
+  # ===== DECORATION =====
+  border:
+    slots:
+      - 0-8
+      - 9
+      - 17
+      - 18
+      - 26
+      - 27
+      - 35
+      - 36
+      - 44
+      - 45-53
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+
+  info_item:
+    type: zspawner_info
+    slot: 4
+    item:
+      material: SPAWNER
+      name: "&e&l⚡ Spawner Information"
+      lore:
+        - ""
+        - "&7Owner: &e%spawner-owner%"
+        - "&7Entity: &e%entity-type%"
+        - ""
+        - "&8&o[!] This spawner is available for rent"
+
+  # ===== TIME CONTROLS =====
+  remove_time_10:
+    slot: 19
+    item:
+      material: RED_CONCRETE
+      name: "&c&l⬇ Remove 10 Minutes"
+      lore:
+        - ""
+        - "&7Click to decrease rental time"
+        - "&7by &c10 minutes&7."
+        - ""
+        - "&8► Fast decrease"
+    actions:
+      - type: zspawner_player_location_price
+        amount: -10
+
+  remove_time_5:
+    slot: 28
+    item:
+      material: ORANGE_CONCRETE
+      name: "&6&l⬇ Remove 5 Minutes"
+      lore:
+        - ""
+        - "&7Click to decrease rental time"
+        - "&7by &65 minutes&7."
+        - ""
+    actions:
+      - type: zspawner_player_location_price
+        amount: -5
+
+  remove_time:
+    slot: 37
+    item:
+      material: YELLOW_CONCRETE
+      name: "&e&l⬇ Remove 1 Minute"
+      lore:
+        - ""
+        - "&7Click to decrease rental time"
+        - "&7by &e1 minute&7."
+        - ""
+    actions:
+      - type: zspawner_player_location_price
+        amount: -1
+
+  add_time:
+    slot: 43
+    item:
+      material: LIME_CONCRETE
+      name: "&a&l⬆ Add 1 Minute"
+      lore:
+        - ""
+        - "&7Click to increase rental time"
+        - "&7by &a1 minute&7."
+        - ""
+    actions:
+      - type: zspawner_player_location_price
+        amount: 1
+
+  add_time_5:
+    slot: 34
+    item:
+      material: GREEN_CONCRETE
+      name: "&2&l⬆ Add 5 Minutes"
+      lore:
+        - ""
+        - "&7Click to increase rental time"
+        - "&7by &a5 minutes&7."
+        - ""
+    actions:
+      - type: zspawner_player_location_price
+        amount: 5
+
+  add_time_10:
+    slot: 25
+    item:
+      material: GREEN_TERRACOTTA
+      name: "&2&l⬆ Add 10 Minutes"
+      lore:
+        - ""
+        - "&7Click to increase rental time"
+        - "&7by &a10 minutes&7."
+        - ""
+        - "&8► Fast increase"
+    actions:
+      - type: zspawner_player_location_price
+        amount: 10
+
+  # ===== PURCHASE BUTTON =====
+  player_purchase:
+    slot: 31
+    type: zspawner_player_purchase_location
+    item:
+      material: EMERALD
+      name: "&a&l✔ Confirm Rental"
+      lore:
+        - ""
+        - "&7Click to rent this spawner"
+        - "&7for &6%location-time% minutes&7."
+        - ""
+        - "&8▸ &7Price per minute: &6%location-price%$"
+        - "&8▸ &7Total price: &6%location-price-total%$"
+        - ""
+        - "&e&l⚠ Rental Limits:"
+        - "&7  • Minimum: &e%min-location-time% minutes"
+        - "&7  • Maximum: &e%max-location-time% minutes"
+        - ""
+        - "&a&l► Click to purchase!"
+        - ""
+    currencies: VAULT
+    #economy: xxx
+    click-requirement:
+      all:
+        success:
+          - type: message
+            messages:
+              - ""
+              - "&a&l✔ Rental Successful!"
+              - "&7You have rented this spawner for &6%location-time% minutes&7."
+              - "&7Only you can kill mobs and receive loot during this time."
+              - ""
+        deny:
+          - type: message
+            messages:
+              - ""
+              - "&c&l✘ Rental Failed!"
+              - "&7You don't have enough money to rent this spawner."
+              - "&7Required: &6%location-price%$"
+              - ""
+
+  # ===== INFO DISPLAY =====
+  current_time_display:
+    type: zspawner_location_price_display
+    slot: 22
+    item:
+      material: CLOCK
+      name: "&e&l⏰ Selected Time"
+      lore:
+        - ""
+        - "&7Duration: &6%location-time% minutes"
+        - ""
+        - "&7Use the &a+ &7and &c- &7buttons"
+        - "&7to adjust the rental time."
+        - ""
+
+  price_info:
+    type: zspawner_location_price_display
+    slot: 40
+    item:
+      material: GOLD_INGOT
+      name: "&6&l💰 Price Information"
+      lore:
+        - ""
+        - "&7Price per minute: &6%location-price%$"
+        - "&7Selected time: &e%location-time% minutes"
+        - ""
+        - "&7Total cost: &6&l%location-price-total%$"
+        - ""
+        - "&8&oAdjust time to see price changes"

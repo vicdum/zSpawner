@@ -1,0 +1,135 @@
+name: "&8📜 &6Location History &8📜"
+size: 54
+
+items:
+  # ===== DECORATION =====
+  border:
+    slots:
+      - 0-8
+      - 9
+      - 17
+      - 18
+      - 26
+      - 27
+      - 35
+      - 36
+      - 44
+      - 45-53
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+
+  header_left:
+    slot: 1
+    item:
+      material: YELLOW_STAINED_GLASS_PANE
+      name: "&e&l⏰ Rental History"
+
+  header_center:
+    type: zspawner_info
+    slot: 4
+    item:
+      material: BOOK
+      name: "&6&l📜 Location History"
+      lore:
+        - ""
+        - "&7View all past rental records"
+        - "&7for this spawner."
+        - ""
+        - "&7Owner: &e%spawner-owner%"
+        - ""
+        - "&8▸ &7Total Rentals: &e%location-total-rentals%"
+        - "&8▸ &7Total Revenue: &a$%location-total-earned%"
+        - "&8▸ &7Avg. Price: &d$%location-average-earned%"
+        - ""
+
+  header_right:
+    slot: 7
+    item:
+      material: ORANGE_STAINED_GLASS_PANE
+      name: "&6&l💰 Payment Records"
+
+  locations:
+    type: zspawner_location_history
+    slots:
+      - 10-16
+      - 19-25
+      - 28-34
+      - 37-43
+    item:
+      material: PLAYER_HEAD
+      name: "&e&l👤 %location_user%"
+      lore:
+        - ""
+        - "&8▸ &7Start Date: &b%location-date%"
+        - "&8▸ &7End Date: &b%location-end-date%"
+        - "&8▸ &7Duration: &d%location-duration%"
+        - "&8▸ &7Price Paid: &a$%location-price%"
+        - ""
+        - "&7Status: %location_status%"
+        - ""
+    else:
+      item:
+        material: BARRIER
+        name: "&c&l✘ No History"
+        lore:
+          - ""
+          - "&7This spawner has no"
+          - "&7rental history yet."
+          - ""
+          - "&8&oRentals will appear here"
+
+  # BACK BUTTON
+  back_button:
+    slot: 45
+    item:
+      material: RED_WOOL
+      name: "&c&l⬅ Back to Manage Location"
+      lore:
+        - ""
+        - "&7Click to return to the"
+        - "&7manage location menu."
+        - ""
+    actions:
+      - type: inventory
+        inventory: manage-location
+        plugin: zspawner
+
+  # ===== INFO PANEL =====
+  stats_panel:
+    type: zspawner_info
+    slot: 49
+    item:
+      material: EMERALD
+      name: "&a&l📊 Statistics"
+      lore:
+        - ""
+        - "&7Total Rentals: &e%location-total-rentals%"
+        - "&7Total Revenue: &a$%location-total-earned%"
+        - ""
+        - "&8&oAll-time rental statistics"
+
+  # ===== NAVIGATION =====
+  previous_page:
+    type: PREVIOUS
+    slot: 48
+    item:
+      material: ARROW
+      name: "&c&l◀ Previous Page"
+      lore:
+        - ""
+        - "&7Click to view previous"
+        - "&7rental records."
+        - ""
+
+  next_page:
+    type: PREVIOUS
+    slot: 50
+    item:
+      material: ARROW
+      name: "&a&l▶ Next Page"
+      lore:
+        - ""
+        - "&7Click to view next"
+        - "&7rental records."
+        - ""

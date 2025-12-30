@@ -1,0 +1,284 @@
+name: "&8⚙ &6Manage Spawner Location &8⚙"
+size: 54
+
+items:
+  # ===== DECORATION =====
+  border:
+    slots:
+      - 0-8
+      - 9
+      - 17
+      - 18
+      - 26
+      - 27
+      - 35
+      - 36
+      - 44
+      - 45-53
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+
+  info_panel:
+    slot: 4
+    item:
+      material: SPAWNER
+      name: "&e&l⚡ Spawner Configuration"
+      lore:
+        - ""
+        - "&7Configure rental settings"
+        - "&7for this spawner."
+        - ""
+        - "&c[!] Owner controls"
+
+  # ===== MINIMUM TIME SECTION =====
+  min_time_info:
+    type: zspawner_info
+    slot: 10
+    item:
+      material: LIGHT_BLUE_STAINED_GLASS_PANE
+      name: "&b&l⏰ Minimum Rental Time"
+      lore:
+        - ""
+        - "&7Current: &b%min-location-time% minutes"
+        - ""
+        - "&7The minimum time a player"
+        - "&7can rent this spawner."
+        - ""
+
+  remove_min_location_time:
+    type: zspawner_info
+    slot: 19
+    item:
+      material: RED_CONCRETE
+      name: "&c&l⬇ Decrease Minimum"
+      lore:
+        - ""
+        - "&7Click to decrease by &c5 minutes"
+        - ""
+        - "&7Current: &b%min-location-time% minutes"
+        - ""
+    actions:
+      - type: zspawner_min_location_time
+        amount: -5
+
+  add_min_location_time:
+    type: zspawner_info
+    slot: 1
+    item:
+      material: LIME_CONCRETE
+      name: "&a&l⬆ Increase Minimum"
+      lore:
+        - ""
+        - "&7Click to increase by &a5 minutes"
+        - ""
+        - "&7Current: &b%min-location-time% minutes"
+        - ""
+    actions:
+      - type: zspawner_min_location_time
+        amount: 5
+
+  # ===== CENTER TOGGLE =====
+  toggle_location_enabled:
+    type: zspawner_toggle_location
+    slot: 22
+    item:
+      material: LEVER
+      name: "&e&l⚡ Location System"
+      lore:
+        - ""
+        - "&7Enable or disable the rental"
+        - "&7system for this spawner."
+        - ""
+        - "&7Status: %state%"
+        - ""
+        - "&e► Click to toggle"
+        - ""
+    enable: "&a&l✔ ENABLED"
+    disable: "&c&l✘ DISABLED"
+
+  location_time_information:
+    type: zspawner_info
+    slot: 13
+    item:
+      material: BOOK
+      name: "&e&l📋 Rental Information"
+      lore:
+        - ""
+        - "&7System Status: %location-enabled%"
+        - ""
+        - "&b▸ &7Min Time: &b%min-location-time% minutes"
+        - "&b▸ &7Max Time: &b%max-location-time% minutes"
+        - "&6▸ &7Price Rate: &6$%location-price%/min"
+        - ""
+        - "&8&oUse buttons to adjust settings"
+
+  # ===== MAXIMUM TIME SECTION =====
+  max_time_info:
+    type: zspawner_info
+    slot: 16
+    item:
+      material: CYAN_STAINED_GLASS_PANE
+      name: "&3&l⏰ Maximum Rental Time"
+      lore:
+        - ""
+        - "&7Current: &3%max-location-time% minutes"
+        - ""
+        - "&7The maximum time a player"
+        - "&7can rent this spawner."
+        - ""
+
+  remove_max_location_time:
+    type: zspawner_info
+    slot: 25
+    item:
+      material: RED_CONCRETE
+      name: "&c&l⬇ Decrease Maximum"
+      lore:
+        - ""
+        - "&7Click to decrease by &c5 minutes"
+        - ""
+        - "&7Current: &3%max-location-time% minutes"
+        - ""
+    actions:
+      - type: zspawner_max_location_time
+        amount: -5
+
+  add_max_location_time:
+    type: zspawner_info
+    slot: 7
+    item:
+      material: LIME_CONCRETE
+      name: "&a&l⬆ Increase Maximum"
+      lore:
+        - ""
+        - "&7Click to increase by &a5 minutes"
+        - ""
+        - "&7Current: &3%max-location-time% minutes"
+        - ""
+    actions:
+      - type: zspawner_max_location_time
+        amount: 5
+
+  # ===== PRICE SECTION =====
+  price_display:
+    type: zspawner_info
+    slot: 40
+    item:
+      material: GOLD_INGOT
+      name: "&6&l💰 Rental Price"
+      lore:
+        - ""
+        - "&7Current Rate: &6$%location-price%/min"
+        - ""
+        - "&7This is how much players pay"
+        - "&7per minute to rent this spawner."
+        - ""
+        - "&8&oUse +/- buttons to adjust"
+
+  remove_location_price:
+    type: zspawner_info
+    slot: 37
+    item:
+      material: ORANGE_CONCRETE
+      name: "&6&l⬇ Decrease Price"
+      lore:
+        - ""
+        - "&7Click to decrease by &6$100"
+        - ""
+        - "&7Current: &6$%location-price%/min"
+        - ""
+    actions:
+      - type: zspawner_location_price
+        amount: -100
+
+  remove_location_price_10:
+    type: zspawner_info
+    slot: 28
+    item:
+      material: RED_CONCRETE
+      name: "&c&l⬇⬇ Decrease Price (Fast)"
+      lore:
+        - ""
+        - "&7Click to decrease by &c$1000"
+        - ""
+        - "&7Current: &6$%location-price%/min"
+        - ""
+        - "&8► Fast decrease"
+    actions:
+      - type: zspawner_location_price
+        amount: -1000
+
+  add_location_price:
+    type: zspawner_info
+    slot: 43
+    item:
+      material: LIME_CONCRETE
+      name: "&a&l⬆ Increase Price"
+      lore:
+        - ""
+        - "&7Click to increase by &a$100"
+        - ""
+        - "&7Current: &6$%location-price%/min"
+        - ""
+    actions:
+      - type: zspawner_location_price
+        amount: 100
+
+  add_location_price_10:
+    type: zspawner_info
+    slot: 34
+    item:
+      material: GREEN_CONCRETE
+      name: "&2&l⬆⬆ Increase Price (Fast)"
+      lore:
+        - ""
+        - "&7Click to increase by &a$1000"
+        - ""
+        - "&7Current: &6$%location-price%/min"
+        - ""
+        - "&8► Fast increase"
+    actions:
+      - type: zspawner_location_price
+        amount: 1000
+
+  # ===== HELP PANEL =====
+  help_info:
+    slot: 49
+    item:
+      material: EMERALD
+      name: "&a&l❓ Help & Tips"
+      lore:
+        - ""
+        - "&7&l► Minimum Time:"
+        - "&7  Sets the shortest rental duration"
+        - ""
+        - "&7&l► Maximum Time:"
+        - "&7  Sets the longest rental duration"
+        - ""
+        - "&7&l► Price Rate:"
+        - "&7  Cost per minute for players"
+        - ""
+        - "&e&oAdjust these to control rentals!"
+
+  # ===== VIEW HISTORY BUTTON =====
+  view_location_history:
+    type: zspawner_info
+    slot: 50
+    item:
+      material: WRITABLE_BOOK
+      name: "&e&l📜 View Rental History"
+      lore:
+        - ""
+        - "&7Click to view all past"
+        - "&7rental records for this spawner."
+        - ""
+        - "&8▸ &7Total Rentals: &e%location-total-rentals%"
+        - "&8▸ &7Total Revenue: &e%location-total-earned%&a$"
+        - ""
+        - "&e► Click to open"
+        - ""
+    actions:
+      - type: inventory
+        inventory: location-history
+        plugin: zspawner
