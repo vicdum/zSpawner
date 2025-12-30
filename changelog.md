@@ -1,5 +1,11 @@
 # Unreleased
 
+# 4.2.0
+
+- Various code optimization and improvement
+- Fix database implementation
+- Improves inventories
+
 # 4.1.1
 
 - Added SuperiorSkyBlock tracker support.
