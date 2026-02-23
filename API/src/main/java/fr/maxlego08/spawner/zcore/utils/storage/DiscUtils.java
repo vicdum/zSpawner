@@ -1,6 +1,6 @@
 package fr.maxlego08.spawner.zcore.utils.storage;
 
-import fr.maxlego08.menu.api.configuration.Config;
+import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 
 import java.io.*;
@@ -11,114 +11,112 @@ import java.nio.charset.StandardCharsets;
 
 public class DiscUtils {
 
-	// -------------------------------------------- //
-	// CONSTANTS
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // CONSTANTS
+    // -------------------------------------------- //
 
-	private final static String UTF8 = "UTF-8";
+    private final static String UTF8 = "UTF-8";
 
-	// -------------------------------------------- //
-	// BYTE
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // BYTE
+    // -------------------------------------------- //
 
-	public static byte[] readBytes(File file) throws IOException {
-		int length = (int) file.length();
-		byte[] output = new byte[length];
-		InputStream in = new FileInputStream(file);
-		int offset = 0;
-		while (offset < length) {
-			offset += in.read(output, offset, (length - offset));
-		}
-		in.close();
-		return output;
-	}
+    public static byte[] readBytes(File file) throws IOException {
+        int length = (int) file.length();
+        byte[] output = new byte[length];
+        InputStream in = new FileInputStream(file);
+        int offset = 0;
+        while (offset < length) {
+            offset += in.read(output, offset, (length - offset));
+        }
+        in.close();
+        return output;
+    }
 
-	public static void writeBytes(File file, byte[] bytes) throws IOException {
-		FileOutputStream out = new FileOutputStream(file);
-		out.write(bytes);
-		out.close();
-	}
+    public static void writeBytes(File file, byte[] bytes) throws IOException {
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(bytes);
+        out.close();
+    }
 
-	// -------------------------------------------- //
-	// STRING
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // STRING
+    // -------------------------------------------- //
 
-	public static void write(File file, String content) throws IOException {
-		writeBytes(file, utf8(content));
-	}
+    public static void write(File file, String content) throws IOException {
+        writeBytes(file, utf8(content));
+    }
 
-	public static String read(File file) throws IOException {
-		return utf8(readBytes(file));
-	}
+    public static String read(File file) throws IOException {
+        return utf8(readBytes(file));
+    }
 
-	// -------------------------------------------- //
-	// CATCH
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // CATCH
+    // -------------------------------------------- //
 
-	public static boolean writeCatch(File file, String content) {
-		try {
-			write(file, content);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    public static boolean writeCatch(File file, String content) {
+        try {
+            write(file, content);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	public static String readCatch(File file) {
-		try {
-			return read(file);
-		} catch (IOException e) {
-			return null;
-		}
-	}
+    public static String readCatch(File file) {
+        try {
+            return read(file);
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
-	// -------------------------------------------- //
-	// DOWNLOAD
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // DOWNLOAD
+    // -------------------------------------------- //
 
-	public static boolean downloadUrl(String urlstring, File file) {
-		try {
-			URL url = new URL(urlstring);
-			ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-			@SuppressWarnings("resource")
-			FileOutputStream fos = new FileOutputStream(file);
-			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
-			return true;
-		} catch (Exception e) {
-            Logger.showException(Config.enableDebug, "cannot download url",e);
-			return false;
-		}
-	}
+    public static boolean downloadUrl(String urlstring, File file) {
+        try {
+            URL url = new URL(urlstring);
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+            @SuppressWarnings("resource") FileOutputStream fos = new FileOutputStream(file);
+            fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+            return true;
+        } catch (Exception e) {
+            Logger.showException(Configuration.enableDebug, "cannot download url", e);
+            return false;
+        }
+    }
 
-	public static boolean downloadUrl(String urlstring, String filename) {
-		return downloadUrl(urlstring, new File(filename));
-	}
+    public static boolean downloadUrl(String urlstring, String filename) {
+        return downloadUrl(urlstring, new File(filename));
+    }
 
-	// -------------------------------------------- //
-	// FILE DELETION
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // FILE DELETION
+    // -------------------------------------------- //
 
-	public static boolean deleteRecursive(File path) throws FileNotFoundException {
-		if (!path.exists())
-			throw new FileNotFoundException(path.getAbsolutePath());
-		boolean ret = true;
-		if (path.isDirectory()) {
-			for (File f : path.listFiles()) {
-				ret = ret && deleteRecursive(f);
-			}
-		}
-		return ret && path.delete();
-	}
+    public static boolean deleteRecursive(File path) throws FileNotFoundException {
+        if (!path.exists()) throw new FileNotFoundException(path.getAbsolutePath());
+        boolean ret = true;
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
+                ret = ret && deleteRecursive(f);
+            }
+        }
+        return ret && path.delete();
+    }
 
-	// -------------------------------------------- //
-	// UTF8 ENCODE AND DECODE
-	// -------------------------------------------- //
+    // -------------------------------------------- //
+    // UTF8 ENCODE AND DECODE
+    // -------------------------------------------- //
 
-	public static byte[] utf8(String string) {
+    public static byte[] utf8(String string) {
         return string.getBytes(StandardCharsets.UTF_8);
     }
 
-	public static String utf8(byte[] bytes) {
+    public static String utf8(byte[] bytes) {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

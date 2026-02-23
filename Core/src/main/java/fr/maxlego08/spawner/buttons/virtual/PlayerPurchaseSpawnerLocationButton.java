@@ -14,6 +14,7 @@ import fr.maxlego08.spawner.api.storage.StorageManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -84,7 +85,7 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
     }
 
     @Override
-    public ItemStack getCustomItemStack(Player player) {
+    public ItemStack getCustomItemStack(Player player, boolean useCache, @NonNull Placeholders placeholders) {
         var playerSpawners = this.plugin.getManager().getPlayerSpawners();
         UUID playerUniqueId = player.getUniqueId();
         PlayerSpawner playerSpawner = playerSpawners.get(playerUniqueId);
@@ -93,7 +94,7 @@ public class PlayerPurchaseSpawnerLocationButton extends Button {
             playerSpawner = playerSpawners.get(playerUniqueId);
         }
         Spawner spawner = playerSpawner == null ? null : playerSpawner.getVirtualSpawner();
-        if (spawner == null) return super.getCustomItemStack(player);
+        if (spawner == null) return super.getCustomItemStack(player, useCache, placeholders);
         return getItemStack().build(player, false, getPlaceholders(playerSpawner, spawner));
     }
 

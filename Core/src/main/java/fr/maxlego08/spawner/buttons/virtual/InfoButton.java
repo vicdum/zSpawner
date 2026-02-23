@@ -9,6 +9,7 @@ import fr.maxlego08.spawner.api.utils.PlayerSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NonNull;
 
 public class InfoButton extends Button {
 
@@ -19,9 +20,7 @@ public class InfoButton extends Button {
     }
 
     @Override
-    public ItemStack getCustomItemStack(Player player) {
-
-        Placeholders placeholders = new Placeholders();
+    public ItemStack getCustomItemStack(Player player, boolean useCache, @NonNull Placeholders placeholders) {
 
         SpawnerManager manager = this.plugin.getManager();
         PlayerSpawner playerSpawner = manager.getPlayerSpawners().get(player.getUniqueId());

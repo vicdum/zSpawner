@@ -1,12 +1,6 @@
 package fr.maxlego08.spawner.storage;
 
-import fr.maxlego08.sarah.DatabaseConfiguration;
-import fr.maxlego08.sarah.DatabaseConnection;
-import fr.maxlego08.sarah.HikariDatabaseConnection;
-import fr.maxlego08.sarah.MigrationManager;
-import fr.maxlego08.sarah.RequestHelper;
-import fr.maxlego08.sarah.SchemaBuilder;
-import fr.maxlego08.sarah.SqliteConnection;
+import fr.maxlego08.sarah.*;
 import fr.maxlego08.sarah.database.DatabaseType;
 import fr.maxlego08.sarah.database.Schema;
 import fr.maxlego08.sarah.logger.JULogger;
@@ -72,13 +66,15 @@ public class StorageManagerImp extends ZUtils implements StorageManager {
         boolean enableDebug = globalDatabaseConfiguration.isDebug();
 
         String storageType = config.getString("storage-type", "SQLITE");
+        Logger logger = JULogger.from(this.plugin.getLogger());
+
         DatabaseConnection databaseConnection;
         if (storageType.equalsIgnoreCase("SQLITE")) {
-            databaseConnection = new SqliteConnection(new DatabaseConfiguration(prefix, user, password, port, host, dataBase, enableDebug, DatabaseType.SQLITE), this.plugin.getDataFolder());
+            databaseConnection = new SqliteConnection(new DatabaseConfiguration(prefix, user, password, port, host, dataBase, enableDebug, DatabaseType.SQLITE), this.plugin.getDataFolder(), logger);
         } else {
-            databaseConnection = new HikariDatabaseConnection(new DatabaseConfiguration(prefix, user, password, port, host, dataBase, enableDebug, storageType.equalsIgnoreCase("MYSQL") ? DatabaseType.MYSQL : DatabaseType.MARIADB));
+            databaseConnection = new HikariDatabaseConnection(new DatabaseConfiguration(prefix, user, password, port, host, dataBase, enableDebug, storageType.equalsIgnoreCase("MYSQL") ? DatabaseType.MYSQL : DatabaseType.MARIADB), logger);
         }
-        Logger logger = JULogger.from(this.plugin.getLogger());
+
         this.requestHelper = new RequestHelper(databaseConnection, logger);
         if (!databaseConnection.isValid()) {
             fr.maxlego08.spawner.zcore.logger.Logger.info("The database connection could not be established, disabling zspawner...", fr.maxlego08.spawner.zcore.logger.Logger.LogType.ERROR);

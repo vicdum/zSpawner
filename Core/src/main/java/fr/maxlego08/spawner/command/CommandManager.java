@@ -1,6 +1,6 @@
 package fr.maxlego08.spawner.command;
 
-import fr.maxlego08.menu.api.configuration.Config;
+import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.logger.Logger;
@@ -290,7 +290,7 @@ public class CommandManager extends ZUtils implements CommandExecutor, TabComple
                 Logger.info("Unable to add the command " + vCommand.getSyntax());
             }
         } catch (Exception exception) {
-            Logger.showException(Config.enableDebug, "cannot get a new instance for "+vCommand.getSyntax(), exception);
+            Logger.showException(Configuration.enableDebug, "cannot get a new instance for "+vCommand.getSyntax(), exception);
         }
     }
 

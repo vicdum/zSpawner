@@ -1,14 +1,12 @@
 package fr.maxlego08.spawner.zcore.logger;
 
-import fr.maxlego08.menu.api.configuration.Config;
 import org.bukkit.Bukkit;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class Logger {
+public record Logger(String prefix) {
 
-    private final String prefix;
     private static Logger logger;
 
     public Logger(String prefix) {
@@ -28,30 +26,9 @@ public class Logger {
         getLogger().log(message, LogType.INFO);
     }
 
-    public static void showException(boolean enableDebug, String errorName,Throwable throwable) {
+    public static void showException(boolean enableDebug, String errorName, Throwable throwable) {
         if (enableDebug) {
-            getLogger().printException(errorName,throwable);
-        }
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public enum LogType {
-        ERROR("§c"),
-        INFO("§7"),
-        WARNING("§6"),
-        SUCCESS("§2");
-
-        private final String color;
-
-        LogType(String color) {
-            this.color = color;
-        }
-
-        public String getColor() {
-            return color;
+            getLogger().printException(errorName, throwable);
         }
     }
 
@@ -78,19 +55,33 @@ public class Logger {
     }
 
     public void printException(String errorName, Throwable throwable) {
-        this.log("An error occurred while "+errorName+".",LogType.ERROR);
-        this.log("Exception error message: "+throwable.getMessage(),LogType.ERROR);
-        this.log("Please check the stack trace below for more details. If you don't understand the issue report it to the developer.",LogType.ERROR);
-        this.log("------------------- Stack Trace ------------------",LogType.ERROR);
+        this.log("An error occurred while " + errorName + ".", LogType.ERROR);
+        this.log("Exception error message: " + throwable.getMessage(), LogType.ERROR);
+        this.log("Please check the stack trace below for more details. If you don't understand the issue report it to the developer.", LogType.ERROR);
+        this.log("------------------- Stack Trace ------------------", LogType.ERROR);
         StringWriter sw = new StringWriter();
         try (PrintWriter pw = new PrintWriter(sw)) {
             throwable.printStackTrace(pw);
         }
         log(sw.toString(), LogType.ERROR);
-        this.log("--------------------------------------------------",LogType.ERROR);
+        this.log("--------------------------------------------------", LogType.ERROR);
     }
 
     public String getColoredMessage(String message) {
         return message.replace("<&>", "§");
+    }
+
+    public enum LogType {
+        ERROR("§c"), INFO("§7"), WARNING("§6"), SUCCESS("§2");
+
+        private final String color;
+
+        LogType(String color) {
+            this.color = color;
+        }
+
+        public String getColor() {
+            return color;
+        }
     }
 }
