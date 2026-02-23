@@ -1,6 +1,5 @@
 package fr.maxlego08.spawner.save;
 
-import fr.maxlego08.menu.api.configuration.Config;
 import fr.maxlego08.spawner.SpawnerPlugin;
 import fr.maxlego08.spawner.zcore.enums.Message;
 import fr.maxlego08.spawner.zcore.enums.MessageType;
@@ -49,7 +48,7 @@ public class MessageLoader extends YamlUtils implements Savable {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                Logger.showException(Config.enableDebug, "cannot create messages.yml",e);
+                Logger.showException(Config.enableDebug, "cannot create messages.yml", e);
             }
         }
 
@@ -85,7 +84,7 @@ public class MessageLoader extends YamlUtils implements Savable {
         try {
             configuration.save(file);
         } catch (IOException e) {
-            Logger.showException(Config.enableDebug, "cannot save messages.yml",e);
+            Logger.showException(Config.enableDebug, "cannot save messages.yml", e);
         }
 
     }

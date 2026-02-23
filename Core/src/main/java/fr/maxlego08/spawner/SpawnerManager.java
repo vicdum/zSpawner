@@ -3,17 +3,12 @@ package fr.maxlego08.spawner;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.MenuItemStack;
-import fr.maxlego08.menu.api.configuration.Config;
+import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.menu.api.exceptions.InventoryException;
 import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.Placeholders;
 import fr.maxlego08.menu.api.utils.TypedMapAccessor;
-import fr.maxlego08.spawner.api.ShopAction;
-import fr.maxlego08.spawner.api.Spawner;
-import fr.maxlego08.spawner.api.SpawnerItem;
-import fr.maxlego08.spawner.api.SpawnerLocationHistory;
-import fr.maxlego08.spawner.api.SpawnerOption;
-import fr.maxlego08.spawner.api.SpawnerType;
+import fr.maxlego08.spawner.api.*;
 import fr.maxlego08.spawner.api.enums.Sort;
 import fr.maxlego08.spawner.api.storage.ServerDataManager;
 import fr.maxlego08.spawner.api.storage.ServerProfile;
@@ -22,21 +17,10 @@ import fr.maxlego08.spawner.api.utils.SpawnerResult;
 import fr.maxlego08.spawner.buttons.ShowButton;
 import fr.maxlego08.spawner.buttons.gui.SortButton;
 import fr.maxlego08.spawner.buttons.gui.SpawnersButton;
-import fr.maxlego08.spawner.buttons.virtual.InfoButton;
-import fr.maxlego08.spawner.buttons.virtual.ItemsButton;
-import fr.maxlego08.spawner.buttons.virtual.LocationHistoryButton;
-import fr.maxlego08.spawner.buttons.virtual.LocationPriceDisplayButton;
-import fr.maxlego08.spawner.buttons.virtual.RemoveButton;
-import fr.maxlego08.spawner.buttons.virtual.ShopButton;
+import fr.maxlego08.spawner.buttons.virtual.*;
 import fr.maxlego08.spawner.drop.CustomVirtualDrop;
 import fr.maxlego08.spawner.drop.VirtualDrop;
-import fr.maxlego08.spawner.loader.LocationPriceActionLoader;
-import fr.maxlego08.spawner.loader.MaxLocationTimeActionLoader;
-import fr.maxlego08.spawner.loader.MinLocationTimeActionLoader;
-import fr.maxlego08.spawner.loader.PlayerLocationPriceActionLoader;
-import fr.maxlego08.spawner.loader.PlayerPurchaseLocationButtonLoader;
-import fr.maxlego08.spawner.loader.ToggleDropLoader;
-import fr.maxlego08.spawner.loader.ToggleLocationLoader;
+import fr.maxlego08.spawner.loader.*;
 import fr.maxlego08.spawner.materials.SpawnerItemLoader;
 import fr.maxlego08.spawner.materials.SpawnerOptionItemLoader;
 import fr.maxlego08.spawner.zcore.enums.Message;
@@ -46,32 +30,20 @@ import fr.maxlego08.spawner.zcore.utils.compatibility.FoliaCompatibilityManager;
 import fr.maxlego08.spawner.zcore.utils.storage.Persist;
 import fr.maxlego08.spawner.zcore.utils.storage.Savable;
 import fr.maxlego08.spawner.zcore.utils.yaml.YamlUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SpawnerManager extends YamlUtils implements Savable, Runnable {
 
@@ -250,7 +222,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
                     MenuItemStack menuItemStack = this.plugin.getInventoryManager().loadItemStack(configuration, "items." + type + ".", file);
                     this.spawnerTypeItemStacks.put(spawnerType, menuItemStack);
                 } catch (Exception exception) {
-                    Logger.showException(Config.enableDebug, "invalid spawner type", exception);
+                    Logger.showException(Configuration.enableDebug, "invalid spawner type", exception);
                 }
             });
         }
@@ -312,7 +284,7 @@ public class SpawnerManager extends YamlUtils implements Savable, Runnable {
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/virtual/location-history.yml");
             inventoryManager.loadInventoryOrSaveResource(this.plugin, "inventories/show.yml");
         } catch (InventoryException exception) {
-            Logger.showException(Config.enableDebug, "loading inventories", exception);
+            Logger.showException(Configuration.enableDebug, "loading inventories", exception);
         }
     }
 

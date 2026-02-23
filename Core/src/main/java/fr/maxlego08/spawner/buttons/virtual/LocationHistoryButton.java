@@ -43,7 +43,7 @@ public class LocationHistoryButton extends PaginateButton {
         if (locationHistories.isEmpty()) {
             Button elseButton = this.getElseButton();
             if (elseButton != null) {
-                ItemStack customItemStack = elseButton.getCustomItemStack(player);
+                ItemStack customItemStack = elseButton.getCustomItemStack(player, false, new Placeholders());
                 inventory.addItem(this.getSlot(), customItemStack);
             }
             return;

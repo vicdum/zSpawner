@@ -56,7 +56,7 @@
         <dependency>
             <groupId>fr.maxlego08.spawner</groupId>
             <artifactId>API</artifactId>
-            <version>4.1.1</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>fr.maxlego08.sarah</groupId>
             <artifactId>sarah</artifactId>
-            <version>1.20</version>
+            <version>1.22</version>
         </dependency>
     </dependencies>
 </project>

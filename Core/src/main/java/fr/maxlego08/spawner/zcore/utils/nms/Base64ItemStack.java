@@ -1,7 +1,7 @@
 package fr.maxlego08.spawner.zcore.utils.nms;
 
 
-import fr.maxlego08.menu.api.configuration.Config;
+import fr.maxlego08.menu.api.configuration.Configuration;
 import fr.maxlego08.spawner.zcore.logger.Logger;
 import fr.maxlego08.spawner.zcore.utils.Base64;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +31,7 @@ public class Base64ItemStack {
             objectOutputStream.close();
             return Base64.encode(byteArrayOutputStream.toByteArray());
         } catch (IOException exception) {
-            Logger.showException(Config.enableDebug, "cannot encode item", exception);
+            Logger.showException(Configuration.enableDebug, "cannot encode item", exception);
             return null;
         }
     }
@@ -45,7 +45,7 @@ public class Base64ItemStack {
             objectInputStream.close();
             return item;
         } catch (IOException | ClassNotFoundException exception) {
-            Logger.showException(Config.enableDebug, "cannot decode item", exception);
+            Logger.showException(Configuration.enableDebug, "cannot decode item", exception);
             return null;
         }
     }
