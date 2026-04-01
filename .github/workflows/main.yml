@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plugin-jar
-          path: target/*.jar
+          path: Core/target/*.jar
           
   # Release işi aynı kalabilir...
   release:
